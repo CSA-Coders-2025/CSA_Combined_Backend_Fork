@@ -20,7 +20,7 @@ public class SeedRole {
 
     public boolean updateRole(String oldRoleName, String newRoleName) {
         for (PersonRole role : roles) {
-            if (role.getRoleName().equalsIgnoreCase(oldRoleName)) {
+            if (role.getName().equalsIgnoreCase(oldRoleName)) {
                 roles.remove(role);
                 roles.add(new PersonRole(newRoleName));
                 return true;
