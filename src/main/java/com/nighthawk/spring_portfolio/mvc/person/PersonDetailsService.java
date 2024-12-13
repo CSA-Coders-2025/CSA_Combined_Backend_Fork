@@ -44,6 +44,22 @@ public class PersonDetailsService implements UserDetailsService {
 
         if (person == null) {
             throw new UsernameNotFoundException("User not found with username: " + ghid); // Handle case where user is not found
+          
+public class PersonDetailsService implements UserDetailsService {  // "implements" ties ModelRepo to Spring Security
+    // Encapsulate many object into a single Bean (Person, Roles, and Scrum)
+    @Autowired  // Inject PersonJpaRepository
+    private PersonJpaRepository personJpaRepository;
+    @Autowired  // Inject RoleJpaRepository
+    private PersonRoleJpaRepository personRoleJpaRepository;
+    @Autowired // Inject PasswordEncoder
+    private PasswordEncoder passwordEncoder;
+
+    /* loadUserByUsername Overrides and maps Person & Roles POJO into Spring Security */
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Person person = personJpaRepository.findByEmail(email); // setting variable user equal to the method finding the username in the database
+        if(person==null) {
+			throw new UsernameNotFoundException("User not found with username: " + email);
         }
 
         // Convert the person's roles into Spring Security's SimpleGrantedAuthority objects
@@ -54,9 +70,17 @@ public class PersonDetailsService implements UserDetailsService {
 
         // Create a Spring Security User object with person info and roles
         return new User(person.getGhid(), person.getPassword(), authorities);
+        person.getRoles().forEach(role -> { //loop through roles
+            authorities.add(new SimpleGrantedAuthority(role.getName())); //create a SimpleGrantedAuthority by passed in role, adding it all to the authorities list, list of roles gets past in for spring security
+        });
+        // train spring security to User and Authorities
+        User user = new User(person.getEmail(), person.getPassword(), authorities);
+        return user;
+
     }
 
     /* Person-related CRUD operations */
+
 
     /**
      * Retrieves all Person entities sorted by name in ascending order.
@@ -99,6 +123,26 @@ public class PersonDetailsService implements UserDetailsService {
     public List<Person> listLikeNative(String term) {
         String likeTerm = String.format("%%%s%%", term); // Format term for LIKE query
         return personJpaRepository.findByLikeTermNative(likeTerm); // Execute the native query
+
+    public  List<Person>listAll() {
+        return personJpaRepository.findAllByOrderByNameAsc();
+    }
+
+    // custom query to find match to name or email
+    public  List<Person>list(String name, String email) {
+        return personJpaRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(name, email);
+    }
+
+    // custom query to find anything containing term in name or email ignoring case
+    public  List<Person>listLike(String term) {
+        return personJpaRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(term, term);
+    }
+
+    // custom query to find anything containing term in name or email ignoring case
+    public  List<Person>listLikeNative(String term) {
+        String like_term = String.format("%%%s%%",term);  // Like required % rappers
+        return personJpaRepository.findByLikeTermNative(like_term);
+
     }
 
     /**
@@ -121,6 +165,7 @@ public class PersonDetailsService implements UserDetailsService {
         return personJpaRepository.findById(id).orElse(null); // Return person if found, else null
     }
 
+
     /**
      * Retrieves a Person entity by its ghid (unique identifier).
      *
@@ -129,6 +174,10 @@ public class PersonDetailsService implements UserDetailsService {
      */
     public Person getByGhid(String ghid) {
         return personJpaRepository.findByGhid(ghid); // Fetch person by ghid
+
+    public Person getByEmail(String email) {
+        return (personJpaRepository.findByEmail(email));
+
     }
 
     /**
@@ -148,8 +197,12 @@ public class PersonDetailsService implements UserDetailsService {
      * @param roleName The default role to assign to users without roles.
      */
     public void defaults(String password, String roleName) {
+
         for (Person person : listAll()) {
             // Set default password if not already set
+
+        for (Person person: listAll()) {
+
             if (person.getPassword() == null || person.getPassword().isEmpty() || person.getPassword().isBlank()) {
                 person.setPassword(passwordEncoder.encode(password)); // Encode default password
             }
@@ -163,6 +216,7 @@ public class PersonDetailsService implements UserDetailsService {
         }
     }
 
+
     /**
      * Retrieves all roles available in the system.
      *
@@ -170,6 +224,7 @@ public class PersonDetailsService implements UserDetailsService {
      */
     public List<PersonRole> listAllRoles() {
         return personRoleJpaRepository.findAll(); // Fetch all roles from the database
+
     }
 
     /**
@@ -195,12 +250,6 @@ public class PersonDetailsService implements UserDetailsService {
             if (role != null) {
                 // Add the role to the person if not already assigned
                 boolean addRole = true;
-                for (PersonRole roleObj : person.getRoles()) {
-                    if (roleObj.getName().equals(roleName)) {
-                        addRole = false;
-                        break;
-                    }
-                }
                 if (addRole) {
                     person.getRoles().add(role); // Add the role if not present
                 }
@@ -218,3 +267,10 @@ public class PersonDetailsService implements UserDetailsService {
         return personJpaRepository.existsByGhid(ghid); // Check existence of person by ghid
     }
 }
+                if (addRole) person.getRoles().add(role);   // everything is valid for adding role
+            }
+        }
+    }
+    
+}
+

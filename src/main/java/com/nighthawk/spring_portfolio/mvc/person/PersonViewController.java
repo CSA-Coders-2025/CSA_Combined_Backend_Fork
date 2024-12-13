@@ -1,6 +1,5 @@
 package com.nighthawk.spring_portfolio.mvc.person;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +63,19 @@ public class PersonViewController {
      * @param person a blank Person object to bind form fields to
      * @return the view name for the creation form
      */
+
+    @GetMapping("/read")
+    public String person(Model model) {
+        List<Person> list = repository.listAll();
+        model.addAttribute("list", list);
+        return "person/read";
+    }
+
+    /*  The HTML template Forms and PersonForm attributes are bound
+        @return - template for person form
+        @param - Person Class
+    */
+
     @GetMapping("/create")
     public String personAdd(Person person) {
         return "person/create";  // Return the template for the create form
@@ -78,6 +90,7 @@ public class PersonViewController {
      * @return the view name for the creation form (with errors if any) or redirect to the read page if successful
      */
     @PostMapping("/create")
+
     public String personSave(@Valid Person person, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {  // If there are validation errors
             return "person/create";  // Return to the create form with errors
@@ -104,11 +117,24 @@ public class PersonViewController {
      * @param model the model to add attributes for the view
      * @return the view name for the update form
      */
+
+    public String personSave(@Valid Person person, BindingResult bindingResult) {
+        // Validation of Decorated PersonForm attributes
+        if (bindingResult.hasErrors()) {
+            return "person/create";
+        }
+        repository.save(person);
+        repository.addRoleToPerson(person.getEmail(), "ROLE_STUDENT");
+        // Redirect to next step
+        return "redirect:/mvc/person/read";
+    }
+
     @GetMapping("/update/{id}")
     public String personUpdate(@PathVariable("id") int id, Model model) {
         model.addAttribute("person", repository.get(id));  // Add the person to the model
         return "person/update";  // Return the template for the update form
     }
+
 
     /**
      * Saves the updated details of a person.
@@ -233,8 +259,34 @@ public class PersonViewController {
      *
      * @return the view name for the search page
      */
+=======
+    @PostMapping("/update")
+    public String personUpdateSave(@Valid Person person, BindingResult bindingResult) {
+        // Validation of Decorated PersonForm attributes
+        if (bindingResult.hasErrors()) {
+            return "person/update";
+        }
+        repository.save(person);
+        repository.addRoleToPerson(person.getEmail(), "ROLE_STUDENT");
+
+        // Redirect to next step
+        return "redirect:/mvc/person/read";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String personDelete(@PathVariable("id") long id) {
+        repository.delete(id);
+        return "redirect:/mvc/person/read";
+    }
+
+
     @GetMapping("/search")
     public String person() {
         return "person/search";  // Return the template for the search page
     }
+
 }
+
+
+}
+
