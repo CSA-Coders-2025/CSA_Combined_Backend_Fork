@@ -9,13 +9,15 @@ import java.util.Optional;
 
 @Repository // this is a repositary and is responsible for the database access
 public interface StreakJpaRepository extends JpaRepository<Streak, Long> {
-// declares SJP as interface
-    // Method to find a single streak by userId, returns a streak if found or empty result if not found
+    // declares SJP as interface
+    // Method to find a single streak by userId, returns a streak if found or empty
+    // result if not found
     Optional<Streak> findByUserId(Long userId);
 
-    // Method to find streaks by userId or maxStreak, it can return a list if multiple entries have the same numbers (if needed for more complex queries)
+    // Method to find streaks by userId or maxStreak, it can return a list if
+    // multiple entries have the same numbers (if needed for more complex queries)
     List<Streak> findByUserIdOrMaxStreak(Long userId, int maxStreak);
 
     // Method to find streaks by email
-    List<Streak> findByUserEmailStreak(String email);
+    List<Streak> findByEmail(String email);
 }

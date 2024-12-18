@@ -13,9 +13,13 @@ import lombok.NoArgsConstructor;
 
 /**
  * Streak is a POJO, Plain Old Java Object.
- * --- @Data is a Lombok annotation that generates @Getter, @Setter, @ToString, @EqualsAndHashCode, and @RequiredArgsConstructor.
- * --- @AllArgsConstructor is a Lombok annotation for a constructor with all arguments.
- * --- @NoArgsConstructor is a Lombok annotation for a constructor with no arguments.
+ * --- @Data is a Lombok annotation that
+ * generates @Getter, @Setter, @ToString, @EqualsAndHashCode,
+ * and @RequiredArgsConstructor.
+ * --- @AllArgsConstructor is a Lombok annotation for a constructor with all
+ * arguments.
+ * --- @NoArgsConstructor is a Lombok annotation for a constructor with no
+ * arguments.
  * --- @Entity annotation is used to mark the class as a persistent Java class.
  */
 @Data
@@ -24,44 +28,53 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Streak {
 
-    /** Automatic unique identifier for Streak record
+    /**
+     * Automatic unique identifier for Streak record
      * --- @Id annotation specifies the identifier property of the entity.
-     * --- @GeneratedValue annotation Automatically generates the id value for each new Streak record 
+     * --- @GeneratedValue annotation Automatically generates the id value for each
+     * new Streak record
      */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    /**   
+    /**
      * --- @NotNull annotation ensures that the field cannot be null.
      */
-    @NotNull
+    // @NotNull
     @Column(nullable = false)
     private Long userId;
 
-    /** currentStreak is the number of consecutive days the user has interacted
+    /**
+     * currentStreak is the number of consecutive days the user has interacted
      * --- @Column annotation sets the default value and ensures it is not null.
      */
     @NotNull
     @Column(nullable = false, columnDefinition = "int default 0")
     private int currentStreak;
 
-    /** maxStreak is the longest streak the user has achieved
+    /**
+     * maxStreak is the longest streak the user has achieved
      * --- @Column annotation sets the default value and ensures it is not null.
      */
     @NotNull
     @Column(nullable = false, columnDefinition = "int default 0")
     private int maxStreak;
 
-    /** email is the user's email
+    /**
+     * email is the user's email
      * --- @Column annotation sets the default value and ensures it is not null.
      */
     @NotNull
-    @Column(nullable = false, columnDefinition = "int default 0")
+    @Column(nullable = false)
     private String email;
 
     /** Custom constructor for creating a Streak object with specific details */
-    public Streak(Long userId, int currentStreak, int maxStreak, String email) { // The custom constructor in the Streak class allows developers to initialize objects with specific values for userId, currentStreak, and maxStreak
+    public Streak(Long userId, int currentStreak, int maxStreak, String email) { // The custom constructor in the Streak
+                                                                                 // class allows developers to
+                                                                                 // initialize objects with specific
+                                                                                 // values for userId, currentStreak,
+                                                                                 // and maxStreak
         this.userId = userId;
         this.currentStreak = currentStreak;
         this.maxStreak = maxStreak;

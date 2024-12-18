@@ -27,21 +27,24 @@ public class StreakApiController {
     @Autowired
     private StreakJpaRepository streakJpaRepository;
 
-    // This method is important because it helps find a specific Streak in the database using its ID.
+    // This method is important because it helps find a specific Streak in the
+    // database using its ID.
     @GetMapping("/streak/{id}")
     public ResponseEntity<Streak> getStreak(@PathVariable long id) {
         Optional<Streak> optional = streakJpaRepository.findById(id);
-// If the streak is found, it sends the data with an "OK" message. If it isn’t found, it sends a "NOT FOUND" message. 
+        // If the streak is found, it sends the data with an "OK" message. If it isn’t
+        // found, it sends a "NOT FOUND" message.
         return optional.map(streak -> new ResponseEntity<>(streak, HttpStatus.OK))
-                       .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    // Get streak by user ID
     @GetMapping("/streak")
-    public ResponseEntity<Streak> getStreakByUserId(@RequestParam Long userId) {
-        Optional<Streak> streak = streakJpaRepository.findByUserId(userId);
-        return streak.map(ResponseEntity::ok)
-                     .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    public ResponseEntity<List<Streak>> getStreakByEmail(@RequestParam String email) {
+        List<Streak> streaks = streakJpaRepository.findByEmail(email);
+        if (!streaks.isEmpty()) {
+            return ResponseEntity.ok(streaks);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     // Delete streak by ID
@@ -69,20 +72,20 @@ public class StreakApiController {
     public ResponseEntity<Object> postStreak(@RequestBody StreakDto streakDto) {
         Optional<Streak> existingStreak = streakJpaRepository.findByUserId(streakDto.getUserId());
         Streak streak;
-        
+
         if (existingStreak.isPresent()) {
             // Update existing streak
             streak = existingStreak.get();
             streak.setCurrentStreak(streak.getCurrentStreak() + 1); // Increment the current streak
-            streak.setMaxStreak(Math.max(streak.getMaxStreak(), streak.getCurrentStreak())); // Update max streak if necessary
+            streak.setMaxStreak(Math.max(streak.getMaxStreak(), streak.getCurrentStreak())); // Update max streak if
+                                                                                             // necessary
         } else {
             // Create new streak if none exists
             streak = new Streak(
-                streakDto.getUserId(),
-                streakDto.getCurrentStreak(),
-                streakDto.getMaxStreak(),
-                streakDto.getEmail()
-            );
+                    streakDto.getUserId(),
+                    streakDto.getCurrentStreak(),
+                    streakDto.getMaxStreak(),
+                    streakDto.getEmail());
         }
 
         streakJpaRepository.save(streak); // Save either the new or updated streak
@@ -94,9 +97,8 @@ public class StreakApiController {
     public ResponseEntity<Object> streakSearch(@RequestBody final Map<String, String> map) {
         String term = map.get("term");
         List<Streak> list = streakJpaRepository.findByUserIdOrMaxStreak(
-            Long.parseLong(term), 
-            Integer.parseInt(term)
-        );
+                Long.parseLong(term),
+                Integer.parseInt(term));
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
@@ -104,9 +106,8 @@ public class StreakApiController {
     @PostMapping("/streak/searchbyemail")
     public ResponseEntity<Object> streakSearchEmail(@RequestBody final Map<String, String> map) {
         String term = map.get("term");
-        List<Streak> list = streakJpaRepository.findByUserEmailStreak(
-            term
-        );
+        List<Streak> list = streakJpaRepository.findByEmail(
+                term);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }
