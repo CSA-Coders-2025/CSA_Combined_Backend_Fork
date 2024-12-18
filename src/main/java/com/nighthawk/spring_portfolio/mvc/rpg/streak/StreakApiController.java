@@ -61,6 +61,7 @@ public class StreakApiController {
         private Long userId;
         private int currentStreak;
         private int maxStreak;
+        private String email;
     }
 
     // Post a new streak or update an existing one
@@ -79,7 +80,8 @@ public class StreakApiController {
             streak = new Streak(
                 streakDto.getUserId(),
                 streakDto.getCurrentStreak(),
-                streakDto.getMaxStreak()
+                streakDto.getMaxStreak(),
+                streakDto.getEmail()
             );
         }
 
@@ -94,6 +96,16 @@ public class StreakApiController {
         List<Streak> list = streakJpaRepository.findByUserIdOrMaxStreak(
             Long.parseLong(term), 
             Integer.parseInt(term)
+        );
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    // Search for streaks by userId or maxStreak based on the provided term
+    @PostMapping("/streak/searchbyemail")
+    public ResponseEntity<Object> streakSearchEmail(@RequestBody final Map<String, String> map) {
+        String term = map.get("term");
+        List<Streak> list = streakJpaRepository.findByUserEmailStreak(
+            term
         );
         return new ResponseEntity<>(list, HttpStatus.OK);
     }

@@ -53,22 +53,30 @@ public class Streak {
     @Column(nullable = false, columnDefinition = "int default 0")
     private int maxStreak;
 
+    /** email is the user's email
+     * --- @Column annotation sets the default value and ensures it is not null.
+     */
+    @NotNull
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private String email;
+
     /** Custom constructor for creating a Streak object with specific details */
-    public Streak(Long userId, int currentStreak, int maxStreak) { // The custom constructor in the Streak class allows developers to initialize objects with specific values for userId, currentStreak, and maxStreak
+    public Streak(Long userId, int currentStreak, int maxStreak, String email) { // The custom constructor in the Streak class allows developers to initialize objects with specific values for userId, currentStreak, and maxStreak
         this.userId = userId;
         this.currentStreak = currentStreak;
         this.maxStreak = maxStreak;
+        this.email = email;
     }
 
     /** Static method to create a new Streak instance */
-    public static Streak createStreak(Long userId, int currentStreak, int maxStreak) {
-        return new Streak(userId, currentStreak, maxStreak);
+    public static Streak createStreak(Long userId, int currentStreak, int maxStreak, String email) {
+        return new Streak(userId, currentStreak, maxStreak, email);
     }
 
     /** Static method to initialize an array of Streak objects for testing */
     public static Streak[] init() {
         ArrayList<Streak> streaks = new ArrayList<>();
-        streaks.add(createStreak(1L, 5, 10));
+        streaks.add(createStreak(1L, 5, 10, "hello@gmail.com"));
         return streaks.toArray(new Streak[0]);
     }
 }

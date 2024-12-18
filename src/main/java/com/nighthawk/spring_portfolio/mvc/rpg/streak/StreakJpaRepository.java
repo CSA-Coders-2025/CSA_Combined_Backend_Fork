@@ -15,4 +15,7 @@ public interface StreakJpaRepository extends JpaRepository<Streak, Long> {
 
     // Method to find streaks by userId or maxStreak, it can return a list if multiple entries have the same numbers (if needed for more complex queries)
     List<Streak> findByUserIdOrMaxStreak(Long userId, int maxStreak);
+
+    // Method to find streaks by email
+    List<Streak> findByUserEmailStreak(String email);
 }
