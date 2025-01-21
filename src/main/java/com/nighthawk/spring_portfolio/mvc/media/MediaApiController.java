@@ -1,6 +1,7 @@
 package com.nighthawk.spring_portfolio.mvc.media;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,14 +83,14 @@ public class MediaApiController {
 
     @GetMapping("/")
     public ResponseEntity<List<Map<String, Object>>> getLeaderboard() {
-        List<Score> scoresList = mediaJpaRepository.findAllByScoreInc();
+        List<Score> scoresList = mediaJpaRepository.findAll();
 
         if (scoresList.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
         // Sort scores using heap sort
-        heapSort(scoresList);
+        Collections.reverse(heapSort(scoresList));
 
 
         /*
