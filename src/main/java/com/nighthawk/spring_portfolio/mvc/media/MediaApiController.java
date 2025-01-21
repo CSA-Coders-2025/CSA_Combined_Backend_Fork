@@ -71,7 +71,7 @@ public class MediaApiController {
             Score temp = list.get(0);
             list.set(0, list.get(i));
             list.set(i, temp);
-
+  
             // Restore heap property after each extraction
             heapify(list, i, 0);
         }
