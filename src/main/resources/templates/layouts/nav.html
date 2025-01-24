@@ -1,7 +1,8 @@
 <th:block xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="header">
     <nav class="navbar navbar-light bg-secondary">
         <div class="container-fluid">
-            <div class="d-flex align-items-left">
+            <!-- Logo and Brand -->
+            <div class="d-flex align-items-center">
                 <img alt="" class="d-inline-block align-left" 
                      src="" 
                      th:src="@{/images/ncs_logo.png}" 
@@ -10,8 +11,8 @@
                 <a class="navbar-brand ms-3" th:href="@{https://nighthawkcodingsociety.com}">Nighthawk Coders</a>
             </div>
 
-            <!-- Navbar items always visible, aligned to the left -->
-            <ul class="navbar-nav d-flex flex-row justify-content-start">
+            <!-- Navbar items aligned to the left -->
+            <ul class="navbar-nav d-flex flex-row me-auto">
                 <li class="nav-item active me-3">
                     <a class="nav-link" th:href="@{/}">Home<span class="sr-only"></span></a>
                 </li>
@@ -26,7 +27,8 @@
                 </th:block>
             </ul>
 
-            <div class="d-flex align-items-left">
+            <!-- Login/Signup (if anonymous) and Dropdown (if authenticated) -->
+            <div class="d-flex align-items-center">
                 <th:block sec:authorize="isAnonymous()">
                     <div class="px-3">
                         <a th:href='@{/login}' class="link-dark">Login</a>
