@@ -118,6 +118,7 @@ public class PersonApiController {
         private String password;
         private String name;
         private Boolean kasmServerNeeded;
+        private String scrumGroup;
     }
         
             /**
@@ -178,7 +179,9 @@ public class PersonApiController {
             if (personDto.getKasmServerNeeded() != null) {
                 existingPerson.setKasmServerNeeded(personDto.getKasmServerNeeded());
             }
-
+            if (personDto.getScrumGroup() != null) {
+                existingPerson.setScrumGroup(personDto.getScrumGroup());
+            }
             // Save and return the updated person entity
             Person updatedPerson = repository.save(existingPerson);
             return new ResponseEntity<>(updatedPerson, HttpStatus.OK);

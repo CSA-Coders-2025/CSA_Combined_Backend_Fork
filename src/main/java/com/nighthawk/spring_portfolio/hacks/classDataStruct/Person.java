@@ -60,6 +60,10 @@ public class Person extends Generics{
         this.uid = uid;
     }
 
+    public String getEmail(String email){
+        return email;
+    }
+
     public void setEmail(String email){
         this.email = email;
     }

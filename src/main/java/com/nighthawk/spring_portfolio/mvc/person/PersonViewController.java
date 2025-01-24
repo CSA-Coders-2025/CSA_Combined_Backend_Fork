@@ -68,9 +68,10 @@ public class PersonViewController {
                 private String password;
                 private String name;
                 private boolean kasmServerNeeded;
+                private String scrumGroup;
             }
             // Wrap the person data into a PersonAdjacent object for consistent list format
-            PersonAdjacent personAdjacent = new PersonAdjacent("user", person.getUid(), person.getEmail(), person.getPassword(), person.getName(), person.getKasmServerNeeded());
+            PersonAdjacent personAdjacent = new PersonAdjacent("user", person.getUid(), person.getEmail(), person.getPassword(), person.getName(), person.getKasmServerNeeded(), person.getScrumGroup());
             List<PersonAdjacent> list = Arrays.asList(personAdjacent);  // Convert the single person into a list
             model.addAttribute("list", list);  // Add the list to the model for the view
         }
@@ -110,9 +111,10 @@ public class PersonViewController {
                 private String password;
                 private String name;
                 private boolean kasmServerNeeded;
+                private String scrumGroup;
             }
             // Wrap the person data into a PersonAdjacent object for consistent list format
-            PersonAdjacent personAdjacent = new PersonAdjacent("user", person.getUid(),person.getEmail(), person.getPassword(), person.getName(), person.getKasmServerNeeded());
+            PersonAdjacent personAdjacent = new PersonAdjacent("user", person.getUid(),person.getEmail(), person.getPassword(), person.getName(), person.getKasmServerNeeded(), person.getScrumGroup());
             List<PersonAdjacent> list = Arrays.asList(personAdjacent);  // Convert the single person into a list
             model.addAttribute("list", list);  // Add the list to the model for the view
         }
