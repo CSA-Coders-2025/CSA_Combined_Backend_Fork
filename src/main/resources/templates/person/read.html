@@ -141,9 +141,9 @@
         <div class="container py-4 text-light bg-success rounded">
             <h2>Person Viewer</h2>
 
-            <!-- Search box for filtering users by their GHID, UID, or username -->
+            <!-- Search box for filtering users by their UID, name, or username -->
             <div class="search-container">
-                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search GHID/UID/UN">
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search UID/UN">
             </div>
 
             <div class="row align-items-md-stretch">
@@ -152,9 +152,8 @@
                     <thead>
                     <tr>
                         <th>ID#</th>
-                        <th>GHID</th>
+                        <th>UID</th> <!-- Changed GHID to UID -->
                         <th>UN</th>
-                        <th>UID</th> <!-- Added Uid column -->
                         <th>Email</th> <!-- Added Email column -->
                         <th>KSM</th>
                         <th>PFP</th>
@@ -166,10 +165,9 @@
                     <tr th:each="person : ${list}">
                         <td th:text="${person.id}">Person ID</td>
                         <td>
-                            <a th:href="'https://github.com/' + ${person.uid}" target="_blank" th:text="${person.uid}">User GHID</a>
+                            <a th:href="'https://github.com/' + ${person.uid}" target="_blank" th:text="${person.uid}">User UID</a>
                         </td>
                         <td th:text="${person.name}">Name</td>
-                        <td class="uid" th:text="${person.uid}" title="${person.uid}">Uid</td> <!-- Shortened Uid with full on hover -->
                         <td th:text="${person.email}">Email</td> <!-- Display Email -->
                         <!-- Checkbox for Kasm Image status -->
                         <td>
