@@ -221,11 +221,11 @@ public class Person {
      */
     public static Person[] init() {
         ArrayList<Person> persons = new ArrayList<>();
-        persons.add(createPerson("Thomas Edison", "toby@gmail.com", "toby@gmail.com", "123toby", true, "1", "02-11-1847", Arrays.asList("ROLE_ADMIN", "ROLE_USER", "ROLE_TESTER", "ROLE_TEACHER","ROLE_SCRUMLEADER"),0));
-        persons.add(createPerson("John Mortensen", "jm1021", "jm1021", "123Qwerty!", false, "1", "10-21-1959", Arrays.asList("ROLE_ADMIN","ROLE_USER", "ROLE_TESTER","ROLE_TEACHER","ROLE_SCRUMLEADER"),1));
-        persons.add(createPerson("Nikola Tesla", "niko@gmail.com", "niko@gmail.com", "123niko", true, "1", "07-10-1856", Arrays.asList("ROLE_USER", "ROLE_STUDENT"),2));
-        persons.add(createPerson("Madam Curie", "madam@gmail.com", "madam@gmail.com", "123madam", true, "1", "11-07-1867", Arrays.asList("ROLE_USER", "ROLE_STUDENT"),3));
-        persons.add(createPerson("Grace Hopper", "hop@gmail.com", "hop@gmail.com", "123hop", true, "1", "12-09-1906", Arrays.asList("ROLE_USER", "ROLE_STUDENT"),4));
+        persons.add(createPerson("Thomas Edison", "toby@gmail.com", "toby@gmail.com", "123toby", true, "1", "02-11-1847", Arrays.asList("ROLE_ADMIN", "ROLE_USER", "ROLE_TESTER", "ROLE_TEACHER","ROLE_SCRUMLEADER"),000000));
+        persons.add(createPerson("John Mortensen", "jm1021", "jm1021", "123Qwerty!", false, "1", "10-21-1959", Arrays.asList("ROLE_ADMIN","ROLE_USER", "ROLE_TESTER","ROLE_TEACHER","ROLE_SCRUMLEADER"),111111));
+        persons.add(createPerson("Nikola Tesla", "niko@gmail.com", "niko@gmail.com", "123niko", true, "1", "07-10-1856", Arrays.asList("ROLE_USER", "ROLE_STUDENT"),222222));
+        persons.add(createPerson("Madam Curie", "madam@gmail.com", "madam@gmail.com", "123madam", true, "1", "11-07-1867", Arrays.asList("ROLE_USER", "ROLE_STUDENT"),333333));
+        persons.add(createPerson("Grace Hopper", "hop@gmail.com", "hop@gmail.com", "123hop", true, "1", "12-09-1906", Arrays.asList("ROLE_USER", "ROLE_STUDENT"),444444));
         return persons.toArray(Person[]::new);
     }
 
