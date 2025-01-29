@@ -13,7 +13,6 @@ public class Person extends Generics{
 
     // Instance data
     private String uid;  // user / person id
-    private String email;
     private String password;
     private String name;
     
@@ -27,7 +26,6 @@ public class Person extends Generics{
     public Person(String uid, String email, String password, String name) {
         this();  // runs zero argument constructor
         this.uid = uid;
-        this.email = email;
         this.password = password;
         this.name = name;
     }
@@ -65,7 +63,6 @@ public class Person extends Generics{
     }
 
     public void setEmail(String email){
-        this.email = email;
     }
 
     public String getPassword() {
