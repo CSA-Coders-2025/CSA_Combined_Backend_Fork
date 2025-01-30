@@ -117,7 +117,7 @@ public class PersonApiController {
         private String email;
         private String password;
         private String name;
-        private Boolean kasmServerNeeded;
+        private Boolean ksm;
         private String scrumGroup;
         private String student_id;
     }
@@ -177,8 +177,8 @@ public class PersonApiController {
             if (personDto.getName() != null) {
                 existingPerson.setName(personDto.getName());
             }
-            if (personDto.getKasmServerNeeded() != null) {
-                existingPerson.setKasmServerNeeded(personDto.getKasmServerNeeded());
+            if (personDto.getKsm() != null) {
+                existingPerson.setKsm(personDto.getKsm());
             }
             if (personDto.getScrumGroup() != null) {
                 existingPerson.setScrumGroup(personDto.getScrumGroup());

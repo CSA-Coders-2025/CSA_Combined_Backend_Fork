@@ -129,7 +129,7 @@ public class Person {
      * The default value is false.
      */
     @Column(nullable = false, columnDefinition = "boolean default false")
-    private Boolean kasmServerNeeded = false;
+    private Boolean ksm = false;
 
     @Column(nullable = false)
     private String scrumGroup;
@@ -155,12 +155,12 @@ public class Person {
      * Constructor to create a Person object for API calls.
      * This constructor is used to initialize a new person with basic details and a role.
      */
-    public Person(String uid, String email, String password, String name, Boolean kasmServerNeeded, String scrumGroup, PersonRole role, String studentId) {
+    public Person(String uid, String email, String password, String name, Boolean ksm, String scrumGroup, PersonRole role, String studentId) {
         this.uid = uid;
         this.email = email;
         this.password = password;
         this.name = name;
-        this.kasmServerNeeded = kasmServerNeeded;
+        this.ksm = ksm;
         this.scrumGroup = scrumGroup;
         this.roles.add(role);
         this.studentId = studentId;
@@ -173,13 +173,13 @@ public class Person {
      * @param uid: Uid of the person.
      * @param email: Email of the person.
      * @param password: Password for the person.
-     * @param kasmServerNeeded: Whether Kasm server is needed.
+     * @param ksm: Whether Kasm server is needed.
      * @param Scrum Group of the user
      * @return A new Person object.
      */
-    public static Person createPerson(String name, String uid, String email, String password, Boolean kasmServerNeeded, String scrumGroup, String studentId) {
+    public static Person createPerson(String name, String uid, String email, String password, Boolean ksm, String scrumGroup, String studentId) {
         // By default, Spring Security expects roles to have a "ROLE_" prefix.
-        return createPerson(name, uid, email, password, kasmServerNeeded, scrumGroup, password, Arrays.asList("ROLE_USER", "ROLE_STUDENT"),studentId);
+        return createPerson(name, uid, email, password, ksm, scrumGroup, password, Arrays.asList("ROLE_USER", "ROLE_STUDENT"),studentId);
     }
 
     /**
@@ -189,19 +189,19 @@ public class Person {
      * @param uid: Uid of the person.
      * @param email: Email of the person.
      * @param password: Password for the person.
-     * @param kasmServerNeeded: Whether Kasm server is needed.
+     * @param ksm: Whether Kasm server is needed.
      * @param scrumGroup: scrum group of the person
      * @param dob: Date of birth (not used directly).
      * @param roleNames: List of role names to assign to the person.
      * @return A new Person object.
      */
-    public static Person createPerson(String name, String uid, String email, String password, Boolean kasmServerNeeded, String scrumGroup, String dob, List<String> roleNames, String studentId) {
+    public static Person createPerson(String name, String uid, String email, String password, Boolean ksm, String scrumGroup, String dob, List<String> roleNames, String studentId) {
         Person person = new Person();
         person.setName(name);
         person.setUid(uid);
         person.setEmail(email);
         person.setPassword(password);
-        person.setKasmServerNeeded(kasmServerNeeded);
+        person.setKsm(ksm);
         person.setScrumGroup(scrumGroup);
         List<PersonRole> roles = new ArrayList<>();
         for (String roleName : roleNames) {

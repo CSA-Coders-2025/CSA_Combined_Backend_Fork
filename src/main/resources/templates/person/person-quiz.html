@@ -31,7 +31,7 @@
                     document.getElementById("question").innerHTML = "What is this user's: "+ "Display Name".bold()+"?";
                     break;
                 case 4:
-                    answer = document.getElementById("kasmServerNeeded").innerText;
+                    answer = document.getElementById("ksm").innerText;
                     document.getElementById("question").innerHTML = "What is this user's: "+ "Kasm Server Needed Status".bold()+"?";
                     break;
                 case 5:
@@ -73,7 +73,7 @@
                                 </td>    
                                 <td th:text="${person.uid}" id="uid">Person ID</td>
                                 <td th:text="${person.name}" id="name">Name</td>
-                                <td th:text="${person.kasmServerNeeded}" id="kasmServerNeeded">Kasm Server Needed</td>
+                                <td th:text="${person.ksm}" id="ksm">Kasm Server Needed</td>
                                 <td th:text="${person.dob}" id="dob">Date of Birth</td>
                             </tr>
                         </tbody>
