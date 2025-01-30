@@ -1,6 +1,4 @@
-<!DOCTYPE HTML>
-<html xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml"
-      layout:decorate="~{layouts/base}" lang="en">
+<html xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml"layout:decorate="~{layouts/base}" lang="en">
 
 <head>
     <title>View Grades</title>
@@ -109,7 +107,7 @@
                                 <input 
                                     type="number" min="0" step="any"
                                     class="grade-input"
-                                    th:name="'grades[' + ${assignment.id} + '][' + ${student.id} + ']'" 
+                                    th:name="'grades[' + ${assignment.id} + '][' + ${student.id} + ']" 
                                     th:value="${grades[assignment.id][student.id] != null ? grades[assignment.id][student.id] : ''}" 
                                     th:placeholder="${grades[assignment.id][student.id] != null ? '' : 'N/A'}"
                                 />
@@ -124,4 +122,48 @@
     </div>
 </div>
 </body>
+
+<th:block layout:fragment="script" th:remove="tag">
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        const table = $('#edit-grades-table').DataTable();
+        table.column(0).visible(true);
+
+        $('#column-search').on('keyup', function () {
+            const searchTerm = this.value.toLowerCase();
+            table.columns().every(function (index) {
+                if (index === 0) {
+                    this.visible(true);
+                    return;
+                }
+                const columnHeader = this.header();
+                const columnText = $(columnHeader).text().toLowerCase();
+                this.visible(columnText.includes(searchTerm));
+            });
+        });
+    });
+
+    document.getElementById('save-btn').addEventListener('click', async function () {
+        const form = document.getElementById('grade-form');
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch('/api/synergy/grades', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('Grades saved successfully!');
+            } else {
+                alert('Failed to save grades. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('An error occurred. Please try again.');
+        }
+    });
+</script>
+
 </html>
