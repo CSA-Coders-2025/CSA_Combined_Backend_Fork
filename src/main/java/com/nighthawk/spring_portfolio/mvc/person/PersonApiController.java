@@ -119,6 +119,7 @@ public class PersonApiController {
         private String name;
         private Boolean kasmServerNeeded;
         private String scrumGroup;
+        private Integer student_id;
     }
         
             /**
@@ -181,6 +182,9 @@ public class PersonApiController {
             }
             if (personDto.getScrumGroup() != null) {
                 existingPerson.setScrumGroup(personDto.getScrumGroup());
+            }
+            if (personDto.getStudent_id() != null) {
+                existingPerson.setStudentId(personDto.getStudent_id());
             }
             // Save and return the updated person entity
             Person updatedPerson = repository.save(existingPerson);
