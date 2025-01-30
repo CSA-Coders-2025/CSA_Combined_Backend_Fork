@@ -119,7 +119,7 @@ public class PersonApiController {
         private String name;
         private Boolean kasmServerNeeded;
         private String scrumGroup;
-        private Integer student_id;
+        private String student_id;
     }
         
             /**
