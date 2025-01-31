@@ -25,8 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.Getter;
 
 /**
- * PersonApiController handles RESTful API endpoints for managing Person entities.
- * The controller supports CRUD (Create, Read, Update, Delete) operations for Person data.
+ * PersonApiController handles RESTful API endpoints for managing Person
+ * entities.
+ * The controller supports CRUD (Create, Read, Update, Delete) operations for
+ * Person data.
  */
 @RestController
 @RequestMapping("/api")
@@ -45,8 +47,10 @@ public class PersonApiController {
     /**
      * Retrieves the current user's Person entity based on the JWT token.
      * 
-     * @param authentication The authentication object, typically containing the current user's details.
-     * @return A ResponseEntity containing the found Person object or a NOT_FOUND status if the person doesn't exist.
+     * @param authentication The authentication object, typically containing the
+     *                       current user's details.
+     * @return A ResponseEntity containing the found Person object or a NOT_FOUND
+     *         status if the person doesn't exist.
      */
     @GetMapping("/person/get")
     public ResponseEntity<Person> getPerson(Authentication authentication) {
@@ -77,7 +81,8 @@ public class PersonApiController {
      * Retrieves a specific Person entity by its ID.
      * 
      * @param id The ID of the Person to retrieve.
-     * @return A ResponseEntity containing the Person entity or a NOT_FOUND status if no matching person is found.
+     * @return A ResponseEntity containing the Person entity or a NOT_FOUND status
+     *         if no matching person is found.
      */
     @GetMapping("/person/{id}")
     public ResponseEntity<Person> getPerson(@PathVariable long id) {
@@ -94,7 +99,8 @@ public class PersonApiController {
      * Deletes a specific Person entity by its ID.
      * 
      * @param id The ID of the Person to delete.
-     * @return A ResponseEntity with the deleted Person entity or a NOT_FOUND status if no matching person is found.
+     * @return A ResponseEntity with the deleted Person entity or a NOT_FOUND status
+     *         if no matching person is found.
      */
     @DeleteMapping("/person/{id}")
     public ResponseEntity<Person> deletePerson(@PathVariable long id) {
@@ -121,51 +127,62 @@ public class PersonApiController {
         private String scrumGroup;
         private String student_id;
     }
-        
-            /**
-             * Creates a new Person entity in the database.
-             * 
-             * @param personDto A DTO containing the information for the new person.
-             * @return A ResponseEntity containing a success message or a BAD_REQUEST status if input is invalid.
-             */
-            @SuppressWarnings("unchecked")
-            @PostMapping("/person/create")
-            public ResponseEntity<Object> postPerson(@RequestBody PersonDto personDto) {
-                // Create a new Person entity without an ID (it will be auto-generated in the database)
-                Person person = new Person();
-                personDetailsService.save(person); // Save the new person entity to the database
-        
-                // Prepare JSON response with success message
-                HttpHeaders responseHeaders = new HttpHeaders();
-                responseHeaders.setContentType(MediaType.APPLICATION_JSON);
-        
-                JSONObject responseObject = new JSONObject();
-                responseObject.put("response", personDto.getUid() + " is created successfully");
-        
-                // Return the response with status OK
-                String responseString = responseObject.toString();
-                return new ResponseEntity<>(responseString, responseHeaders, HttpStatus.OK);
+
+    /**
+     * Creates a new Person entity in the database.
+     * 
+     * @param personDto A DTO containing the information for the new person.
+     * @return A ResponseEntity containing a success message or a BAD_REQUEST status
+     *         if input is invalid.
+     */
+    @SuppressWarnings("unchecked")
+    @PostMapping("/person/create")
+    public ResponseEntity<Object> postPerson(@RequestBody PersonDto personDto) {
+        // Create a new Person entity without an ID (it will be auto-generated in the
+        // database)
+        Person person = new Person();
+        person.setUid(personDto.getUid());
+        person.setEmail(personDto.getEmail());
+        person.setPassword(passwordEncoder.encode(personDto.getPassword()));
+        person.setName(personDto.getName());
+        person.setKsm(personDto.getKsm());
+        person.setScrumGroup(personDto.getScrumGroup());
+        person.setStudent_id(personDto.getStudent_id());
+        personDetailsService.save(person); // Save the new person entity to the database
+
+        // Prepare JSON response with success message
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        JSONObject responseObject = new JSONObject();
+        responseObject.put("response", personDto.getUid() + " is created successfully");
+
+        // Return the response with status OK
+        String responseString = responseObject.toString();
+        return new ResponseEntity<>(responseString, responseHeaders, HttpStatus.OK);
+    }
+
+    /**
+     * Updates an existing Person entity.
+     * 
+     * @param authentication The authentication object containing current user
+     *                       details.
+     * @param personDto      The data to update the person entity.
+     * @return A ResponseEntity with the updated Person entity or a NOT_FOUND status
+     *         if the person doesn't exist.
+     */
+    @PostMapping(value = "/person/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> updatePerson(Authentication authentication, @RequestBody final PersonDto personDto) {
+        // Find the person by uid
+        Optional<Person> optionalPerson = Optional.empty();
+        if (optionalPerson.isPresent()) {
+            Person existingPerson = optionalPerson.get(); // Extract existing person from repository
+
+            // Update the person's fields if provided in the DTO
+            if (personDto.getUid() != null) {
+                existingPerson.setUid(personDto.getUid());
             }
-        
-            /**
-             * Updates an existing Person entity.
-             * 
-             * @param authentication The authentication object containing current user details.
-             * @param personDto The data to update the person entity.
-             * @return A ResponseEntity with the updated Person entity or a NOT_FOUND status if the person doesn't exist.
-             */
-            @PostMapping(value = "/person/update", produces = MediaType.APPLICATION_JSON_VALUE)
-            public ResponseEntity<Object> updatePerson(Authentication authentication, @RequestBody final PersonDto personDto) {
-                // Find the person by uid
-                Optional<Person> optionalPerson = Optional.empty();
-                if (optionalPerson.isPresent()) {
-                    Person existingPerson = optionalPerson.get(); // Extract existing person from repository
-        
-                    // Update the person's fields if provided in the DTO
-                    if (personDto.getUid() != null) {
-                        existingPerson.setUid(personDto.getUid());
-                    }
-                    if (personDto.getUid() != null) {
+            if (personDto.getUid() != null) {
                 existingPerson.setUid((String) personDto.getUid());
             }
             if (personDto.getEmail() != null) {
@@ -184,7 +201,7 @@ public class PersonApiController {
                 existingPerson.setScrumGroup(personDto.getScrumGroup());
             }
             if (personDto.getStudent_id() != null) {
-                existingPerson.setStudentId(personDto.getStudent_id());
+                existingPerson.setStudent_id(personDto.getStudent_id());
             }
             // Save and return the updated person entity
             Person updatedPerson = repository.save(existingPerson);
@@ -215,12 +232,16 @@ public class PersonApiController {
     /**
      * Updates the stats for a specific person (e.g., health data).
      * 
-     * @param authentication The authentication object to get the current user's uid.
-     * @param stat_map A map containing the stats data, e.g., health stats with date and measurements.
-     * @return A ResponseEntity containing the updated Person entity with stats or a NOT_FOUND status.
+     * @param authentication The authentication object to get the current user's
+     *                       uid.
+     * @param stat_map       A map containing the stats data, e.g., health stats
+     *                       with date and measurements.
+     * @return A ResponseEntity containing the updated Person entity with stats or a
+     *         NOT_FOUND status.
      */
     @PostMapping(value = "/person/setStats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Person> personStats(Authentication authentication, @RequestBody final Map<String,Object> stat_map) {
+    public ResponseEntity<Person> personStats(Authentication authentication,
+            @RequestBody final Map<String, Object> stat_map) {
         // Find the person by uid
         Optional<Person> optional = Optional.empty();
         if (optional.isPresent()) {

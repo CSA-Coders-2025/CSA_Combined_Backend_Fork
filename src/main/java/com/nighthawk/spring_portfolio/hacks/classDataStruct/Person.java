@@ -15,6 +15,7 @@ public class Person extends Generics{
     private String uid;  // user / person id
     private String password;
     private String name;
+    private String student_id;
     
 
     // Constructor with zero arguments
@@ -80,6 +81,14 @@ public class Person extends Generics{
     public void setName(String name) {
         this.name = name;
     }
+    public String getStudentId() {
+        return student_id;
+    }
+
+    public void setStudentId(String student_id) {
+        this.student_id = student_id;
+    }
+
 
     // Initialize static test data 
     public static Person[] init() {

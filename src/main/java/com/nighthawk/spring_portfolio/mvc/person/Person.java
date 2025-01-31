@@ -65,7 +65,7 @@ public class Person {
     private Long id;
 
     @Column(unique = true)
-    private String studentId;
+    private String student_id;
     /**
      * The many-to-many relationship with PersonSections.
      * 
@@ -133,7 +133,6 @@ public class Person {
 
     @Column(nullable = false)
     private String scrumGroup;
-    
     /**
      * JSON data to store daily statistics (e.g., calories, steps).
      * 
@@ -155,7 +154,7 @@ public class Person {
      * Constructor to create a Person object for API calls.
      * This constructor is used to initialize a new person with basic details and a role.
      */
-    public Person(String uid, String email, String password, String name, Boolean ksm, String scrumGroup, PersonRole role, String studentId) {
+    public Person(String uid, String email, String password, String name, Boolean ksm, String scrumGroup, PersonRole role, String student_id) {
         this.uid = uid;
         this.email = email;
         this.password = password;
@@ -163,7 +162,7 @@ public class Person {
         this.ksm = ksm;
         this.scrumGroup = scrumGroup;
         this.roles.add(role);
-        this.studentId = studentId;
+        this.student_id = student_id;
     }
 
     /**
@@ -177,9 +176,9 @@ public class Person {
      * @param Scrum Group of the user
      * @return A new Person object.
      */
-    public static Person createPerson(String name, String uid, String email, String password, Boolean ksm, String scrumGroup, String studentId) {
+    public static Person createPerson(String name, String uid, String email, String password, Boolean ksm, String scrumGroup, String student_id) {
         // By default, Spring Security expects roles to have a "ROLE_" prefix.
-        return createPerson(name, uid, email, password, ksm, scrumGroup, password, Arrays.asList("ROLE_USER", "ROLE_STUDENT"),studentId);
+        return createPerson(name, uid, email, password, ksm, scrumGroup, password, Arrays.asList("ROLE_USER", "ROLE_STUDENT"),student_id);
     }
 
     /**
@@ -195,7 +194,7 @@ public class Person {
      * @param roleNames: List of role names to assign to the person.
      * @return A new Person object.
      */
-    public static Person createPerson(String name, String uid, String email, String password, Boolean ksm, String scrumGroup, String dob, List<String> roleNames, String studentId) {
+    public static Person createPerson(String name, String uid, String email, String password, Boolean ksm, String scrumGroup, String dob, List<String> roleNames, String student_id) {
         Person person = new Person();
         person.setName(name);
         person.setUid(uid);
@@ -209,7 +208,7 @@ public class Person {
             roles.add(role);
         }
         person.setRoles(roles);
-        person.setStudentId(studentId);
+        person.setStudent_id(student_id);
 
         return person;
     }
