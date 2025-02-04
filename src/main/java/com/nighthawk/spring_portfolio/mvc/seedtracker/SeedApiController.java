@@ -15,11 +15,18 @@ public class SeedApiController {
     // Add a new seed entry
     @PostMapping("/")
     public Seed addSeed(@RequestBody Seed seed) {
+        // If studentId not provided, auto-increment it
         if (seed.getStudentId() == null) {
             Long maxStudentId = seedJpaRepository.findMaxStudentId().orElse(0L);
             seed.setStudentId(maxStudentId + 1);
         }
         return seedJpaRepository.save(seed);
+    }
+
+    // Retrieve all seeds
+    @GetMapping("/")
+    public List<Seed> getAllSeeds() {
+        return seedJpaRepository.findAll();
     }
 
     // Retrieve seeds by studentId
@@ -28,34 +35,35 @@ public class SeedApiController {
         return seedJpaRepository.findByStudentId(studentId);
     }
 
-    // Update a seed entry by id
+    // Update a seed's ongoing grade (and/or other fields) by seed "id"
     @PutMapping("/{id}")
     public Seed updateSeed(@PathVariable Long id, @RequestBody Seed updatedSeed) {
         System.out.println("Received request to update seed with id: " + id);
-        System.out.println("Updated grade: " + updatedSeed.getGrade());
 
         return seedJpaRepository.findById(id)
-                .map(seed -> {
-                    if (updatedSeed.getGrade() != null) {
-                        seed.setGrade(updatedSeed.getGrade());
-                    }
-                    System.out.println("Saving updated seed: " + seed);
-                    return seedJpaRepository.save(seed);
-                })
-                .orElseThrow(() -> {
-                    System.out.println("Seed not found with id " + id);
-                    return new RuntimeException("Seed not found with id " + id);
-                });
+            .map(seed -> {
+                // Update the grade if new one is provided
+                if (updatedSeed.getGrade() != null) {
+                    System.out.println("Old Grade: " + seed.getGrade() + ", New Grade: " + updatedSeed.getGrade());
+                    seed.setGrade(updatedSeed.getGrade());
+                }
+
+                // Update the comment or name if you want to allow that too
+                if (updatedSeed.getComment() != null) {
+                    seed.setComment(updatedSeed.getComment());
+                }
+                if (updatedSeed.getName() != null) {
+                    seed.setName(updatedSeed.getName());
+                }
+
+                return seedJpaRepository.save(seed);
+            })
+            .orElseThrow(() -> new RuntimeException("Seed not found with id " + id));
     }
 
     // Delete a seed entry by id
     @DeleteMapping("/{id}")
     public void deleteSeed(@PathVariable Long id) {
         seedJpaRepository.deleteById(id);
-    }
-
-    @GetMapping("/")
-    public List<Seed> getAllSeeds() {
-        return seedJpaRepository.findAll();
     }
 }
