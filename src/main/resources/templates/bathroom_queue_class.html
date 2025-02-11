@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bathroom Queue by Class</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        h2 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bathroom Queues by Class</h1>
+
+    <div th:each="entry : ${classQueues}">
+        <h2 th:text="${entry.key}">Class Name</h2>
+        <table>
+            <tr>
+                <th>Students in Queue</th>
+            </tr>
+            <tr th:each="queue : ${entry.value}">
+                <td th:text="${queue}"></td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
