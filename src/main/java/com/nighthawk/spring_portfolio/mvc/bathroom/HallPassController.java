@@ -1,5 +1,7 @@
 package com.nighthawk.spring_portfolio.mvc.bathroom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,14 +18,28 @@ import lombok.Getter;
 @RequestMapping("/api/hallpass")
 public class HallPassController {
 
+    private static final Logger logger = LoggerFactory.getLogger(HallPassController.class);
+
     @Autowired private HallPassService hallPassService;
     @Getter
     public static class HallPassRequestDTO
     {
         private String userName;
-        private Long teacherId;
+        // private Long teacherId;
+        private String teacherName;
         private int period;
         private String activity;
+
+        @Override
+        public String toString() {
+            return "HallPassRequestDTO{" +
+                    "userName='" + userName + '\'' +
+                    // ", teacherId=" + teacherId +
+                    ", teacherName=" + teacherName +
+                    ", period=" + period +
+                    ", activity='" + activity + '\'' +
+                    '}';
+        }
         
     }
     /**
@@ -34,11 +50,12 @@ public class HallPassController {
     public ResponseEntity<Object> requestHallPass(@RequestBody HallPassRequestDTO request) {
         try {
             HallPass pass = hallPassService.requestPass(    
-                request.getTeacherId(),
+                request.getTeacherName(),
                 request.getPeriod(),
                 request.getActivity(),
                 request.getUserName()
             );
+            logger.info("Hall pass issued successfully: {}", pass);
             return ResponseEntity.ok(pass);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());

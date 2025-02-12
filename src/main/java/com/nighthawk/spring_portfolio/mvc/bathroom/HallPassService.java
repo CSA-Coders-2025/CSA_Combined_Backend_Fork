@@ -26,8 +26,9 @@ public class HallPassService {
         return tinkleRepository.findByPersonIdAndCheckoutIsNull(username).orElse(null);
     }
 
-    public Teacher getTeacherForActivePass(HallPass pass) {
-        return pass != null ? teacherRepository.findById(pass.getTeacher_id()).orElse(null) : null;
+    public Teacher getTeacherForActivePass(String firstName, String lastName) {
+        List<Teacher> teachers = teacherRepository.findByFirstnameIgnoreCaseAndLastnameIgnoreCase(firstName, lastName);
+        return teachers.isEmpty() ? null : teachers.get(0); // make not eq null
     }
 
     public HallPass requestPass(Long teacherId, int period, String activity, String email) {
@@ -35,7 +36,7 @@ public class HallPassService {
         if (email != null) {
             HallPass pass = new HallPass();
             pass.setPersonId(email);
-            pass.setTeacher_id(teacherId);
+            pass.setTeacherName(teacherName);
             pass.setCheckin(new Date(System.currentTimeMillis()));
             pass.setPeriod(period);
             pass.setActivity(activity);

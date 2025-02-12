@@ -51,7 +51,8 @@ public class HallPass {
      */ 
     
     private String personId;
-    private long teacher_id;
+    // private long teacher_id;
+    private String teacherName;
     private int period;
     private String activity;
     private Date checkout;
