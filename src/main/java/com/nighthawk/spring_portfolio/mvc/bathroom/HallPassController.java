@@ -1,5 +1,6 @@
 package com.nighthawk.spring_portfolio.mvc.bathroom;
 
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class HallPassController {
     public static class HallPassRequestDTO
     {
         private String userName;
-        // private Long teacherId;
+        private Long teacherId;
         private String teacherName;
         private int period;
         private String activity;
@@ -34,7 +35,7 @@ public class HallPassController {
         public String toString() {
             return "HallPassRequestDTO{" +
                     "userName='" + userName + '\'' +
-                    // ", teacherId=" + teacherId +
+                    ", teacherId=" + teacherId +
                     ", teacherName=" + teacherName +
                     ", period=" + period +
                     ", activity='" + activity + '\'' +
@@ -49,8 +50,8 @@ public class HallPassController {
     @PostMapping("/request")
     public ResponseEntity<Object> requestHallPass(@RequestBody HallPassRequestDTO request) {
         try {
-            HallPass pass = hallPassService.requestPass(    
-                request.getTeacherName(),
+            HallPass pass = hallPassService.requestPass(
+                request.getTeacherId(),  
                 request.getPeriod(),
                 request.getActivity(),
                 request.getUserName()
@@ -61,6 +62,7 @@ public class HallPassController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+    
 
     /**
      * Endpoint to check out (return) a hall pass.
@@ -99,4 +101,14 @@ public class HallPassController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+    @CrossOrigin(origins = "http://127.0.0.1:8080")
+@GetMapping("/getTeachers")
+public ResponseEntity<Object> getAllTeachers() {
+    try {
+        List<Teacher> teachers = hallPassService.getAllTeachers();
+        return ResponseEntity.ok(teachers);
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+    }
+}
 }

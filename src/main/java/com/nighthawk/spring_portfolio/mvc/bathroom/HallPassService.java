@@ -21,7 +21,12 @@ public class HallPassService {
         List<Teacher> teachers = teacherRepository.findByFirstnameIgnoreCaseAndLastnameIgnoreCase(firstName, lastName);
         return teachers.isEmpty() ? null : teachers.get(0);
     }
-
+    
+    public List<Teacher> getAllTeachers() {
+        return teacherRepository.findAll(); // Fetch all teachers
+    }
+    
+    
     public HallPass getActivePassForUser(String username) {
         return tinkleRepository.findByPersonIdAndCheckoutIsNull(username).orElse(null);
     }
@@ -32,18 +37,27 @@ public class HallPassService {
     }
 
     public HallPass requestPass(Long teacherId, int period, String activity, String email) {
-        
-        if (email != null) {
+        if (email != null && teacherId != null) {
+            Optional<Teacher> teacherOpt = teacherRepository.findById(teacherId);
+            
+            if (!teacherOpt.isPresent()) {
+                return null; // Teacher not found
+            }
+    
+            Teacher teacher = teacherOpt.get(); // Get teacher by ID
+    
             HallPass pass = new HallPass();
             pass.setPersonId(email);
-            pass.setTeacherName(teacherName);
+            pass.setTeacher_id(teacher.getId()); // Ensure teacher ID is set correctly
             pass.setCheckin(new Date(System.currentTimeMillis()));
             pass.setPeriod(period);
             pass.setActivity(activity);
+            
             return tinkleRepository.save(pass);
         }
         return null;
     }
+    
 
     public boolean checkoutPass(String email) {
         

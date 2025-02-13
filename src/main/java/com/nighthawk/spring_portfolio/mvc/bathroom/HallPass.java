@@ -51,7 +51,7 @@ public class HallPass {
      */ 
     
     private String personId;
-    // private long teacher_id;
+    private long teacher_id;
     private String teacherName;
     private int period;
     private String activity;
@@ -72,6 +72,7 @@ public class HallPass {
             this.checkin = checkin;
             this.checkout = checkout;
         }
+
    
     /** Static method to print Teacher objects from an array
      * @param args, not used
