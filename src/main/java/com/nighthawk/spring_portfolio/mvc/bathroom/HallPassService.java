@@ -17,7 +17,10 @@ public class HallPassService {
     @Autowired
     private HallPassJpaRepository tinkleRepository;
 
-    public Teacher getTeacherByName(String firstName, String lastName) {
+    public Teacher getTeacherByName(String name) {
+        String[] names = name.split(" ", 2);
+        String firstName = names[0];
+        String lastName = names[1];
         List<Teacher> teachers = teacherRepository.findByFirstnameIgnoreCaseAndLastnameIgnoreCase(firstName, lastName);
         return teachers.isEmpty() ? null : teachers.get(0);
     }
@@ -36,9 +39,9 @@ public class HallPassService {
         return teachers.isEmpty() ? null : teachers.get(0); // make not eq null
     }
 
-    public HallPass requestPass(Long teacherId, int period, String activity, String email) {
-        if (email != null && teacherId != null) {
-            Optional<Teacher> teacherOpt = teacherRepository.findById(teacherId);
+    public HallPass requestPass(String teacherName, int period, String activity, String email) {
+        if (email != null && teacherName != null) {
+            Optional<Teacher> teacherOpt = teacherRepository.getTeacherByName(teacherName);
             
             if (!teacherOpt.isPresent()) {
                 return null; // Teacher not found
@@ -72,5 +75,9 @@ public class HallPassService {
         }
         return false;
     }
+    public HallPass savePass(HallPass pass) {
+        return tinkleRepository.save(pass);
+    }
 }
+
 

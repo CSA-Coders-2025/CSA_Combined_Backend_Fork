@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.Getter;
 
 @RestController
 @RequestMapping("/api/hallpass")
@@ -22,7 +21,6 @@ public class HallPassController {
     private static final Logger logger = LoggerFactory.getLogger(HallPassController.class);
 
     @Autowired private HallPassService hallPassService;
-    @Getter
     public static class HallPassRequestDTO
     {
         private String userName;
@@ -42,21 +40,43 @@ public class HallPassController {
                     '}';
         }
         
-    }
-    /**
-     * Endpoint to request a hall pass by providing the user's email address.
-     */
-    //@CrossOrigin(origins = "http://127.0.0.1:4100")
-    @PostMapping("/request")
-    public ResponseEntity<Object> requestHallPass(@RequestBody HallPassRequestDTO request) {
-        try {
-            HallPass pass = hallPassService.requestPass(
-                request.getTeacherId(),  
-                request.getPeriod(),
-                request.getActivity(),
-                request.getUserName()
+                public String getTeacherId() {
+                    // TODO Auto-generated method stub
+                    throw new UnsupportedOperationException("Unimplemented method 'getTeacherId'");
+                }
+                
+                                public int getPeriod() {
+                                    // TODO Auto-generated method stub
+                                    throw new UnsupportedOperationException("Unimplemented method 'getPeriod'");
+                                }
+                                
+                                                                public String getActivity() {
+                                                                    // TODO Auto-generated method stub
+                                                                    throw new UnsupportedOperationException("Unimplemented method 'getActivity'");
+                                                                }
+                                                                
+                                                                                                                                public String getUserName() {
+                                                                                                                                    // TODO Auto-generated method stub
+                                                                                                                                    throw new UnsupportedOperationException("Unimplemented method 'getUserName'");
+                                                                                                                                }
+                                                                                                                                
+                                                                                                                            }
+                                                                                                                            /**
+                                                                                                                             * Endpoint to request a hall pass by providing the user's email address.
+                                                                                                                             */
+                                                                                                                            //@CrossOrigin(origins = "http://127.0.0.1:4100")
+                                                                                                                            @PostMapping("/request")
+                                                                                                                            public ResponseEntity<Object> requestHallPass(@RequestBody HallPassRequestDTO request) {
+                                                                                                                                try {
+                                                                                                                                    HallPass pass = hallPassService.requestPass(
+                                                                                                                                        request.getTeacherId(),  
+                                                                                                                                        request.getPeriod(),
+                                                                                                                                        request.getActivity(),
+                                                                                                                                        request.getUserName()
             );
+            hallPassService.savePass(pass); 
             logger.info("Hall pass issued successfully: {}", pass);
+            hallPassService.savePass(pass);
             return ResponseEntity.ok(pass);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
