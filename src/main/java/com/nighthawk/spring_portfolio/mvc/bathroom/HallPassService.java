@@ -17,7 +17,7 @@ public class HallPassService {
     @Autowired
     private HallPassJpaRepository tinkleRepository;
 
-    public Teacher getTeacherByName(String name) {
+    public Teacher getTeacherByName(String name, String lastName2) {
         String[] names = name.split(" ", 2);
         String firstName = names[0];
         String lastName = names[1];
