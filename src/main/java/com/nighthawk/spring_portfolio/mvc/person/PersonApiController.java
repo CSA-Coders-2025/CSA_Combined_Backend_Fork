@@ -95,6 +95,12 @@ public class PersonApiController {
         return new ResponseEntity<>( repository.findAllByOrderByNameAsc(), HttpStatus.OK);
     }
 
+    @PostMapping("/all")
+    public ResponseEntity<List<Person>> findAll() {
+        return new ResponseEntity<>(repository.findAllByOrderByNameAsc(), HttpStatus.OK);
+    }
+
+
     /**
      * Retrieves a Person entity by its ID.
      *
