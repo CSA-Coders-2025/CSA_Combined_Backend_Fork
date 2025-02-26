@@ -3,7 +3,6 @@ package com.nighthawk.spring_portfolio.system;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -22,7 +21,6 @@ import com.nighthawk.spring_portfolio.mvc.bathroom.BathroomQueue;
 import com.nighthawk.spring_portfolio.mvc.bathroom.BathroomQueueJPARepository;
 import com.nighthawk.spring_portfolio.mvc.bathroom.Issue;
 import com.nighthawk.spring_portfolio.mvc.bathroom.IssueJPARepository;
-import com.nighthawk.spring_portfolio.mvc.bathroom.Teacher;
 import com.nighthawk.spring_portfolio.mvc.bathroom.TeacherJpaRepository;
 import com.nighthawk.spring_portfolio.mvc.bathroom.Tinkle;
 import com.nighthawk.spring_portfolio.mvc.bathroom.TinkleJPARepository;
@@ -39,7 +37,6 @@ import com.nighthawk.spring_portfolio.mvc.person.PersonRole;
 import com.nighthawk.spring_portfolio.mvc.person.PersonRoleJpaRepository;
 import com.nighthawk.spring_portfolio.mvc.rpg.adventureQuestion.AdventureQuestion;
 import com.nighthawk.spring_portfolio.mvc.rpg.adventureQuestion.AdventureQuestionJpaRepository;
-import com.nighthawk.spring_portfolio.mvc.student.StudentInfo;
 import com.nighthawk.spring_portfolio.mvc.student.StudentInfo.StudentService;
 import com.nighthawk.spring_portfolio.mvc.student.StudentInfoJPARepository;
 import com.nighthawk.spring_portfolio.mvc.student.StudentQueue;
@@ -147,14 +144,14 @@ public class ModelInit {
                 }
             }
 
-            // Tinkle[] tinkleArray = Tinkle.init(personArray);
-            // for(Tinkle tinkle: tinkleArray) {
-            //     // List<Tinkle> tinkleFound = 
-            //     Optional<Tinkle> tinkleFound = tinkleJPA.findByPersonName(tinkle.getPerson_name());
-            //     if(tinkleFound.isEmpty()) {
-            //         tinkleJPA.save(tinkle);
-            //     }
-            // }
+            Tinkle[] tinkleArray = Tinkle.init(personArray);
+            for(Tinkle tinkle: tinkleArray) {
+                // List<Tinkle> tinkleFound = 
+                Optional<Tinkle> tinkleFound = tinkleJPA.findByPersonName(tinkle.getPersonName());
+                if(tinkleFound.isEmpty()) {
+                    tinkleJPA.save(tinkle);
+                }
+            }
 
             BathroomQueue[] queueArray = BathroomQueue.init();
             for(BathroomQueue queue: queueArray) {
@@ -173,12 +170,12 @@ public class ModelInit {
             }
 
             // Teacher API is populated with starting announcements
-            List<Teacher> teachers = Teacher.init();
-            for (Teacher teacher : teachers) {
-                List<Teacher> existTeachers = teacherJPARepository.findByFirstnameIgnoreCaseAndLastnameIgnoreCase(teacher.getFirstname(), teacher.getLastname());
-                if(existTeachers.isEmpty())
-                teacherJPARepository.save(teacher); // JPA save
-            }
+            // List<Teacher> teachers = Teacher.init();
+            // for (Teacher teacher : teachers) {
+            // List<Teacher> existTeachers = teacherJPARepository.findByFirstnameIgnoreCaseAndLastnameIgnoreCase(teacher.getFirstname(), teacher.getLastname());
+            //     if(existTeachers.isEmpty())
+            //    teacherJPARepository.save(teacher); // JPA save
+            //}
             // Issue database initialization
             Issue[] issueArray = Issue.init();
             for (Issue issue : issueArray) {
