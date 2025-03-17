@@ -131,6 +131,8 @@ public class StudentInfo {
             students.add(new StudentInfo("Th35py27", 1, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Nandan"));
             students.add(new StudentInfo("M8tth3", 1, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Matthew"));
             students.add(new StudentInfo("Trevorhuang1", 1, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Trevor"));
+            students.add(new StudentInfo("LiliWuu", 1, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Lilian"));
+            students.add(new StudentInfo("tarasehdave", 1, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Tara"));
 
 
             for (StudentInfo student : students) {
