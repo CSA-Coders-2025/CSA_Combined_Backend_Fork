@@ -136,8 +136,19 @@ public class StudentInfo {
             students.add(new StudentInfo("anikabhatnagar20", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Anika"));
             students.add(new StudentInfo("shuban-789", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Shuban"));
             students.add(new StudentInfo("KinetekEnergy", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Aashray"));
+            students.add(new StudentInfo("SGTech08", 3, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Saathvik"));
+            students.add(new StudentInfo("tanav-kambhampati", 3, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Tanav"));
+            students.add(new StudentInfo("SriS126", 3, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Sri"));
+            students.add(new StudentInfo("AidanLau10", 3, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Aidan"));
+            students.add(new StudentInfo("ArnavNadar", 3, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Arnav"));
+            students.add(new StudentInfo("JasonGuan1012", 3, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Jason"));
+            students.add(new StudentInfo("alishahussain", 4, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Alisha"));
+            students.add(new StudentInfo("dino596", 4, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Arthur"));
+            students.add(new StudentInfo("hanlunli", 4, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Hanlun"));
+            students.add(new StudentInfo("Saaras859", 4, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Saaras"));
+            students.add(new StudentInfo("Be1uga4life", 4, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Eric"));
+            students.add(new StudentInfo("Dabear14", 4, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Dinesh"));
             
-
 
             for (StudentInfo student : students) {
                 Optional<StudentInfo> existingStudent = studentJPARepository.findByUsername(student.getUsername());
