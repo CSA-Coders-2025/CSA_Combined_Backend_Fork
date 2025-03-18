@@ -129,7 +129,7 @@ public class StudentInfo {
             students.add(new StudentInfo("dylangarrettschool99", 1, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Dylan"));
             students.add(new StudentInfo("TDWolff", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Torin"));
             students.add(new StudentInfo("Th35py27", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Nandan"));
-            students.add(new StudentInfo("M8tth3", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Matthew"));
+            students.add(new StudentInfo("M8tth3", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Matthew Wakayama"));
             students.add(new StudentInfo("Trevorhuang1", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Trevor"));
             students.add(new StudentInfo("LiliWuu", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Lilian"));
             students.add(new StudentInfo("tarasehdave", 2, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Tara"));
@@ -160,13 +160,19 @@ public class StudentInfo {
             students.add(new StudentInfo("Akhil353", 6, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Akhil"));
             students.add(new StudentInfo("rahulverma13", 6, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Rahul"));
             students.add(new StudentInfo("aaguy-hue", 6, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Aadit"));
-            
             students.add(new StudentInfo("AdityaSamavedam", 7, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Aditya"));
             students.add(new StudentInfo("nitinsandiego", 7, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Nitin"));
             students.add(new StudentInfo("SrinivasNampalli", 7, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Srini"));
             students.add(new StudentInfo("JoshThinh", 7, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Josh"));
             students.add(new StudentInfo("DavidL0914", 7, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "David"));
             students.add(new StudentInfo("tarunja1ks", 7, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Tarun"));
+            
+            students.add(new StudentInfo("7mwang", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Matthew Wang"));
+            students.add(new StudentInfo("nitinsandiego", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Nitin"));
+            students.add(new StudentInfo("SrinivasNampalli", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Srini"));
+            students.add(new StudentInfo("JoshThinh", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Josh"));
+            students.add(new StudentInfo("DavidL0914", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "David"));
+            students.add(new StudentInfo("tarunja1ks", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Tarun"));
             
 
             for (StudentInfo student : students) {
