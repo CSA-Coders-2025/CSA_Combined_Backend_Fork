@@ -172,9 +172,8 @@ public class StudentInfo {
             students.add(new StudentInfo("avanthikadaita", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "avanthika"));
             students.add(new StudentInfo("Flying-Book", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Anusha"));
             students.add(new StudentInfo("vibha-yganji", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Vibha"));
-            students.add(new StudentInfo("vibha-yganji", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Vibha"));
-
-            
+            students.add(new StudentInfo("iKAN2025", 8, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Bella"));
+        
 
             for (StudentInfo student : students) {
                 Optional<StudentInfo> existingStudent = studentJPARepository.findByUsername(student.getUsername());
