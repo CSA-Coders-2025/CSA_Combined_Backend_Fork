@@ -154,6 +154,13 @@ public class StudentInfo {
             students.add(new StudentInfo("miggysp", 5, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Miheer"));
             students.add(new StudentInfo("DrishyaMody", 5, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Drishya"));
             students.add(new StudentInfo("tanuj253", 5, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Tanuj"));
+
+            students.add(new StudentInfo("KaydenLe", 5, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Kayden"));
+            students.add(new StudentInfo("spooketti", 5, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Jonathan"));
+            students.add(new StudentInfo("iwu78", 5, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Ian"));
+            students.add(new StudentInfo("Akhil353", 5, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Akhil"));
+            students.add(new StudentInfo("rahulverma13", 5, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Rahul"));
+            students.add(new StudentInfo("aaguy-hue", 5, "CSA", new ArrayList<String>(Arrays.asList("Task 1")), new ArrayList<String>(Arrays.asList("Task 1")), 3, 3, "Aadit"));
             
 
             for (StudentInfo student : students) {
