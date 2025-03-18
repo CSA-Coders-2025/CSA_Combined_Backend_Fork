@@ -18,7 +18,7 @@
               </form>
           </div>
           <div th:if="${input != null}">
-              <p th:text="'Checking: ' + ${input}"></p>
+              <p th:text="'Palindrome Candidate: ' + ${input}"></p>
               <ul>
                   <li th:each="check : ${checks}">
                       <span th:text="'Comparing: ' + ${check.left} + ' and ' + ${check.right}"></span>
