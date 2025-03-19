@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.AllArgsConstructor;
@@ -340,4 +341,18 @@ public class StudentInfoApiController {
                   ratingDto.getPunctuality();
         return sum / 5.0; // Divide by 5 to get the average
     }
+    @PostMapping("/sumbit")
+public ResponseEntity<String> sumbitNotebook(@RequestParam("file") MultipartFile file) {
+    if (file.isEmpty() || !file.getOriginalFilename().endsWith(".ipynb")) {
+        return ResponseEntity.badRequest().body("Please upload a valid .ipynb file.");
+    }
+    try {
+        String content = new String(file.getBytes());
+        int length = content.length();
+        return ResponseEntity.ok("Successfully read IPYNB file, length: " + length + " characters.");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("Error reading .ipynb file: " + e.getMessage());
+    }
+}
 }
