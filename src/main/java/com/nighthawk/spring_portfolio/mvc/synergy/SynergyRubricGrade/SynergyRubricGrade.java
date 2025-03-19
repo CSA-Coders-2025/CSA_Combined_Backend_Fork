@@ -1,6 +1,8 @@
-package com.nighthawk.spring_portfolio.mvc.synergy;
+package com.nighthawk.spring_portfolio.mvc.synergy.SynergyRubricGrade;
 
 import java.util.Map;
+
+import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade.SynergyGrade;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;

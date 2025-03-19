@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
-import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
-import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGradeJpaRepository;
+import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade.SynergyGrade;
+import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade.SynergyGradeJpaRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.Getter;

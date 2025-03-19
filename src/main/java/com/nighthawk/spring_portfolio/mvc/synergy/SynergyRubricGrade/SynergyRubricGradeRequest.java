@@ -1,4 +1,4 @@
-package com.nighthawk.spring_portfolio.mvc.synergy;
+package com.nighthawk.spring_portfolio.mvc.synergy.SynergyRubricGrade;
 
 import com.nighthawk.spring_portfolio.mvc.assignments.Assignment;
 import com.nighthawk.spring_portfolio.mvc.person.Person;

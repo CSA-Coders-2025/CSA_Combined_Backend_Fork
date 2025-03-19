@@ -12,8 +12,8 @@ import com.nighthawk.spring_portfolio.mvc.assignments.Assignment;
 import com.nighthawk.spring_portfolio.mvc.assignments.AssignmentJpaRepository;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
-import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
-import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGradeJpaRepository;
+import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade.SynergyGrade;
+import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade.SynergyGradeJpaRepository;
 
 import java.util.Collections;
 import java.util.List;

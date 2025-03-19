@@ -1,23 +1,27 @@
-package com.nighthawk.spring_portfolio.mvc.synergy;
+package com.nighthawk.spring_portfolio.mvc.synergy.SynergyRubricGrade;
+
+import java.util.Map;
 
 import com.nighthawk.spring_portfolio.mvc.assignments.Assignment;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class SynergyGradeRequest {
+@Table(name = "synergy_rubric_grade_request")
+public class SynergyRubricGradeAPIController {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -28,7 +32,8 @@ public class SynergyGradeRequest {
     private String explanation;
 
     @NotNull
-    private Double gradeSuggestion;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Map<String, SynergyRubricGrade.RubricCriterion> rubricScores;
 
     @NotNull
     @ManyToOne
@@ -42,19 +47,13 @@ public class SynergyGradeRequest {
     @ManyToOne
     private Assignment assignment;
 
-
-    public SynergyGradeRequest(Assignment assignment, Person student, Person grader, String explanation, Double gradeSuggestion) {
-        this.gradeSuggestion = gradeSuggestion;
+    public SynergyRubricGradeAPIController(Assignment assignment, Person student, Person grader, String explanation, Map<String, SynergyRubricGrade.RubricCriterion> rubricScores) {
+        this.rubricScores = rubricScores;
         this.explanation = explanation;
         this.grader = grader;
         this.student = student;
         this.assignment = assignment;
         this.status = 0;
-    }
-
-    @Override
-    public String toString() {
-        return "SynergyGradeRequest{id=" + id + ", explanation=" + explanation + ", gradeSuggestion=" + gradeSuggestion + ", status=" + status + ", grader=" + grader.getName() + ", student=" + student.getName() + ", assignment=" + assignment.getName() + "}";
     }
 
     public void accept() {

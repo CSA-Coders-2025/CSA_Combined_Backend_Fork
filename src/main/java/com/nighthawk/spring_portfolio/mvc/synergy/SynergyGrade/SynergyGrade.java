@@ -1,4 +1,4 @@
-package com.nighthawk.spring_portfolio.mvc.synergy;
+package com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

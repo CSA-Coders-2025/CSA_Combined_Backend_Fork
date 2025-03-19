@@ -1,4 +1,4 @@
-package com.nighthawk.spring_portfolio.mvc.synergy;
+package com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
 
 import java.util.List;
 import java.util.Optional;

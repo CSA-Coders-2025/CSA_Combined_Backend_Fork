@@ -46,7 +46,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import com.nighthawk.spring_portfolio.mvc.assignments.AssignmentSubmission;
 import com.nighthawk.spring_portfolio.mvc.bathroom.Tinkle;
 import com.nighthawk.spring_portfolio.mvc.student.StudentInfo;
-import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
+import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade.SynergyGrade;
 
 import jakarta.persistence.FetchType;
 import lombok.AllArgsConstructor;

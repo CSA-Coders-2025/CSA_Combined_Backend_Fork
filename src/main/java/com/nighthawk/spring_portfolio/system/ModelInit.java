@@ -41,8 +41,8 @@ import com.nighthawk.spring_portfolio.mvc.student.StudentInfo.StudentService;
 import com.nighthawk.spring_portfolio.mvc.student.StudentInfoJPARepository;
 import com.nighthawk.spring_portfolio.mvc.student.StudentQueue;
 import com.nighthawk.spring_portfolio.mvc.student.StudentQueueJPARepository;
-import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
-import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGradeJpaRepository;
+import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade.SynergyGrade;
+import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade.SynergyGradeJpaRepository;
 import com.nighthawk.spring_portfolio.mvc.user.UserJpaRepository;
 
 @Component
