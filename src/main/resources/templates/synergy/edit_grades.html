@@ -7,46 +7,66 @@
 
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
     <style>
+        /* Force the table to a fixed layout so columns do not auto-expand */
         table {
             border-collapse: collapse;
-            overflow-x: auto;
-            display: block;
+            table-layout: fixed !important;
+            width: 50% !important;
         }
+    
+        /* Cells will clip or scroll content instead of resizing */
         th, td {
             padding: 1em;
             text-align: center;
-            min-width: 8em;
+            min-width: 8em; /* optional; remove or adjust as needed */
+            overflow: hidden !important; /* ensures content can be clipped if too wide */
         }
+    
+        /* Container can still provide general overflow if desired, 
+           but remove white-space: nowrap so the entire table doesn't scroll */
         .container {
             overflow-x: auto;
-            white-space: nowrap;
+            /* white-space: nowrap;  <-- remove or comment out to avoid scrolling the entire table */
         }
+    
+        /* This class controls content within each cell. 
+           Setting a max-width + overflow-x: auto + white-space: nowrap 
+           ensures that only the cell scrolls horizontally if content is too wide. */
         .grade-cell {
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5em;
+            max-width: 8em;      /* or any fixed size you prefer */
+            overflow-x: auto;    /* horizontal scroll within the cell */
+            white-space: nowrap; /* keep text on one line */
         }
+    
         .grade-input {
             width: 4em;
             text-align: right;
             padding: 0.25em;
         }
+    
         .points-separator {
             margin: 0 0.25em;
         }
+    
         .total-points {
             color: #666;
         }
+    
         .assignment-header {
             display: flex;
             flex-direction: column;
             gap: 0.5em;
         }
+    
         .assignment-name {
             font-weight: bold;
         }
+    
         .assignment-points {
             font-size: 0.9em;
             color: #666;
@@ -67,7 +87,7 @@
                 <input type="text" id="column-search" placeholder="Search for an assignment" />
             </div>
             
-            <table id="edit-grades-table" class="table">
+            <table id="edit-grades-table">
                 <thead>
                     <tr>
                         <th>Student Name</th>
@@ -190,6 +210,7 @@
                     <button onclick="submitGradeRequest(${request.id}, true)" class="btn btn-success btn-sm">Accept</button>
                     <button onclick="submitGradeRequest(${request.id}, false)" class="btn btn-danger btn-sm">Reject</button>
                 </div>
+                <p>Rachit is a cutie</p>
             `;
             container.appendChild(requestCard);
         });
