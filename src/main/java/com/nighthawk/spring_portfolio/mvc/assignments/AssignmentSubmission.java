@@ -39,19 +39,19 @@ public class AssignmentSubmission {
     private String content;
     private Double grade;
     private String feedback;
-
     private String comment;
-
     private long assignmentid;
+    private String filePath; // New field for file storage
     
-    public AssignmentSubmission(Assignment assignment, Person student, String content, String comment) {
+    public AssignmentSubmission(Assignment assignment, Person student, String content, String comment, String filePath) {
         this.assignment = assignment;
         this.student = student;
         this.content = content;
         this.grade = null;
         this.feedback = null;
         this.comment = comment;
-        this.assignmentid=assignment.getId();
+        this.assignmentid = assignment.getId();
+        this.filePath = filePath;
     }
 
     // Getters and Setters (if not using Lombok)
@@ -92,12 +92,20 @@ public class AssignmentSubmission {
         return grade;
     }
 
+    public String getFilePath() {
+        return filePath;
+    }
+
     public void setFeedback(String feedback) {
         this.feedback = feedback;
     }
 
     public void setGrade(Double grade) {
         this.grade = grade;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
     
 }
