@@ -1,5 +1,7 @@
 package com.nighthawk.spring_portfolio.mvc.assignments;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
@@ -76,25 +79,39 @@ public class AssignmentSubmissionAPIController {
      * @param studentId    the ID of the student submitting the assignment
      * @param content      the content of the submission
      * @param comment      any comments related to the submission
+     * @param file        optional file upload
      * @return a ResponseEntity containing the created submission or an error if the assignment is not found
      */
     @PostMapping("/submit/{assignmentId}")
     public ResponseEntity<?> submitAssignment(
             @PathVariable Long assignmentId,
             @RequestParam Long studentId,
-            @RequestParam String content,
-            @RequestParam String comment
+            @RequestParam(required = false) String content,
+            @RequestParam(required = false) String comment,
+            @RequestParam(required = false) MultipartFile file
     ) {
         Assignment assignment = assignmentRepo.findById(assignmentId).orElse(null);
         Person student = personRepo.findById(studentId).orElse(null);
-        if (assignment != null) {
-            AssignmentSubmission submission = new AssignmentSubmission(assignment, student, content, comment);
+        
+        if (assignment != null && student != null) {
+            String filePath = null;
+            if (file != null && !file.isEmpty()) {
+                try {
+                    // Define file storage path (adjust path as needed)
+                    String storagePath = "uploads/" + file.getOriginalFilename();
+                    file.transferTo(new File(storagePath));
+                    filePath = storagePath;
+                } catch (IOException e) {
+                    return new ResponseEntity<>(Collections.singletonMap("error", "File upload failed"), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+            
+            AssignmentSubmission submission = new AssignmentSubmission(assignment, student, content, comment, filePath);
             AssignmentSubmission savedSubmission = submissionRepo.save(submission);
             return new ResponseEntity<>(savedSubmission, HttpStatus.CREATED);
         }
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "Assignment not found");
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        
+        return new ResponseEntity<>(Collections.singletonMap("error", "Assignment or Student not found"), HttpStatus.NOT_FOUND);
     }
 
     /**
