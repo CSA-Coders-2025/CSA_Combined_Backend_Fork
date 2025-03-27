@@ -1,9 +1,14 @@
 package com.nighthawk.spring_portfolio.mvc.backups;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -11,6 +16,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,6 +56,8 @@ public class ImportsController {
 
     private final ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
     private final Object lock = new Object();
+
+    
 
     @EventListener(ApplicationReadyEvent.class)
     public synchronized void initializeOnStartup() {
@@ -96,10 +106,35 @@ public class ImportsController {
         try {
             InputStream inputStream = file.getInputStream();
             String rawJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-
+    
+            // Parse the JSON data first
             Map<String, List<Map<String, Object>>> data = objectMapper.readValue(rawJson, Map.class);
-
+            
+            // FIRST PASS: Create all tables that don't exist yet
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH)) {
+                connection.setAutoCommit(false); // Start transaction
+                
+                // Get existing tables
+                Set<String> existingTables = getAllTables(connection);
+                
+                // Create all tables first before attempting to insert any data
+                for (Map.Entry<String, List<Map<String, Object>>> entry : data.entrySet()) {
+                    String tableName = sanitizeTableName(entry.getKey());
+                    List<Map<String, Object>> tableData = entry.getValue();
+                    
+                    if (!tableName.endsWith("_seq") && !tableData.isEmpty() && !existingTables.contains(tableName)) {
+                        System.out.println("Pre-creating table: " + tableName);
+                        Set<String> columns = tableData.get(0).keySet();
+                        createTable(connection, tableName, columns);
+                    }
+                }
+                
+                connection.commit();
+            }
+            
+            // SECOND PASS: Process all the data normally
             sanitizeAndProcessData(data, true);
+            
             return "Data imported successfully from uploaded file: " + file.getOriginalFilename();
         } catch (Exception e) {
             e.printStackTrace();
@@ -212,12 +247,6 @@ public class ImportsController {
         }
     }
 
-    private void disableWalMode(Connection connection) throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            statement.execute("PRAGMA journal_mode=DELETE;");
-        }
-    }
-
     private void setBusyTimeout(Connection connection, int timeoutMillis) throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.execute("PRAGMA busy_timeout=" + timeoutMillis + ";");
@@ -264,13 +293,25 @@ public class ImportsController {
             for (Map.Entry<String, List<Map<String, Object>>> entry : data.entrySet()) {
                 String tableName = sanitizeTableName(entry.getKey());
                 List<Map<String, Object>> tableData = entry.getValue();
+                
                 if (!tableName.endsWith("_seq")) { // Skip sequence tables
-                    ensureTableExists(connection, tableName, tableData, removeExcessData);
-                    if (removeExcessData) {
-                        // Delete all existing data and replace with the JSON data
-                        clearTableData(connection, tableName);
+                    // First make sure the table exists with all necessary columns
+                    try {
+                        ensureTableExists(connection, tableName, tableData, removeExcessData);
+                        
+                        if (removeExcessData) {
+                            // Delete all existing data and replace with the JSON data
+                            clearTableData(connection, tableName);
+                        }
+                        
+                        // Only attempt to insert data if we have any
+                        if (!tableData.isEmpty()) {
+                            insertTableData(connection, tableName, tableData);
+                        }
+                    } catch (SQLException e) {
+                        System.err.println("Error processing table " + tableName + ": " + e.getMessage());
+                        throw e; // Rethrow to roll back the transaction
                     }
-                    insertTableData(connection, tableName, tableData);
                 }
             }
             
@@ -376,39 +417,58 @@ public class ImportsController {
         return tableName.replaceAll("[^a-zA-Z0-9_]", "_");
     }
 
-    private File getMostRecentBackupFile() {
-        File backupsDir = new File(BACKUP_DIR);
-        if (!backupsDir.exists() || !backupsDir.isDirectory()) {
-            return null;
-        }
-
-        File[] backupFiles = backupsDir.listFiles((dir, name) -> name.startsWith("backup_") && name.endsWith(".json"));
-        if (backupFiles == null || backupFiles.length == 0) {
-            return null;
-        }
-
-        Arrays.sort(backupFiles, Comparator.comparingLong(File::lastModified).reversed());
-        return backupFiles[0];
-    }
-
     private void insertTableData(Connection connection, String tableName, List<Map<String, Object>> tableData) throws SQLException {
         if (tableData.isEmpty()) {
+            System.out.println("No data to insert for table: " + tableName);
             return;
         }
-
+    
         Set<String> columns = tableData.get(0).keySet();
+        
+        // Verify table exists before attempting insert
+        if (!tableExists(connection, tableName)) {
+            System.out.println("Table " + tableName + " doesn't exist. Creating it now...");
+            createTable(connection, tableName, columns);
+        }
+        
+        // Verify all columns exist
+        Set<String> existingColumns = getExistingColumns(connection, tableName);
+        for (String column : columns) {
+            if (!existingColumns.contains(column)) {
+                System.out.println("Adding missing column: " + column + " to table: " + tableName);
+                addColumn(connection, tableName, column);
+            }
+        }
+        
+        // Now build the insert query based on the actual columns in the database
         String sql = buildInsertQuery(tableName, columns);
-
+    
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            int batchSize = 0;
             for (Map<String, Object> row : tableData) {
                 int index = 1;
                 for (String column : columns) {
                     preparedStatement.setObject(index++, row.get(column));
                 }
                 preparedStatement.addBatch();
+                batchSize++;
+                
+                // Execute in batches of 100 to avoid memory issues
+                if (batchSize >= 100) {
+                    preparedStatement.executeBatch();
+                    batchSize = 0;
+                }
             }
-
-            preparedStatement.executeBatch();
+    
+            // Execute any remaining items in the batch
+            if (batchSize > 0) {
+                preparedStatement.executeBatch();
+            }
+            
+            System.out.println("Successfully inserted " + tableData.size() + " rows into " + tableName);
+        } catch (SQLException e) {
+            System.err.println("Error inserting data into " + tableName + ": " + e.getMessage());
+            throw e;
         }
     }
 
@@ -435,14 +495,33 @@ public class ImportsController {
     }
 
     private void ensureTableExists(Connection connection, String tableName, List<Map<String, Object>> tableData, boolean removeExcessColumns) throws SQLException {
+        // If the data is empty, create a basic table structure instead of skipping
         if (tableData.isEmpty()) {
+            System.out.println("No data provided for table: " + tableName + ". Creating with basic structure.");
+            if (!tableExists(connection, tableName)) {
+                // Create a basic table if it doesn't exist
+                String sql = "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
+                             "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                             "name TEXT, " +
+                             "description TEXT, " +
+                             "created_date TEXT" +
+                             ")";
+                try (Statement stmt = connection.createStatement()) {
+                    stmt.execute(sql);
+                    System.out.println("Created basic table structure for: " + tableName);
+                }
+            }
             return;
         }
-
+    
         Set<String> columnsInJson = tableData.get(0).keySet();
         
-        if (!tableExists(connection, tableName)) {
+        // Check if the table exists
+        boolean tableExists = tableExists(connection, tableName);
+        
+        if (!tableExists) {
             // Create a new table with exactly the columns in the JSON
+            System.out.println("Creating new table: " + tableName + " with columns: " + columnsInJson);
             createTable(connection, tableName, columnsInJson);
         } else if (removeExcessColumns) {
             // Get existing columns in the database
@@ -454,12 +533,14 @@ public class ImportsController {
             
             // If we have columns to remove, recreate the table
             if (!columnsToRemove.isEmpty()) {
+                System.out.println("Recreating table: " + tableName + " to remove columns: " + columnsToRemove);
                 // Need to recreate the table to remove columns
                 recreateTableWithNewSchema(connection, tableName, columnsInJson);
             } else {
                 // Just add any missing columns
                 for (String column : columnsInJson) {
                     if (!existingColumns.contains(column)) {
+                        System.out.println("Adding column: " + column + " to table: " + tableName);
                         addColumn(connection, tableName, column);
                     }
                 }
@@ -469,6 +550,7 @@ public class ImportsController {
             Set<String> existingColumns = getExistingColumns(connection, tableName);
             for (String column : columnsInJson) {
                 if (!existingColumns.contains(column)) {
+                    System.out.println("Adding column: " + column + " to table: " + tableName);
                     addColumn(connection, tableName, column);
                 }
             }
@@ -497,26 +579,53 @@ public class ImportsController {
     }
 
     private void createTable(Connection connection, String tableName, Set<String> columns) throws SQLException {
-        StringBuilder sqlBuilder = new StringBuilder("CREATE TABLE " + tableName + " (");
+        StringBuilder sqlBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS " + tableName + " (");
+        
+        boolean hasIdColumn = columns.stream().anyMatch(col -> col.equalsIgnoreCase("id"));
+        
         for (String column : columns) {
-            if (column.equalsIgnoreCase("id")) {
+            if (column.equalsIgnoreCase("id") && hasIdColumn) {
                 sqlBuilder.append(column).append(" INTEGER PRIMARY KEY AUTOINCREMENT,");
+            } else if (column.toLowerCase().endsWith("_id") || column.toLowerCase().equals("id")) {
+                // Foreign keys or other ID fields are usually integers
+                sqlBuilder.append(column).append(" INTEGER,");
+            } else if (column.toLowerCase().contains("date") || column.toLowerCase().contains("time")) {
+                // Date/time fields
+                sqlBuilder.append(column).append(" TEXT,");
+            } else if (column.toLowerCase().contains("is_") || column.toLowerCase().startsWith("has_") || 
+                      column.toLowerCase().equals("active") || column.toLowerCase().equals("enabled")) {
+                // Boolean fields
+                sqlBuilder.append(column).append(" BOOLEAN,");
+            } else if (column.toLowerCase().contains("count") || column.toLowerCase().contains("number") || 
+                      column.toLowerCase().contains("amount") || column.toLowerCase().contains("quantity")) {
+                // Numeric fields
+                sqlBuilder.append(column).append(" INTEGER,");
+            } else if (column.toLowerCase().contains("price") || column.toLowerCase().contains("cost") || 
+                      column.toLowerCase().contains("rate")) {
+                // Decimal fields
+                sqlBuilder.append(column).append(" REAL,");
             } else {
+                // Default to TEXT for everything else
                 sqlBuilder.append(column).append(" TEXT,");
             }
         }
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(")");
-
-        try (Statement statement = connection.createStatement()) {
-            statement.execute(sqlBuilder.toString());
+        
+        // Remove the trailing comma
+        if (columns.size() > 0) {
+            sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         }
-    }
-
-    private boolean columnExists(Connection connection, String tableName, String columnName) throws SQLException {
-        DatabaseMetaData meta = connection.getMetaData();
-        try (ResultSet resultSet = meta.getColumns(null, null, tableName, columnName)) {
-            return resultSet.next();
+        
+        sqlBuilder.append(")");
+        
+        String sql = sqlBuilder.toString();
+        System.out.println("Creating table with SQL: " + sql);
+        
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+            System.out.println("Successfully created table: " + tableName);
+        } catch (SQLException e) {
+            System.err.println("Error creating table " + tableName + ": " + e.getMessage());
+            throw e;
         }
     }
 
@@ -562,6 +671,8 @@ public class ImportsController {
         }
     }
 
+    private static final String LOG_FILE_PATH = "./volumes/logs/restore_operations.log";
+
     @PostMapping("/revert")
     public String revertToBackup(@RequestParam("filename") String filename, Model model) {
         synchronized (lock) {
@@ -572,15 +683,75 @@ public class ImportsController {
                     return "db_management/db_error";
                 }
                 
+                // Log the restore operation
+                logRestoreOperation(filename);
+                
                 String result = importFromFile(backupFile);
                 model.addAttribute("message", result);
                 return "db_management/db_success";
             } catch (Exception e) {
                 e.printStackTrace();
+                // Log the error too
+                logRestoreOperation(filename + " (FAILED: " + e.getMessage() + ")");
                 model.addAttribute("message", "Failed to revert to backup: " + e.getMessage());
                 return "db_management/db_error";
             }
         }
+    }
+
+    private void logRestoreOperation(String filename) {
+        try {
+            // Create logs directory if it doesn't exist
+            File logDir = new File("./volumes/logs/");
+            if (!logDir.exists()) {
+                logDir.mkdirs();
+            }
+            
+            // Get current timestamp
+            LocalDateTime now = LocalDateTime.now();
+            String timestamp = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            
+            // Append to log file
+            Path logPath = Paths.get(LOG_FILE_PATH);
+            String logEntry = timestamp + " - Restore operation performed: " + filename + "\n";
+            
+            Files.write(logPath, logEntry.getBytes(), 
+                        java.nio.file.StandardOpenOption.CREATE, 
+                        java.nio.file.StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            System.err.println("Failed to log restore operation: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/logs")
+    public String viewRestoreLogs(Model model) {
+        try {
+            List<String> logs = readLogFile();
+            model.addAttribute("logs", logs);
+            return "db_management/restore_logs";
+        } catch (IOException e) {
+            model.addAttribute("message", "Failed to read log file: " + e.getMessage());
+            return "db_management/db_error";
+        }
+    }
+
+    private List<String> readLogFile() throws IOException {
+        List<String> logs = new ArrayList<>();
+        File logFile = new File(LOG_FILE_PATH);
+        
+        if (!logFile.exists()) {
+            return logs;
+        }
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(logFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                logs.add(line);
+            }
+        }
+    
+        Collections.reverse(logs);
+        return logs;
     }
 
     @GetMapping("/view")
