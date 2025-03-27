@@ -2,13 +2,11 @@ package com.nighthawk.spring_portfolio.mvc.assignments;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 
 import jakarta.persistence.Entity;
@@ -58,33 +56,46 @@ public class AssignmentSubmission {
     private String content;
     private Double grade;
     private String feedback;
-
     private String comment;
-
     private long assignmentid;
-
     private boolean isLate;
+
+    // New field for file upload
+    private String filePath;
 
     @PreRemove
     private void removeStudentsFromSubmission() {
         if (students != null) {
-            // before the submission is removed, remove the submission from the students' submissions list
             for (Person student : students) {
                 student.getSubmissions().remove(this);
             }
         }
     }
-    
+
+    // Constructor for text-based submission
     public AssignmentSubmission(Assignment assignment, List<Person> students, String content, String comment, boolean isLate) {
         this.assignment = assignment;
         this.students = students;
         this.content = content;
+        this.comment = comment;
+        this.isLate = isLate;
+        this.assignmentid = assignment.getId();
         this.grade = null;
         this.feedback = null;
-        this.comment = comment;
-        this.assignmentid=assignment.getId();
-        this.isLate=isLate;
+        this.filePath = null; // No file
+    }
 
+    // Constructor for file-based submission
+    public AssignmentSubmission(Assignment assignment, List<Person> students, String filePath, String comment, boolean isLate, boolean isFile) {
+        this.assignment = assignment;
+        this.students = students;
+        this.filePath = filePath;
+        this.comment = comment;
+        this.isLate = isLate;
+        this.assignmentid = assignment.getId();
+        this.grade = null;
+        this.feedback = null;
+        this.content = null; // No text content
     }
 
     // Getters and Setters (if not using Lombok)
