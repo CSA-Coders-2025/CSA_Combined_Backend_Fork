@@ -90,14 +90,15 @@
         <small th:if="${#fields.hasErrors('kasmServerNeeded')}" th:errors="*{ksm}">Kasm Server Needed Error</small>
     </div>
 
+    <-- Verify Account Button-->
+    <button id="verifyButton" onclick="attemptVerify()">verify</button>
+
     <!-- Create Account Button -->
     <button type="submit" class="btn btn-secondary" id="feild8" style="display: none;">Create Account</button>
 
     <!-- Log In Button aligned to the right -->
     <a th:href="@{/login}">Log In</a>
 </form>
-
-<button id="verifyButton" onclick="attemptVerify()">verify</button>
 
 </div>
 </div>
