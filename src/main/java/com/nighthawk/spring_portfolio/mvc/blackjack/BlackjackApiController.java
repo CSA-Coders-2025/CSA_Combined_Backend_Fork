@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
 
+import io.jsonwebtoken.lang.Arrays;
+
 @RestController
 @RequestMapping("/api/casino/blackjack")
 public class BlackjackApiController {
@@ -182,6 +184,6 @@ public class BlackjackApiController {
         if (obj instanceof List) {
             return (List<String>) obj;
         }
-        return new ArrayList<>();
+        return Arrays.asList(new String[0]);
     }
 }
