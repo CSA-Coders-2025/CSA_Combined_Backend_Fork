@@ -34,7 +34,9 @@ public class BathroomQueue {
      * 
      * @param teacherEmail - the teacher's email for what class they are from
      * @param peopleQueue  - the people in the queue
+     * @param queues      - the list of all queues
      */
+
     public BathroomQueue(String teacherEmail, String peopleQueue) {
         this.teacherEmail = teacherEmail;
         this.peopleQueue = peopleQueue;
@@ -104,6 +106,14 @@ public class BathroomQueue {
             throw new IllegalStateException("Queue is empty");
         }
     }
+
+    public static void addQueue(String teacherEmail, String peopleQueue, ArrayList<BathroomQueue> queues) {
+    if (queues != null) {
+        queues.add(new BathroomQueue(teacherEmail, peopleQueue));
+    } else {
+        throw new IllegalArgumentException("Queue list cannot be null");
+    }
+}
 
     /**
      * @return - initialize the queue

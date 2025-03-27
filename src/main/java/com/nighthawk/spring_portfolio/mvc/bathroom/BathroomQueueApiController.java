@@ -3,6 +3,7 @@ package com.nighthawk.spring_portfolio.mvc.bathroom;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,12 +34,50 @@ public class BathroomQueueApiController {
     @Autowired
     private EmailService emailService; // Service for handling email-related functionality
 
+    private final ArrayList<BathroomQueue> queues = new ArrayList<>();
+
     // DTO (Data Transfer Object) for queue operations
     @Getter
     public static class QueueDto {
         private String teacherEmail; // Teacher's email associated with the queue
         private String studentName;  // Name of the student to be added/removed/approved
         private String uri;          // URI for constructing approval links
+    }
+
+    public static class QueueAddReq {
+        private String teacherEmail;
+        private String peopleQueue;
+
+        public String getTeacherEmail() {
+            return teacherEmail;
+        }
+
+        public String getPeopleQueue() {
+            return peopleQueue;
+        }
+    }
+
+    @CrossOrigin(origins = {"http://localhost:8085", "https://nighthawkcoders.github.io/portfolio_2025"})
+    @PostMapping("/addQueue")
+    public ResponseEntity<String> addQueue(@RequestBody QueueAddReq request) {
+        try {
+            BathroomQueue newQueue = new BathroomQueue(request.getTeacherEmail(), request.getPeopleQueue());
+            repository.save(newQueue); // Save the new queue to the database
+            return ResponseEntity.ok("Queue added successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add queue: " + e.getMessage());
+        }
+    }
+
+    /**
+     * API endpoint to get all queues
+     * 
+     * @return List of all queues
+     */
+    @CrossOrigin(origins = {"http://localhost:8085", "https://nighthawkcoders.github.io/portfolio_2025"})
+    @GetMapping("/getQueues")
+    public ResponseEntity<ArrayList<BathroomQueue>> getQueues() {
+        return ResponseEntity.ok(queues);
     }
 
     // Endpoint to add a student to the queue
