@@ -3,12 +3,13 @@ package com.nighthawk.spring_portfolio.mvc.assignments;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.nighthawk.spring_portfolio.mvc.RubricGrading.RubricGrading;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
 
@@ -60,6 +61,8 @@ public class Assignment {
 
     @NotEmpty
     private String timestamp;
+
+    private RubricGrading rubricgrade;
 
     @OneToMany(mappedBy="assignment", cascade=CascadeType.ALL, orphanRemoval=true)
     @JsonIgnore

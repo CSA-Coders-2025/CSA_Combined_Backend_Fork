@@ -102,7 +102,7 @@ public class SynergyApiController {
 
         public SynergyGradeDto(SynergyGrade grade) {
             this.id = grade.getId();
-            this.grade = grade.getGrade();
+            this.grade = grade.rubric.getOverallGrade();
             this.assignmentId = grade.getAssignment().getId();
             this.studentId = grade.getStudent().getId();
         }

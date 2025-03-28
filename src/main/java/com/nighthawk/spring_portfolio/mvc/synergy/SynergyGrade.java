@@ -3,6 +3,7 @@ package com.nighthawk.spring_portfolio.mvc.synergy;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.nighthawk.spring_portfolio.mvc.RubricGrading.RubricGrading;
 import com.nighthawk.spring_portfolio.mvc.assignments.Assignment;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 
@@ -25,7 +26,11 @@ public class SynergyGrade {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Double grade;
+    // private Double grade;
+
+    RubricGrading rubric;
+
+
 
     @ManyToOne
     @JoinColumn(name="assignment_id", nullable=false)
@@ -37,11 +42,19 @@ public class SynergyGrade {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Person student;
 
-    public SynergyGrade(Double grade, Assignment assignment, Person student) {
-        this.grade = grade;
+    public SynergyGrade(RubricGrading rubric, Assignment assignment, Person student) {
+        this.rubric = rubric;
         this.assignment = assignment;
         this.student = student;
     }
+
+    public SynergyGrade(Double grade, Assignment assignment, Person student) {
+        rubric=new RubricGrading(assignment.getDescription(), 1.0, grade );
+        this.assignment = assignment;
+        this.student = student;
+    }
+
+
 
     public static SynergyGrade createFromRequest(SynergyGradeRequest request) {
         return new SynergyGrade(request.getGradeSuggestion(), request.getAssignment(), request.getStudent());
@@ -70,5 +83,13 @@ public class SynergyGrade {
             
             
         };
+    }
+
+    public void setGrade(Double Grade){
+
+    }
+
+    public Double getGrade(){
+        return this.rubric.getOverallGrade();
     }
 }
