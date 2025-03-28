@@ -55,11 +55,13 @@ public class SubmissionService {
             throw new Exception("Error saving file: " + e.getMessage());
         }
 
+        String relativeFilePath = filePath.replace(projectRoot + File.separator, "");
+
         Assignment assignment = assignmentRepo.findById(assignmentId).orElse(null);
         List<Person> students = personRepo.findAllById(studentId);
 
         if (assignment != null) {
-             AssignmentSubmission submission = new AssignmentSubmission(assignment, students, filePath, comment, isLate);
+             AssignmentSubmission submission = new AssignmentSubmission(assignment, students, relativeFilePath, comment, isLate);
              AssignmentSubmission savedSubmission = submissionRepo.save(submission);
         }
 
