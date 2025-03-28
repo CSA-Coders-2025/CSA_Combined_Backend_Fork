@@ -43,7 +43,6 @@ public class RubricGrading {
         this.topic.add(topic);
         this.weightage.add(weightage);
         this.points.add(points);
-        this.RubricOverallGrade=points*weightage;
     }
 
 
