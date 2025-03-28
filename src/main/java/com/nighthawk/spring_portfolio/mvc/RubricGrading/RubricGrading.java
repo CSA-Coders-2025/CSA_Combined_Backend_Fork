@@ -2,12 +2,10 @@ package com.nighthawk.spring_portfolio.mvc.RubricGrading;
 
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -21,7 +19,7 @@ public class RubricGrading {
 
     private Double RubricOverallGrade;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // many rubric items(singular topics, weightages) inside one rubric gradinger
+    // @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // many rubric items(singular topics, weightages) inside one rubric gradinger
     private List<RubricItem> rubricItems;
 
     public RubricGrading(List<RubricItem> rubricItems) { 
