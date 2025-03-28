@@ -2,10 +2,13 @@ package com.nighthawk.spring_portfolio.mvc.RubricGrading;
 
 import java.util.List;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -20,6 +23,8 @@ public class RubricGrading {
     private Double RubricOverallGrade;
 
     // @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // many rubric items(singular topics, weightages) inside one rubric gradinger
+    @ElementCollection
+    @CollectionTable(name = "rubric_grading_items", joinColumns = @JoinColumn(name = "rubric_grading_id"))
     private List<RubricItem> rubricItems;
 
     public RubricGrading(List<RubricItem> rubricItems) { 
