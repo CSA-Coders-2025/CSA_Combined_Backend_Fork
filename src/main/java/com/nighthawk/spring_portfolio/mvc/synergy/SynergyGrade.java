@@ -86,7 +86,7 @@ public class SynergyGrade {
     }
 
     public void setGrade(Double Grade){
-
+        this.rubric.setOverallGrade(Grade);
     }
 
     public Double getGrade(){
