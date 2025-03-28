@@ -1,6 +1,6 @@
 package com.nighthawk.spring_portfolio.mvc.RubricGrading;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -20,19 +20,19 @@ public class RubricGrading {
 
     @Column(unique=false)
     @NotNull
-    private ArrayList<String> topic;
+    private List<String> topic;
 
     @Column(unique=false)
     @NotNull
-    private ArrayList<Double> weightage;
+    private List<Double> weightage;
 
     @Column(unique=false)
     @NotNull
-    private ArrayList<Double> points; // Range from 0 to 1
+    private List<Double> points; // Range from 0 to 1
 
 
 
-    public RubricGrading(ArrayList<String>topic, ArrayList<Double>weightage, ArrayList<Double>points){
+    public RubricGrading(List<String>topic, List<Double>weightage, List<Double>points){
         this.topic=topic;
         this.weightage=weightage;
         this.points=points;
@@ -40,9 +40,6 @@ public class RubricGrading {
 
 
     public RubricGrading(String topic, Double weightage, Double points){
-        this.topic=new  ArrayList<String>();
-        this.weightage=new  ArrayList<Double>();
-        this.points=new  ArrayList<Double>();
         this.topic.add(topic);
         this.weightage.add(weightage);
         this.points.add(points);
