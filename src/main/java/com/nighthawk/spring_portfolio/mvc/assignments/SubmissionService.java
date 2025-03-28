@@ -61,7 +61,7 @@ public class SubmissionService {
         List<Person> students = personRepo.findAllById(studentId);
 
         if (assignment != null) {
-             AssignmentSubmission submission = new AssignmentSubmission(assignment, students, relativeFilePath, comment, isLate);
+             AssignmentSubmission submission = new AssignmentSubmission(assignment, students, relativeFilePath, comment, isLate, true);
              AssignmentSubmission savedSubmission = submissionRepo.save(submission);
         }
 
