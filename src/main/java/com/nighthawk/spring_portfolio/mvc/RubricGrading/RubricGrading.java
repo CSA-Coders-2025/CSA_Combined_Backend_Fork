@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -23,16 +22,15 @@ public class RubricGrading {
     private Double RubricOverallGrade;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "rubric_grading_id")
-    private List<RubricItemDTO> rubricItems;
+    private List<RubricItem> rubricItems;
 
-    public RubricGrading(List<RubricItemDTO> rubricItems) { 
+    public RubricGrading(List<RubricItem> rubricItems) { 
         this.rubricItems = rubricItems;
     }
 
 
     public RubricGrading(String topic, Double weightage, Double points){
-        this.rubricItems.add(new RubricItemDTO(topic,weightage,points));
+        this.rubricItems.add(new RubricItem(topic,weightage,points));
     }
 
 
