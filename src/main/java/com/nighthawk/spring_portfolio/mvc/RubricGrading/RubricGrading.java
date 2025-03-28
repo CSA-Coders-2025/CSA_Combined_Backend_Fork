@@ -21,7 +21,7 @@ public class RubricGrading {
 
     private Double RubricOverallGrade;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // many rubric items(singular topics, weightages) inside one rubric gradinger
     private List<RubricItem> rubricItems;
 
     public RubricGrading(List<RubricItem> rubricItems) { 
