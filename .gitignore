@@ -43,6 +43,7 @@ build/
 *.db-shm
 *.db-wal
 volumes/backups/
+volumes/uploads/
 
 ### Plots ###
 testoutput/
