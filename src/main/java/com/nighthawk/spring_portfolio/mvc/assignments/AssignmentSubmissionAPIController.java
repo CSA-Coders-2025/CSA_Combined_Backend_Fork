@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.nighthawk.spring_portfolio.mvc.person.Person;
@@ -31,11 +32,6 @@ import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGradeJpaRepository;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;
-
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 
 /**
  * REST API Controller for managing assignment submissions.
@@ -139,7 +135,7 @@ public class AssignmentSubmissionAPIController {
 
     @PostMapping("/submit/{assignmentId}")
     public ResponseEntity<?> submitAssignment(
-            @RequestParam("studentId") Long studentId,
+            @RequestParam("studentId") List<Long> studentId,
             @RequestParam("comment") String comment,
             @RequestParam("isLate") boolean isLate,
             @RequestParam("file") MultipartFile file, // File upload
