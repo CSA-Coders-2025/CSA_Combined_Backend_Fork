@@ -32,6 +32,11 @@ import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+
 /**
  * REST API Controller for managing assignment submissions.
  * Provides endpoints for CRUD operations on assignment submissions.
@@ -44,6 +49,9 @@ public class AssignmentSubmissionAPIController {
 
     @Autowired
     private AssignmentSubmissionJPA submissionRepo;
+
+    @Autowired
+    private SubmissionService submissionService;
 
     @Autowired
     private AssignmentJpaRepository assignmentRepo;
@@ -129,29 +137,22 @@ public class AssignmentSubmissionAPIController {
         public Boolean isLate;
     }
 
-    /**
-     * Submit an assignment for a student.
-     * 
-     * @param assignmentId the ID of the assignment being submitted
-     * @param studentId    the ID of the student submitting the assignment
-     * @param content      the content of the submission
-     * @param comment      any comments related to the submission
-     * @return a ResponseEntity containing the created submission or an error if the assignment is not found
-     */
     @PostMapping("/submit/{assignmentId}")
     public ResponseEntity<?> submitAssignment(
-            @RequestBody SubmissionRequestDto requestData
-    ) {
-        Assignment assignment = assignmentRepo.findById(requestData.assignmentId).orElse(null);
-        List<Person> students = personRepo.findAllById(requestData.studentIds);
-        if (assignment != null) {
-            AssignmentSubmission submission = new AssignmentSubmission(assignment, students, requestData.content, requestData.comment,requestData.isLate);
-            AssignmentSubmission savedSubmission = submissionRepo.save(submission);
-            return new ResponseEntity<>(new AssignmentSubmissionReturnDto(savedSubmission), HttpStatus.CREATED);
+            @RequestParam("studentId") Long studentId,
+            @RequestParam("comment") String comment,
+            @RequestParam("isLate") boolean isLate,
+            @RequestParam("file") MultipartFile file, // File upload
+            @PathVariable Long assignmentId) {
+
+        try {
+            // Call a service method to process the submission
+            submissionService.submitAssignment(studentId, assignmentId, comment, isLate, file);
+
+            return ResponseEntity.ok("Submission successful!");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Submission failed: " + e.getMessage());
         }
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "Assignment not found");
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
     
     /**
