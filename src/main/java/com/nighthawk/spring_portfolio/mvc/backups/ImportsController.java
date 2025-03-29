@@ -627,13 +627,7 @@ public class ImportsController {
             System.err.println("Error creating table " + tableName + ": " + e.getMessage());
             throw e;
 
-        }
-    }
-
-    private boolean columnExists(Connection connection, String tableName, String columnName) throws SQLException {
-        DatabaseMetaData meta = connection.getMetaData();
-        try (ResultSet resultSet = meta.getColumns(null, null, tableName, columnName)) {
-            return resultSet.next();
+ 
 
         }
     }
