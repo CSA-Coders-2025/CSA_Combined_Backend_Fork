@@ -1,5 +1,23 @@
 package com.nighthawk.spring_portfolio.mvc.cryptoMining;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
 import com.nighthawk.spring_portfolio.mvc.userStocks.UserStocksRepository;
@@ -586,7 +604,7 @@ public class MiningController {
             // Calculate sell price (80% of original price)
             double sellPrice = gpu.getPrice() * 0.8 * quantityToSell;
 
-            // Update user's balance using Person
+            // Update user's balance using Person with source
             Person person = user.getPerson();
             double currentBalance = person.getBalanceDouble();
             double newBalance = currentBalance + sellPrice;
@@ -645,7 +663,7 @@ public class MiningController {
                 soldGPUs.add(String.format("%dx %s", quantity, gpu.getName()));
             }
 
-            // Update user's balance using Person
+            // Update user's balance using Person with source
             Person person = user.getPerson();
             double currentBalance = person.getBalanceDouble();
             double newBalance = currentBalance + totalSellPrice;
