@@ -29,9 +29,6 @@ public class MiningController {
     @Autowired
     private MiningService miningService;
 
-    @Autowired
-    private UserStocksRepository userStocksRepo;
-
     private MiningUser getOrCreateMiningUser() {
         try {
             // Get authentication details
@@ -592,17 +589,17 @@ public class MiningController {
             // Calculate sell price (80% of original price)
             double sellPrice = gpu.getPrice() * 0.8 * quantityToSell;
 
-            // Update user's balance using Person with source
+            // Update user's balance using Person
             Person person = user.getPerson();
             double currentBalance = person.getBalanceDouble();
             double newBalance = currentBalance + sellPrice;
             person.setBalanceString(newBalance);
+            personRepository.save(person);
 
             // Remove GPUs from user's inventory
             user.removeGPUs(gpu, quantityToSell);
 
             // Save changes
-            personRepository.save(person);
             miningUserRepository.save(user);
 
             return ResponseEntity.ok(Map.of(
@@ -651,14 +648,14 @@ public class MiningController {
                 soldGPUs.add(String.format("%dx %s", quantity, gpu.getName()));
             }
 
-            // Update user's balance using Person with source
+            // Update user's balance using Person
             Person person = user.getPerson();
             double currentBalance = person.getBalanceDouble();
             double newBalance = currentBalance + totalSellPrice;
             person.setBalanceString(newBalance);
+            personRepository.save(person);
 
             // Save changes
-            personRepository.save(person);
             miningUserRepository.save(user);
 
             return ResponseEntity.ok(Map.of(
