@@ -582,51 +582,61 @@ public class MiningController {
     }
 
     @PostMapping("/gpu/sell/{gpuId}")
-    public ResponseEntity<?> sellGPU(@PathVariable Long gpuId, @RequestBody(required = false) Map<String, Integer> request) {
+    public ResponseEntity<?> sellGPU(@PathVariable Long gpuId, @RequestBody Map<String, Integer> request) {
         try {
             MiningUser user = getOrCreateMiningUser();
             GPU gpu = gpuRepository.findById(gpuId)
                 .orElseThrow(() -> new RuntimeException("GPU not found"));
 
-            // Get quantity to sell, default to 1
-            int quantityToSell = (request != null && request.containsKey("quantity")) 
-                ? request.get("quantity") 
-                : 1;
+            int quantityToSell = request.getOrDefault("quantity", 1);
+            if (quantityToSell <= 0) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of(
+                        "success", false,
+                        "message", "Invalid quantity"
+                    ));
+            }
 
             // Check if user owns enough GPUs
-            int ownedQuantity = user.getGpuQuantity(gpuId);
-            if (ownedQuantity < quantityToSell) {
+            int currentQuantity = user.getGpuQuantity(gpuId);
+            if (currentQuantity < quantityToSell) {
                 return ResponseEntity.badRequest()
-                    .body(Map.of("success", false, 
-                               "message", "You don't own enough GPUs"));
+                    .body(Map.of(
+                        "success", false,
+                        "message", "Not enough GPUs to sell"
+                    ));
             }
 
             // Calculate sell price (80% of original price)
             double sellPrice = gpu.getPrice() * 0.8 * quantityToSell;
 
-            // Update user's balance using Person with source
+            // Update user's balance using Person
             Person person = user.getPerson();
             double currentBalance = person.getBalanceDouble();
-            double newBalance = currentBalance + sellPrice;
-            person.setBalanceString(newBalance);
+            person.setBalance(String.format("%.2f", currentBalance + sellPrice));
             personRepository.save(person);
 
             // Remove GPUs from user's inventory
             user.removeGPUs(gpu, quantityToSell);
-
-            // Save changes
             miningUserRepository.save(user);
+
+            // Stop mining if no GPUs left
+            if (user.getOwnedGPUs().isEmpty()) {
+                user.setMining(false);
+                miningUserRepository.save(user);
+            }
 
             return ResponseEntity.ok(Map.of(
                 "success", true,
-                "message", String.format("Successfully sold %dx %s for $%.2f", 
-                                       quantityToSell, gpu.getName(), sellPrice),
-                "newBalance", String.format("%.2f", newBalance)
+                "message", String.format("Successfully sold %d %s for $%.2f", 
+                    quantityToSell, gpu.getName(), sellPrice)
             ));
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", e.getMessage()));
+                .body(Map.of(
+                    "success", false,
+                    "message", e.getMessage()
+                ));
         }
     }
 
