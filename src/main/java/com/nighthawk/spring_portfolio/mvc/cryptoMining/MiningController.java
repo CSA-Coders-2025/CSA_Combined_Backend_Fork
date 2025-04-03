@@ -117,9 +117,10 @@ public class MiningController {
                     Map<String, Object> gpuInfo = new HashMap<>();
                     gpuInfo.put("id", gpuId);
                     gpuInfo.put("name", gpu.getName());
-                    gpuInfo.put("hashrate", gpu.getHashRate());
-                    gpuInfo.put("power", gpu.getPowerConsumption());
+                    gpuInfo.put("hashRate", gpu.getHashRate());
+                    gpuInfo.put("powerConsumption", gpu.getPowerConsumption());
                     gpuInfo.put("temp", gpu.getTemp());
+                    gpuInfo.put("price", gpu.getPrice());
                     gpuInfo.put("quantity", user.getGpuQuantity(gpuId));
                     gpuInfo.put("isActive", user.getActiveGPUs().contains(gpu));
                     gpuGroups.put(gpuId, gpuInfo);
@@ -321,9 +322,10 @@ public class MiningController {
                         Map<String, Object> gpuInfo = new HashMap<>();
                         gpuInfo.put("id", gpuId);
                         gpuInfo.put("name", gpu.getName());
-                        gpuInfo.put("hashrate", gpu.getHashRate());
-                        gpuInfo.put("power", gpu.getPowerConsumption());
+                        gpuInfo.put("hashRate", gpu.getHashRate());
+                        gpuInfo.put("powerConsumption", gpu.getPowerConsumption());
                         gpuInfo.put("temp", gpu.getTemp());
+                        gpuInfo.put("price", gpu.getPrice());
                         gpuInfo.put("quantity", user.getGpuQuantity(gpuId));
                         gpuInfo.put("isActive", user.getActiveGPUs().contains(gpu));
                         gpuGroups.put(gpuId, gpuInfo);
