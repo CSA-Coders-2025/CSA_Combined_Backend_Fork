@@ -180,22 +180,6 @@ public class CryptoController {
 
     @GetMapping("/holdings")
     public ResponseEntity<?> getUserHoldings(@RequestParam String email) {
-        Person person = personRepository.findByEmail(email);
-        if (person == null) {
-            return ResponseEntity.status(404).body("User not found: " + email);
-        }
-    
-        userStocksTable userStocks = person.getUser_stocks();
-        if (userStocks == null || userStocks.getCrypto() == null || userStocks.getCrypto().isEmpty()) {
-            return ResponseEntity.status(404).body("No crypto holdings found for email: " + email);
-        }
-    
-        return ResponseEntity.ok("{ \"email\": \"" + email + "\", \"holdings\": \"" + userStocks.getCrypto().replace("\n", "\\n") + "\" }");
-    }
-   
-
-    @GetMapping("/holdings")
-    public ResponseEntity<?> getUserHoldings(@RequestParam String email) {
         userStocksTable userStocks = userStocksRepo.findByEmail(email);
 
         if (userStocks == null || userStocks.getCrypto() == null || userStocks.getCrypto().isEmpty()) {

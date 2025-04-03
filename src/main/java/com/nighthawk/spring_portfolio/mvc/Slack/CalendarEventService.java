@@ -118,23 +118,24 @@ public class CalendarEventService {
         return calendarEventRepository.findById((long) id).orElse(null);
     }
 
+    final String CSP_CHANNEL_ID = "C07SJSF6RQA";
+    final String CSA_CHANNEL_ID = "C07RRJDU5M5";
+    final String CSSE_CHANNEL_ID = "C07RRJ5GECX";
+
     // Parse Slack message and create events
     public void parseSlackMessage(Map<String, String> jsonMap, LocalDate weekStartDate) {
-        String text = jsonMap.get("text");
-        List<CalendarEvent> events = extractEventsFromText(text, weekStartDate);
+        List<CalendarEvent> events = extractEventsFromText(jsonMap, weekStartDate);
         for (CalendarEvent event : events) {
             saveEvent(event); // Save each parsed event
         }
     }
 
     // Extract events and calculate date for each day of the week
-    private List<CalendarEvent> extractEventsFromText(String text, LocalDate weekStartDate) {
+    private List<CalendarEvent> extractEventsFromText(Map<String, String> jsonMap, LocalDate weekStartDate) {
+        String text = jsonMap.get("text");
         List<CalendarEvent> events = new ArrayList<>();
         Pattern dayPattern = Pattern.compile("\\[(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?: - (Mon|Tue|Wed|Thu|Fri|Sat|Sun))?\\]:\\s*(\\*\\*|\\*)?\\s*(.+)");
         Pattern descriptionPattern = Pattern.compile("(\\*\\*|\\*)?\\s*\\u2022\\s*(.+)");
-
-        boolean hasPeriod1 = text.toLowerCase().contains("period 1");
-        boolean hasPeriod3 = text.toLowerCase().contains("period 3");
 
         String[] lines = text.split("\\n");
         CalendarEvent lastEvent = null;
@@ -147,16 +148,19 @@ public class CalendarEventService {
                 String endDay = dayMatcher.group(2) != null ? dayMatcher.group(2) : startDay;
                 String asterisks = dayMatcher.group(3);
                 String currentTitle = dayMatcher.group(4).trim();
-                String period;
+                String period = "0"; 
                 // Append period info if found anywhere in the text
-                if (hasPeriod1) {
-                    period = "1";
-                } else if (hasPeriod3) {
-                    period = "3";
-                } else {
-                    period = "0";
+                switch(jsonMap.get("channel")) {
+                    case(CSP_CHANNEL_ID):
+                        period = "CSP";
+                        break;
+                    case(CSA_CHANNEL_ID):
+                        period = "CSA";
+                        break;
+                    case(CSSE_CHANNEL_ID):
+                        period = "CSSE";
+                        break;
                 }
-
                 String type = "daily plan";
                 if ("*".equals(asterisks)) {
                     type = "check-in";
