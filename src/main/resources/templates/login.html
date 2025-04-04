@@ -2,8 +2,20 @@
 <html xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml"
       layout:decorate="~{layouts/base}" lang="en">
 
+<head>
+    <title>Login</title> <!-- The title of the page displayed in the browser's title bar -->
+</head>
+
 <!-- The 'body' section is defined using Thymeleaf's layout fragment. It will replace the 'body' content in the base layout -->
 <th:block layout:fragment="body" th:remove="tag">
+
+    <!-- Main container for the login page with padding and spacing -->
+    <div class="container py-4">
+        <!-- Header section, with a border and styling -->
+        <header class="pb-3 mb-4 border-bottom border-primary text-light">
+            <span class="fs-4">Login</span> <!-- Title of the page displayed inside the header -->
+        </header>
+    </div>
 
     <!-- Background color section for the login container, with a green success color -->
     <div class="container py-4 text-light bg-primary rounded">
