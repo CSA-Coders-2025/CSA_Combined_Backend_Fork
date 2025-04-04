@@ -91,6 +91,19 @@ public class Person implements Comparable<Person> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @OneToMany(mappedBy="student", cascade=CascadeType.ALL, orphanRemoval=true)
+    @JsonIgnore
+    private List<SynergyGrade> grades;
+    
+    @ManyToMany(mappedBy="students", cascade=CascadeType.MERGE)
+    @JsonIgnore
+    private List<AssignmentSubmission> submissions;
+
+
+    @NotEmpty
+    private String password;
+
+
 
     @Column(unique = true, nullable = false)
     private String uid; // New `uid` column added
@@ -228,13 +241,12 @@ public class Person implements Comparable<Person> {
     private userStocksTable user_stocks;
 
 
+
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Groups group;
 
 
-//////////////////////////////////////////////////////////////////////////////////
-/// Constructors
 
 
     /** Custom constructor for Person when building a new Person object from an API call
