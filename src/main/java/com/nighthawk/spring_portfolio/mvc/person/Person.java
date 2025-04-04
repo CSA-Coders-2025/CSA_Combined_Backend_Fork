@@ -92,27 +92,6 @@ public class Person implements Comparable<Person> {
     private Long id;
 
 
-    @OneToMany(mappedBy="student", cascade=CascadeType.ALL, orphanRemoval=true)
-    @JsonIgnore
-    private List<SynergyGrade> grades;
-    
-    @ManyToMany(mappedBy="students", cascade=CascadeType.MERGE)
-    @JsonIgnore
-    private List<AssignmentSubmission> submissions;
-
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Groups group;
-    
-    @ManyToMany(fetch = EAGER)
-    @JoinTable(
-        name = "person_person_sections",  // unique name to avoid conflicts
-        joinColumns = @JoinColumn(name = "person_id"),
-        inverseJoinColumns = @JoinColumn(name = "section_id")
-    )
-    private Collection<PersonSections> sections = new ArrayList<>();
-
-
     @Column(unique = true, nullable = false)
     private String uid; // New `uid` column added
 
@@ -247,6 +226,11 @@ public class Person implements Comparable<Person> {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "person")
     @JsonIgnore
     private userStocksTable user_stocks;
+
+
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Groups group;
 
 
 //////////////////////////////////////////////////////////////////////////////////
