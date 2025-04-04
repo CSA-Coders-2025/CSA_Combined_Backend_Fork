@@ -85,8 +85,8 @@
             <tbody>
                 <tr th:each="entry : ${tinkleList}">
                     <td th:text="${entry.person_name}"></td>
-                    <td class="day-column" th:text="${#strings.substring(entry.timeIn, 0, 10)}"></td>
-                    <td class="time-in-cell" th:text="${entry.timeIn}"></td>
+                    <td class="day-column" th:text="${entry.day}"></td>
+                    <td class="time-in-cell" th:utext="${entry.timeIn}"></td>
                     <td th:text="${entry.duration}"></td>
                 </tr>
             </tbody>
@@ -122,40 +122,6 @@
 
         <script th:inline="javascript">
             $(document).ready(function () {
-                // Format time in cells for better readability
-                $('.time-in-cell').each(function() {
-                    const cellText = $(this).text().trim();
-                    if (!cellText) return;
-                    
-                    const pairs = cellText.split(',');
-                    const formattedPairs = pairs.map(pair => {
-                        let trimmed = pair.trim();
-                        let times = trimmed.split("--");
-                        
-                        if (times.length === 2) {
-                            // Extract just the time portion (HH:MM:SS) from each datetime
-                            const startTime = times[0].substring(11, 16); // Extract HH:MM
-                            const endTime = times[1].substring(11, 16);   // Extract HH:MM
-                            return `${startTime}--${endTime}`;
-                        }
-                        return trimmed;
-                    }).join(", ");
-                    
-                    $(this).text(formattedPairs);
-                });
-                
-                // Format day column to show MM-DD format
-                $('.day-column').each(function() {
-                    const dateText = $(this).text().trim();
-                    if (!dateText) return;
-                    
-                    // Convert YYYY-MM-DD to MM-DD
-                    const parts = dateText.split('-');
-                    if (parts.length === 3) {
-                        $(this).text(`${parts[1]}-${parts[2]}`);
-                    }
-                });
-
                 // Prepare bar chart data.
                 const labels = /*[[${chartLabels}]]*/ [];
                 const data = /*[[${chartData}]]*/ [];
