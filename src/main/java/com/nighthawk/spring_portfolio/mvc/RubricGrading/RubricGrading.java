@@ -1,14 +1,7 @@
 package com.nighthawk.spring_portfolio.mvc.RubricGrading;
 
 import java.util.List;
-
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -18,37 +11,18 @@ public class RubricGrading {
     @NotNull
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "rubric_grading_id")
     private Long id;
 
     private Double RubricOverallGrade;
 
-    // @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // many rubric items(singular topics, weightages) inside one rubric gradinger
-    @ElementCollection
-    @CollectionTable(name = "rubric_grading_items", joinColumns = @JoinColumn(name = "rubric_grading_id"))
+    @OneToMany(mappedBy = "rubricgrade", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RubricItem> rubricItems;
 
-    public RubricGrading(List<RubricItem> rubricItems) { 
-        this.rubricItems = rubricItems;
+    public double getOverallGrade() {
+        return this.RubricOverallGrade != null ? this.RubricOverallGrade : 0.0;
     }
 
-
-    public RubricGrading(String topic, Double weightage, Double points){
-        this.rubricItems.add(new RubricItem(topic,weightage,points));
-    }
-
-
-    public double getOverallGrade(){
-        if(RubricOverallGrade!=null){
-            return this.RubricOverallGrade;
-        }
-        double grade=0;
-        for(int i=0;i<rubricItems.size();i++){
-            grade+=rubricItems.get(i).getWeightage()*rubricItems.get(i).getPoints();
-        }
-        return grade;
-    }
-
-    // method to edit a topic 
     public void setTopic(String newtopic, int index){
         rubricItems.get(index).setTopic(newtopic);
     }
@@ -57,19 +31,11 @@ public class RubricGrading {
         rubricItems.get(index).setPoints(newgrade);
     }
 
-    public void setWeight(Double neweight, int index){
-        rubricItems.get(index).setWeightage(neweight);
+    public void setWeight(Double newweight, int index){
+        rubricItems.get(index).setWeightage(newweight);
     }
 
-
-
-    // method to set the overall grade(override)
     public void setOverallGrade(double Grade){
-        this.RubricOverallGrade=Grade;
+        this.RubricOverallGrade = Grade;
     }
-
-
-
-
 }
-

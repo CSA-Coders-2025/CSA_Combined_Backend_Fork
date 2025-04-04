@@ -7,12 +7,14 @@ import com.nighthawk.spring_portfolio.mvc.RubricGrading.RubricGrading;
 import com.nighthawk.spring_portfolio.mvc.assignments.Assignment;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +30,9 @@ public class SynergyGrade {
 
     // private Double grade;
 
-    RubricGrading rubric;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rubric_grading_id")
+    private RubricGrading rubric;
 
 
 
@@ -49,7 +53,7 @@ public class SynergyGrade {
     }
 
     public SynergyGrade(Double grade, Assignment assignment, Person student) {
-        rubric=new RubricGrading(assignment.getDescription(), 1.0, grade );
+        rubric=new RubricGrading();
         this.assignment = assignment;
         this.student = student;
     }

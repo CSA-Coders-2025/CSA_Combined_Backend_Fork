@@ -24,6 +24,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -62,7 +63,10 @@ public class Assignment {
     @NotEmpty
     private String timestamp;
 
-    private RubricGrading rubricgrade;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rubric_grading_id")
+    private RubricGrading rubric;
+
 
     @OneToMany(mappedBy="assignment", cascade=CascadeType.ALL, orphanRemoval=true)
     @JsonIgnore
