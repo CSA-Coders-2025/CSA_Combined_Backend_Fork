@@ -13,13 +13,7 @@
             height: 20px;
             cursor: pointer;
         }
-
-        /* Styling for the profile picture container */
-        .profile-picture-container {
-            position: relative;
-            display: inline-block;
-        }
-
+        
         /* Initial styling for the profile picture */
         .profile-picture-container img {
             width: 64px;
@@ -34,28 +28,6 @@
         .profile-picture-container:hover img {
             transform: scale(2); /* Enlarges the image */
             opacity: 1;
-        }
-
-        /* Styling for the search input container */
-        .search-container {
-            margin-bottom: 20px;
-        }
-
-        /* Uid column styling to limit text and show full uid on hover */
-        td.uid {
-            width: 18ch; /* Limit to 18 characters */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        td.uid:hover {
-            cursor: help;
-        }
-
-        /* Custom styles for the toggle buttons */
-        .toggle-column {
-            margin: 5px;
         }
     </style>
 </head>
@@ -95,14 +67,14 @@
                                     <table id="personTable" class="table">
                                         <thead>
                                         <tr>
-                                            <th class="sortable">ID#</th>
-                                            <th class="sortable">UID</th>
-                                            <th class="sortable">Name</th>
-                                            <th class="sortable">Email</th>
-                                            <th class="sortable">KSM</th>
+                                            <th>ID#</th>
+                                            <th>UID</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>KSM</th>
                                             <th>PFP</th>
-                                            <th class="sortable">SID</th>
-                                            <th class="sortable">Balance</th>
+                                            <th>SID</th>
+                                            <th>Balance</th>
                                             <th>Action</th>
                                         </tr>
                                         </thead>
