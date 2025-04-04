@@ -118,10 +118,6 @@ public class CalendarEventService {
         return calendarEventRepository.findById((long) id).orElse(null);
     }
 
-    final String CSP_CHANNEL_ID = "C07SJSF6RQA";
-    final String CSA_CHANNEL_ID = "C07RRJDU5M5";
-    final String CSSE_CHANNEL_ID = "C07RRJ5GECX";
-
     // Parse Slack message and create events
     public void parseSlackMessage(Map<String, String> jsonMap, LocalDate weekStartDate) {
         List<CalendarEvent> events = extractEventsFromText(jsonMap, weekStartDate);
@@ -130,7 +126,15 @@ public class CalendarEventService {
         }
     }
 
-    // Extract events and calculate date for each day of the week
+    // Test ID's
+    //final String CSP_CHANNEL_ID = "C07SJSF6RQA";
+    //final String CSA_CHANNEL_ID = "C07RRJDU5M5";
+    //final String CSSE_CHANNEL_ID = "C07RRJ5GECX";
+    // Official
+    final String CSP_CHANNEL_ID = "CUS8E3M6Z";
+    final String CSA_CHANNEL_ID = "CRRJL1F1D";
+    final String CSSE_CHANNEL_ID = "C05MNRWC2A1";
+
     private List<CalendarEvent> extractEventsFromText(Map<String, String> jsonMap, LocalDate weekStartDate) {
         String text = jsonMap.get("text");
         List<CalendarEvent> events = new ArrayList<>();
@@ -148,8 +152,7 @@ public class CalendarEventService {
                 String endDay = dayMatcher.group(2) != null ? dayMatcher.group(2) : startDay;
                 String asterisks = dayMatcher.group(3);
                 String currentTitle = dayMatcher.group(4).trim();
-                String period = "0"; 
-                // Append period info if found anywhere in the text
+                String period = "0";
                 switch(jsonMap.get("channel")) {
                     case(CSP_CHANNEL_ID):
                         period = "CSP";
