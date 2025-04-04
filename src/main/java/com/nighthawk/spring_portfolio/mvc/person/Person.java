@@ -234,7 +234,9 @@ public class Person implements Comparable<Person> {
     private Groups group;
 
 
-
+//////////////////////////////////////////////////////////////////////////////////
+/// Constructors
+  
 
     /** Custom constructor for Person when building a new Person object from an API call
      * @param email, a String
