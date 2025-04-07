@@ -143,13 +143,7 @@ public class Person implements Comparable<Person> {
     @Column(nullable=true)
     private String sid;
     
-    /**
-     * user_stocks and balance describe properties used by the gamify application
-     */
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "person")
-    @JsonIgnore
-    private userStocksTable user_stocks;
-
+ 
     @Column
     private String balance;
 
