@@ -1,77 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml"
-      layout:decorate="~{layouts/base}" lang="en">
+    layout:decorate="~{layouts/base}" lang="en">
+
 <head>
-    <title>Tinkle View</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* Container */
-        .container {
-            width: 80%; /* Keeps content width reasonable */
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        }
 
-        /* Table Alignment */
-        table {
-            width: 100%; 
-            margin-left: 0;
-            margin-bottom: 40px; /* Increased from 30px to 40px for more space */
-            border-collapse: collapse;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
+    <!-- page style -->
+    <th:block layout:fragment="style" th:remove="tag"></th:block>
 
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <!-- page title -->
+    <th:block layout:fragment="title" th:remove="tag">Tinkle View</th:block>
 
-        /* Table Headings & Cells */
-        th, td {
-            padding: 12px;
-            text-align: left; /* Left-align text */
-            border: 1px solid #ddd;
-        }
-
-        /* Table Header Styling */
-        th {
-            background-color: #4CAF50;
-            color: white;
-            font-size: 14px;
-        }
-
-        /* Hover Effect */
-        tr:hover {
-            background-color: #575353;
-        }
-
-        /* Highlight excessive duration pairs */
-        .highlight-long {
-            background-color: #ec150e !important; /* Light red */
-            font-weight: bold;
-        }
-
-        /* Sort Arrows */
-        .sort-arrow {
-            font-size: 12px;
-            color: #4CAF50;
-            margin-left: 5px;
-            cursor: pointer;
-        }
-
-        /* Day column styling */
-        .day-column {
-            text-align: center;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <div class="navbar">Tinkle View Navbar</div>
-
-    <div class="container" layout:fragment="body">
+    <!-- The 'body' section is defined using Thymeleaf's layout fragment. It will replace the 'body' content in the base layout -->
+    <th:block layout:fragment="body" th:remove="tag">
+        <div class="navbar">Tinkle View Navbar</div>
         <h2>User Entries</h2>
         <table id="userEntriesTable" class="display">
             <thead>
@@ -91,7 +35,7 @@
                 </tr>
             </tbody>
         </table>
-    
+
         <h2>Average Weekly Duration per User</h2>
         <table id="weeklyDurationTable" class="display">
             <thead>
@@ -115,16 +59,14 @@
 
         <!-- DataTables CSS -->
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-        <!-- jQuery -->
-        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <!-- DataTables JS -->
         <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
         <script th:inline="javascript">
             $(document).ready(function () {
                 // Prepare bar chart data.
-                const labels = /*[[${chartLabels}]]*/ [];
-                const data = /*[[${chartData}]]*/ [];
+                const labels = /*[[${chartLabels}]]*/[];
+                const data = /*[[${chartData}]]*/[];
                 const formattedData = data.map(seconds => (seconds / 60).toFixed(2));
 
                 const ctx = $('#weeklyDurationChart')[0].getContext('2d');
@@ -220,12 +162,12 @@
                             // Convert HH:MM to minutes for comparison
                             const startParts = times[0].split(':');
                             const endParts = times[1].split(':');
-                            
+
                             const startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
                             const endMinutes = parseInt(endParts[0]) * 60 + parseInt(endParts[1]);
-                            
+
                             const diffMinutes = endMinutes - startMinutes;
-                            
+
                             if (diffMinutes > thresholdMinutes) {
                                 return `<span class="highlight-long">${trimmed}</span>`;
                             }
@@ -237,7 +179,6 @@
                 });
             });
         </script>
+</th:block>
 
-    </div>
-</body>
 </html>
