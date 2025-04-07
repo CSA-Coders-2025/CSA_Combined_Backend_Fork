@@ -110,21 +110,6 @@ public class Person implements Comparable<Person> {
 
 
     @NotEmpty
-    private String password;
-
-
-       /**
-     * email, password, roles are key attributes to login and authentication
-     * --- @NotEmpty annotation is used to validate that the annotated field is not
-     * null or empty, meaning it has to have a value.
-     * --- @Size annotation is used to validate that the annotated field is between
-     * the specified boundaries, in this case greater than 5.
-     * --- @Email annotation is used to validate that the annotated field is a valid
-     * email address.
-     * --- @Column annotation is used to specify the mapped column for a persistent
-     * property or field, in this case unique and email.
-     */
-    @NotEmpty
     @Size(min = 1)
     @Column(unique = true, nullable = false)
     @Email
@@ -198,19 +183,9 @@ public class Person implements Comparable<Person> {
 /// Relationships
 
 
-    @OneToMany(mappedBy="student", cascade=CascadeType.ALL, orphanRemoval=true)
-    @JsonIgnore
-    private List<SynergyGrade> grades;
-    
-
-    @ManyToMany(mappedBy="students", cascade=CascadeType.MERGE)
-    @JsonIgnore
-    private List<AssignmentSubmission> submissions;
-    
-
     @ManyToMany(fetch = EAGER)
     @JoinTable(
-        name = "person_person_sections",  // unique name to avoid conflicts
+        name = "person_person_sections",
         joinColumns = @JoinColumn(name = "person_id"),
         inverseJoinColumns = @JoinColumn(name = "section_id")
     )
@@ -338,12 +313,6 @@ public class Person implements Comparable<Person> {
 /// getter methods
 
 
-    public double getBalanceDouble() {
-        var balance_tmp = getBalance();
-        return Double.parseDouble(balance_tmp);
-    }
-
-
     /** Custom getter to return age from dob attribute
      * @return int, the age of the person
     */
@@ -358,16 +327,6 @@ public class Person implements Comparable<Person> {
 
 //////////////////////////////////////////////////////////////////////////////////
 /// setter methods
-
-
-    /** Custom setBalanceString method to set balance (string) using a double
-     * @param updatedBalance, a double with the amount to set as the user balance
-     * @return String, the updated String
-     */
-    public String setBalanceString(double updatedBalance) {
-        this.balance = String.valueOf(updatedBalance); // Update the balance as a String
-        return this.balance; // Return the updated balance as a String
-    }
 
 
 //////////////////////////////////////////////////////////////////////////////////
