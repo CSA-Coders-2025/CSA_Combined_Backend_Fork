@@ -19,6 +19,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private void initializeGPUs() {
        // Budget GPUs ($10000-20000)
+       createGPU("NVIDIA GeForce GT 1030", 1.55, 30, 65, 10000, "Budget GPUs ($10000-20000)");
        createGPU("NVIDIA GeForce GTX 1050", 14, 75, 67, 10000, "Budget GPUs ($10000-20000)");
        createGPU("AMD RX 570 8GB", 28, 120, 70, 15000, "Budget GPUs ($10000-20000)");
        createGPU("NVIDIA GeForce GTX 1060 6GB", 22, 120, 68, 20000, "Budget GPUs ($10000-20000)");

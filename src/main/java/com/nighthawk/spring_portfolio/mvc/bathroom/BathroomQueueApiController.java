@@ -39,13 +39,13 @@ public class BathroomQueueApiController {
         private String studentName;  // Name of the student to be added/removed/approved
         private String uri;          // URI for constructing approval links
     }
-    
+
     @Getter
     public static class QueueAddReq {
         private String teacherEmail;
         private String peopleQueue;
     }
-
+    
 
     @CrossOrigin(origins = {"http://localhost:8085", "https://nighthawkcoders.github.io/portfolio_2025"})
     @PostMapping("/addQueue")
