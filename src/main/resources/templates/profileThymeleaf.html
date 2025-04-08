@@ -16,7 +16,9 @@
 
     <h3>Result:</h3>
     <p id="result"></p>
+</th:block>
 
+<th:block layout:fragment="script" th:remove="tag">
     <script>
         async function fetchFibonacci() {
             const n = document.getElementById("number").value;

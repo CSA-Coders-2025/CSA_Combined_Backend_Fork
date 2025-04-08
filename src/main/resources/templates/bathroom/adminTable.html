@@ -6,7 +6,14 @@
 <!-- page style -->
 <th:block layout:fragment="style" th:remove="tag"></th:block>
 
-<head>
+<!-- page title -->
+<th:block layout:fragment="title" th:remove="tag">Admin Table</th:block>
+
+<!-- The 'body' section is defined using Thymeleaf's layout fragment. It will replace the 'body' content in the base layout -->
+<th:block layout:fragment="body" th:remove="tag"></th:block>
+
+<!-- page script -->>
+<th:block layout:fragment="script" th:remove="tag">
     <script>
         const getOptions = {
             method: 'GET',
@@ -28,12 +35,6 @@
             })
         }
     </script>
-</head>
-
-<!-- page title -->
-<th:block layout:fragment="title" th:remove="tag">Admin Table</th:block>
-
-<!-- The 'body' section is defined using Thymeleaf's layout fragment. It will replace the 'body' content in the base layout -->
-<th:block layout:fragment="body" th:remove="tag"></th:block>
+</th:block>
 
 </html>

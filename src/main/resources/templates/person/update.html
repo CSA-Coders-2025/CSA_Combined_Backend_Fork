@@ -105,78 +105,75 @@
 <!-- The 'body' section is defined using Thymeleaf's layout fragment. It will replace the 'body' content in the base layout -->
 <th:block layout:fragment="body" th:remove="tag">
 
-    <div class="container">
-        <h3>Update Info</h3> <!-- Header for Update Info section -->
-        <form class="form-inline" action="#" th:action="@{/mvc/person/update}" th:object="${person}" method="POST"
-            onsubmit="validateForm(event)">
+    <h3>Update Info</h3> <!-- Header for Update Info section -->
+    <form class="form-inline" action="#" th:action="@{/mvc/person/update}" th:object="${person}" method="POST"
+        onsubmit="validateForm(event)">
 
-            <div class="form-group mb-2 mr-sm-2">
-                <input type="text" th:field="*{name}" id="name" placeholder="Display Name">
-            </div>
+        <div class="form-group mb-2 mr-sm-2">
+            <input type="text" th:field="*{name}" id="name" placeholder="Display Name">
+        </div>
 
-            <div class="form-group mb-2 mr-sm-2" style="display: none;">
-                <input type="text" th:field="*{uid}" id="uid" placeholder="Uid Address" required>
-            </div>
+        <div class="form-group mb-2 mr-sm-2" style="display: none;">
+            <input type="text" th:field="*{uid}" id="uid" placeholder="Uid Address" required>
+        </div>
 
-            <!-- Email input field -->
-            <div class="form-group mb-2 mr-sm-2">
-                <input type="email" th:field="*{email}" id="email" placeholder="Email Address" required>
-            </div>
+        <!-- Email input field -->
+        <div class="form-group mb-2 mr-sm-2">
+            <input type="email" th:field="*{email}" id="email" placeholder="Email Address" required>
+        </div>
 
-            <div class="form-group mb-2 mr-sm-2">
-                <input type="password" th:field="*{password}" id="password" placeholder="Password">
-            </div>
+        <div class="form-group mb-2 mr-sm-2">
+            <input type="password" th:field="*{password}" id="password" placeholder="Password">
+        </div>
 
-            <div class="form-group mb-2 mr-sm-2">
-                <input type="password" id="confirm_password" placeholder="Confirm Password">
-            </div>
+        <div class="form-group mb-2 mr-sm-2">
+            <input type="password" id="confirm_password" placeholder="Confirm Password">
+        </div>
 
-            <div class="form-group mb-2 mr-sm-2">
-                <input type="text" th:field="*{sid}" id="sid" placeholder="Student ID#">
-            </div>
+        <div class="form-group mb-2 mr-sm-2">
+            <input type="text" th:field="*{sid}" id="sid" placeholder="Student ID#">
+        </div>
 
-            <div class="form-group mb-2 mr-sm-2">
-                <input type="text" th:field="*{balance}" id="balance" placeholder="Balance">
-            </div>
+        <div class="form-group mb-2 mr-sm-2">
+            <input type="text" th:field="*{balance}" id="balance" placeholder="Balance">
+        </div>
 
-            <div class="input-group mb-2 mr-sm-2">
-                <label for="kasmServerNeeded">Request Kasm Server:</label>
-                <input type="checkbox" th:field="*{kasmServerNeeded}" id="kasmServerNeeded">
-            </div>
+        <div class="input-group mb-2 mr-sm-2">
+            <label for="kasmServerNeeded">Request Kasm Server:</label>
+            <input type="checkbox" th:field="*{kasmServerNeeded}" id="kasmServerNeeded">
+        </div>
 
-            <button type="submit" class="btn-custom">Update Account</button>
-        </form>
-    </div>
+        <button type="submit" class="btn-custom">Update Account</button>
+    </form>
+
     <!-- Roles Input Section -->
-    <div class="p-5 mb-4 bg-success text-light rounded-3">
-        <h3>Add Roles</h3> <!-- Header for Roles section -->
-        <table>
-            <tbody>
-                <tr>
-                    <td>User</td>
-                    <td><input type="checkbox" id="addRole1"></td>
-                </tr>
-                <tr>
-                    <td>Admin</td>
-                    <td><input type="checkbox" id="addRole2"></td>
-                </tr>
-                <tr>
-                    <td>Tester</td>
-                    <td><input type="checkbox" id="addRole3"></td>
-                </tr>
-                <tr>
-                    <td>Teacher</td>
-                    <td><input type="checkbox" id="addRole4"></td>
-                </tr>
-                <tr>
-                    <td>Student</td>
-                    <td><input type="checkbox" id="addRole5"></td>
-                </tr>
-            </tbody>
-        </table>
-        <button class="btn-custom" type="button" id="addRoleButton">Add Roles</button>
-        <div id="footerInfo"></div>
-    </div>
+    <h3>Add Roles</h3> <!-- Header for Roles section -->
+    <table>
+        <tbody>
+            <tr>
+                <td>User</td>
+                <td><input type="checkbox" id="addRole1"></td>
+            </tr>
+            <tr>
+                <td>Admin</td>
+                <td><input type="checkbox" id="addRole2"></td>
+            </tr>
+            <tr>
+                <td>Tester</td>
+                <td><input type="checkbox" id="addRole3"></td>
+            </tr>
+            <tr>
+                <td>Teacher</td>
+                <td><input type="checkbox" id="addRole4"></td>
+            </tr>
+            <tr>
+                <td>Student</td>
+                <td><input type="checkbox" id="addRole5"></td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="btn-custom" type="button" id="addRoleButton">Add Roles</button>
+    <div id="footerInfo"></div>
 </th:block>
 
 </html>
