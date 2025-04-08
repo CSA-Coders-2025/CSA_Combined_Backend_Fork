@@ -10,57 +10,54 @@
 
 <!-- The 'body' section is defined using Thymeleaf's layout fragment. It will replace the 'body' content in the base layout -->
 <th:block layout:fragment="body" th:remove="tag">
+    <!-- Heading for the login section, with added left margin for spacing -->
+    <h3>Login To Account</h3>
 
-    <div class="container">
-        <!-- Heading for the login section, with added left margin for spacing -->
-        <h3>Login To Account</h3>
+    <!-- Form for logging in. Uses POST method to submit the data to the /login endpoint -->
+    <form name="f" th:action="@{/login}" method="POST">
+        <!-- Error message section displayed when login fails, conditional rendering based on the 'error' param -->
+        <tr th:if="${param.error}" class="alert alert-error">
+            Invalid username and password.
+        </tr>
 
-        <!-- Form for logging in. Uses POST method to submit the data to the /login endpoint -->
-        <form name="f" th:action="@{/login}" method="POST">
-            <!-- Error message section displayed when login fails, conditional rendering based on the 'error' param -->
-            <tr th:if="${param.error}" class="alert alert-error">
-                Invalid username and password.
-            </tr>
+        <!-- Success message when the user logs out, conditional rendering based on the 'logout' param -->
+        <tr th:if="${param.logout}" class="alert alert-success">
+            You have been logged out.
+        </tr>
 
-            <!-- Success message when the user logs out, conditional rendering based on the 'logout' param -->
-            <tr th:if="${param.logout}" class="alert alert-success">
-                You have been logged out.
-            </tr>
+        <!-- The 'username' input field. The 'uid' field is mapped to 'username' for Spring Security authentication -->
+        <tr>
+            <td><input type="text" id='username' name="username" placeholder="GitHub ID" size="20" required
+                    style="margin-bottom: 10px; margin-left: 10px;"></td>
+        </tr>
 
-            <!-- The 'username' input field. The 'uid' field is mapped to 'username' for Spring Security authentication -->
+        <!-- Password input field with added margin for spacing -->
+        <div class="form-group mb-2 mr-sm-2">
             <tr>
-                <td><input type="text" id='username' name="username" placeholder="GitHub ID" size="20" required
+                <td><input type="password" id="password" name="password" placeholder="Password" size="20" required
                         style="margin-bottom: 10px; margin-left: 10px;"></td>
             </tr>
 
-            <!-- Password input field with added margin for spacing -->
-            <div class="form-group mb-2 mr-sm-2">
-                <tr>
-                    <td><input type="password" id="password" name="password" placeholder="Password" size="20" required
-                            style="margin-bottom: 10px; margin-left: 10px;"></td>
-                </tr>
+        </div>
 
-            </div>
+        <!-- Submit button for the form, with added margin for spacing -->
+        <tr>
+            <th><input type="submit" value="Submit" style="margin-left: 10px;" class="btn btn-secondary"></th>
+        </tr>
 
-            <!-- Submit button for the form, with added margin for spacing -->
-            <tr>
-                <th><input type="submit" value="Submit" style="margin-left: 10px;" class="btn btn-secondary"></th>
-            </tr>
+        <!-- Link to the signup page for users who don't have an account, with added left margin -->
+        <tr>
+            <td><a th:href="@{/mvc/person/create}" style="margin-left: 10px;">Sign Up</a></td>
+        </tr>
 
-            <!-- Link to the signup page for users who don't have an account, with added left margin -->
-            <tr>
-                <td><a th:href="@{/mvc/person/create}" style="margin-left: 10px;">Sign Up</a></td>
-            </tr>
+        <!-- Link to the signup page for users who don't have an account, with added left margin -->
+        <tr>
+            <td><a th:href="@{/mvc/person/reset}" style="margin-left: 10px;">Forgot Password?</a></td>
+        </tr>
 
-            <!-- Link to the signup page for users who don't have an account, with added left margin -->
-            <tr>
-                <td><a th:href="@{/mvc/person/reset}" style="margin-left: 10px;">Forgot Password?</a></td>
-            </tr>
+        </table>
 
-            </table>
-
-        </form>
-    </div>
+    </form>
 
 </th:block>
 <!-- End of the body fragment -->
