@@ -39,6 +39,34 @@ public class BathroomQueueApiController {
         private String studentName;  // Name of the student to be added/removed/approved
         private String uri;          // URI for constructing approval links
     }
+    
+    @Getter
+    public static class QueueAddReq {
+        private String teacherEmail;
+        private String peopleQueue;
+    }
+
+
+    @CrossOrigin(origins = {"http://localhost:8085", "https://nighthawkcoders.github.io/portfolio_2025"})
+    @PostMapping("/addQueue")
+    public ResponseEntity<String> addQueue(@RequestBody QueueAddReq request) {
+        System.out.println(request);
+
+        try {
+            // Check if a queue already exists for the given teacher email
+            Optional<BathroomQueue> existingQueue = repository.findByTeacherEmail(request.getTeacherEmail());
+            if (existingQueue.isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Queue already exists for this teacher.");
+            }
+
+            // Create and save a new queue if it doesn't exist
+            BathroomQueue newQueue = new BathroomQueue(request.getTeacherEmail(), request.getPeopleQueue());
+            repository.save(newQueue);
+            return ResponseEntity.ok("Queue added successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add queue: " + e.getMessage());
+        }
+    }
 
     // Endpoint to add a student to the queue
     @CrossOrigin(origins = {"http://localhost:8085", "https://nighthawkcoders.github.io/portfolio_2025"})
