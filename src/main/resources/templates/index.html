@@ -2,6 +2,7 @@
 <!-- Signals to the Layout Dialect which layout should be used to decorate this View -->
 <html xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml"
     layout:decorate="~{layouts/base}" lang="en">
+
 <!-- page style -->
 <th:block layout:fragment="style" th:remove="tag">
     <style>
@@ -44,8 +45,11 @@
 <!-- page title -->
 <th:block layout:fragment="title" th:remove="tag">Spring 2025</th:block>
 
-<th:block layout:fragment="body" th:remove="tag">
-    <!-- Start of body content specific to the page -->
+<!-- define removable layout to change default header-->
+<th:block layout:fragment="removable-header" th:remove="tag"></th:block>
+
+<!-- define removable layout to change default body-->
+<th:block layout:fragment="removable-body" th:remove="tag"><!-- Start of body content specific to the page -->
     <div class="px-5 py-5 mx-auto">
         <h1><strong>Java Home Page</strong></h1>
         <div class="card-deck">
