@@ -22,7 +22,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PreRemove;
@@ -78,6 +77,7 @@ public class Person implements Comparable<Person> {
 //////////////////////////////////////////////////////////////////////////////////
 /// Columns stored on Person
 
+
     /** Automatic unique identifier for Person record 
      * --- Id annotation is used to specify the identifier property of the entity.
      * ----GeneratedValue annotation is used to specify the primary key generation
@@ -91,22 +91,20 @@ public class Person implements Comparable<Person> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToMany(mappedBy="student", cascade=CascadeType.ALL, orphanRemoval=true)
-    @JsonIgnore
-    private List<SynergyGrade> grades;
-    
-    @ManyToMany(mappedBy="students", cascade=CascadeType.MERGE)
-    @JsonIgnore
-    private List<AssignmentSubmission> submissions;
-
+/**
+     * email, password, roles are key attributes to login and authentication
+     * --- @NotEmpty annotation is used to validate that the annotated field is not
+     * null or empty, meaning it has to have a value.
+     * --- @Size annotation is used to validate that the annotated field is between
+     * the specified boundaries, in this case greater than 5.
+     * --- @Email annotation is used to validate that the annotated field is a valid
+     * email address.
+     * --- @Column annotation is used to specify the mapped column for a persistent
+     * property or field, in this case unique and email.
+     */
 
     @NotEmpty
     private String password;
-
-
-
-    @Column(unique = true, nullable = false)
-    private String uid; // New `uid` column added
 
 
     @NotEmpty
@@ -116,7 +114,10 @@ public class Person implements Comparable<Person> {
     private String email;
 
 
-     /**
+    @Column(unique = true, nullable = false)
+    private String uid; // New `uid` column added
+
+    /**
      * name, dob are attributes to describe the person
      * --- @NonNull annotation is used to generate a constructor witha
      * AllArgsConstructor Lombox annotation.
@@ -145,22 +146,13 @@ public class Person implements Comparable<Person> {
 
     @Column(nullable=true)
     private String sid;
-
-
+    
+ 
     @Column
     private String balance;
 
-    public double getBalanceDouble() {
-        var balance_tmp = getBalance();
-        return Double.parseDouble(balance_tmp);
-    }
 
-    public String setBalanceString(double updatedBalance) {
-        this.balance = String.format("%.2f", updatedBalance); // Update the balance as a String rounded to 2 decimal places
-        return this.balance; // Return the updated balance as a String
-    }
-
-       /**
+    /**
      * stats is used to store JSON for daily stats
      * --- @JdbcTypeCode annotation is used to specify the JDBC type code for a
      * column, in this case json.
@@ -183,9 +175,19 @@ public class Person implements Comparable<Person> {
 /// Relationships
 
 
+    @OneToMany(mappedBy="student", cascade=CascadeType.ALL, orphanRemoval=true)
+    @JsonIgnore
+    private List<SynergyGrade> grades;
+    
+
+    @ManyToMany(mappedBy="students", cascade=CascadeType.MERGE)
+    @JsonIgnore
+    private List<AssignmentSubmission> submissions;
+    
+
     @ManyToMany(fetch = EAGER)
     @JoinTable(
-        name = "person_person_sections",
+        name = "person_person_sections",  // unique name to avoid conflicts
         joinColumns = @JoinColumn(name = "person_id"),
         inverseJoinColumns = @JoinColumn(name = "section_id")
     )
@@ -225,12 +227,12 @@ public class Person implements Comparable<Person> {
     private userStocksTable user_stocks;
 
 
+    @ManyToMany(mappedBy = "groupMembers")
+    @JsonIgnore
+    private List<Groups> groups = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Groups group;
-
-
+//////////////////////////////////////////////////////////////////////////////////
+/// Constructors
 
 
     /** Custom constructor for Person when building a new Person object from an API call
@@ -313,6 +315,12 @@ public class Person implements Comparable<Person> {
 /// getter methods
 
 
+    public double getBalanceDouble() {
+        var balance_tmp = getBalance();
+        return Double.parseDouble(balance_tmp);
+    }
+
+
     /** Custom getter to return age from dob attribute
      * @return int, the age of the person
     */
@@ -327,6 +335,16 @@ public class Person implements Comparable<Person> {
 
 //////////////////////////////////////////////////////////////////////////////////
 /// setter methods
+
+
+    /** Custom setBalanceString method to set balance (string) using a double
+     * @param updatedBalance, a double with the amount to set as the user balance
+     * @return String, the updated String
+     */
+    public String setBalanceString(double updatedBalance) {
+        this.balance = String.valueOf(updatedBalance); // Update the balance as a String
+        return this.balance; // Return the updated balance as a String
+    }
 
 
 //////////////////////////////////////////////////////////////////////////////////
