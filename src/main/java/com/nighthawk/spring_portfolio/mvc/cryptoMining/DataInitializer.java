@@ -8,12 +8,20 @@ import org.springframework.stereotype.Component;
 public class DataInitializer implements CommandLineRunner {
     @Autowired
     private GPURepository gpuRepository;
+    
+    @Autowired
+    private EnergyRepository energyRepository;
 
     @Override
     public void run(String... args) {
-        // Only initialize if no GPUs exist
+        // Initialize GPUs if none exist
         if (gpuRepository.count() == 0) {
             initializeGPUs();
+        }
+        
+        // Initialize Energy Plans if none exist
+        if (energyRepository.count() == 0) {
+            initializeEnergyPlans();
         }
     }
 
@@ -52,5 +60,18 @@ public class DataInitializer implements CommandLineRunner {
         gpu.setPrice(price);
         gpu.setCategory(category);
         gpuRepository.save(gpu);
+    }
+
+    private void initializeEnergyPlans() {
+        createEnergyPlan("Tesla Energy", 0.12);
+        createEnergyPlan("Duke Energy", 0.15);
+        createEnergyPlan("Pacific Gas and Electric", 0.18);
+        createEnergyPlan("NextEra Energy", 0.21);
+        createEnergyPlan("Southern Company", 0.24);
+    }
+
+    private void createEnergyPlan(String supplierName, double EEM) {
+        Energy energy = new Energy(supplierName, EEM);
+        energyRepository.save(energy);
     }
 }

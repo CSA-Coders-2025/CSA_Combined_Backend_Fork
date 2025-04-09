@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,17 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
-import com.nighthawk.spring_portfolio.mvc.userStocks.UserStocksRepository;
-import com.nighthawk.spring_portfolio.mvc.userStocks.userStocksTable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-import java.util.*;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.stream.Collectors;
-import java.text.SimpleDateFormat;
 
 @RestController
 @RequestMapping("/api/mining")
@@ -109,6 +99,10 @@ public class MiningController {
                     GPU randomBudgetGPU = getRandomBudgetGPU();
                     newUser.addGPU(randomBudgetGPU);
                     System.out.println("Added random budget GPU: " + randomBudgetGPU.getName());
+
+                    // Give the user a cheap energy plan
+                    Energy cheapEnergy = new Energy("Cheap Energy", 0.09);
+                    newUser.setEnergyPlan(cheapEnergy);
                     
                     MiningUser savedUser = miningUserRepository.save(newUser);
                     System.out.println("Successfully created new mining user with ID: " + savedUser.getId());
@@ -384,6 +378,7 @@ public class MiningController {
                 Map<Long, Map<String, Object>> activeGpuGroups = new HashMap<>();
                 for (GPU gpu : user.getActiveGPUs()) {
                     Long gpuId = gpu.getId();
+                    double eem = user.getEnergyPlan().getEEM();
                     if (!activeGpuGroups.containsKey(gpuId)) {
                         Map<String, Object> gpuInfo = new HashMap<>();
                         gpuInfo.put("id", gpuId);
@@ -394,7 +389,7 @@ public class MiningController {
                         gpuInfo.put("price", gpu.getPrice());
                         gpuInfo.put("category", gpu.getCategory());
                         gpuInfo.put("available", gpu.isAvailable());
-                        gpuInfo.put("efficiency", gpu.getEfficiency());
+                        gpuInfo.put("efficiency", gpu.getEfficiency() + eem);
                         gpuInfo.put("quantity", user.getGpuQuantity(gpuId));
                         activeGpuGroups.put(gpuId, gpuInfo);
                     }
@@ -426,6 +421,90 @@ public class MiningController {
                     .body(errorResponse);
         }
     }
+
+    @GetMapping("/energy")
+    public ResponseEntity<?> getEnergyInfo() {
+        try {
+            System.out.println("\n=== Getting Energy Info ===");
+
+            MiningUser user = getOrCreateMiningUser();
+            if (user == null) {
+                System.out.println("ERROR: getOrCreateMiningUser returned null");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "User not authenticated"));
+            }
+
+            System.out.println("Got mining user: " + user.getPerson().getEmail());
+
+            if (user.getEnergyPlan() == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "No energy plan set for user"));
+            }
+
+            Energy energy = user.getEnergyPlan();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("supplierName", energy.getSupplierName());
+            response.put("EEM", energy.getEEM());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.out.println("\n=== ERROR in getEnergyInfo ===");
+            System.out.println("Error type: " + e.getClass().getName());
+            System.out.println("Error message: " + e.getMessage());
+            e.printStackTrace();
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to get energy info");
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("type", e.getClass().getName());
+            errorResponse.put("timestamp", new Date().toString());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(errorResponse);
+        }
+    }
+
+    @Autowired
+    private EnergyRepository energyRepository;
+
+    @PostMapping("/chooseEnergy/{supplierName}/{eem}")
+    public ResponseEntity<?> chooseEnergyPlan(@PathVariable String supplierName, @PathVariable double eem) {
+        try {
+            // Simulate getting or creating the mining user
+            MiningUser user = getOrCreateMiningUser();
+
+            // Simulate fetching the chosen energy plan
+            List<Energy> matchingPlans = energyRepository.findBySupplierName(supplierName)
+                .stream()
+                .filter(plan -> plan.getEEM() == eem)
+                .toList();
+
+            if (matchingPlans.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Energy plan not found."));
+            }
+
+            Energy chosenPlan = matchingPlans.get(0);
+
+            // Simulate assigning this plan to the user
+            user.setEnergyPlan(chosenPlan);  // You need this setter on MiningUser
+            miningUserRepository.save(user); // Save the user with the new plan
+
+            // Return confirmation
+            return ResponseEntity.ok(Map.of(
+                "message", "Energy plan successfully assigned.",
+                "supplierName", chosenPlan.getSupplierName(),
+                "eem", chosenPlan.getEEM()
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", e.getMessage()));
+        }
+    }
+
 
     @PostMapping("/testMining")
     public ResponseEntity<?> testMining() {

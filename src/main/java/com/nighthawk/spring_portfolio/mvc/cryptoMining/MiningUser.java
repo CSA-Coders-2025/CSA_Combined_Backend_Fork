@@ -1,14 +1,24 @@
 package com.nighthawk.spring_portfolio.mvc.cryptoMining;
 
-import com.nighthawk.spring_portfolio.mvc.person.Person;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
+
+import com.nighthawk.spring_portfolio.mvc.person.Person;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
@@ -30,12 +40,18 @@ public class MiningUser {
     private double currentHashrate = 0.0;
     private double dailyRevenue;
     private double powerCost;
+    private String energySupplier;
+    private String EEM;
     
     @ManyToMany
     private List<GPU> ownedGPUs = new ArrayList<>();
 
     @ManyToMany
     private List<GPU> activeGPUs = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "energy_id", referencedColumnName = "id")
+    private Energy energyPlan;
 
     // New mining statistics fields
     private long totalMiningTimeMinutes = 0;
@@ -55,6 +71,13 @@ public class MiningUser {
     public double getAverageHashrate() {
         if (totalMiningTimeMinutes == 0) return 0;
         return (totalSharesMined * 1.0) / totalMiningTimeMinutes;
+    }
+
+    public Energy setEnergyPlan(Energy energyPlan) {
+        this.energyPlan = energyPlan;
+        this.energySupplier = energyPlan.getSupplierName();
+        this.EEM = String.valueOf(energyPlan.getEEM());
+        return energyPlan;
     }
 
     public MiningUser(Person person) {
