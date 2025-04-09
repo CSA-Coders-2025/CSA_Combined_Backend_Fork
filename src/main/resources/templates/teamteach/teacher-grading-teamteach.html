@@ -372,43 +372,6 @@
 
         }
 
-        function saveGradeforStudent(student, grade, commentText) {
-            const postURL = "/api/teachergradingteamteach/submit"; // Endpoint
-            const data = {
-                comment: commentText,  // Ensure it matches the expected format
-                topic_id: selectedTopic,
-                grade: grade,
-                student: student
-            };
-
-            // Fetch API options
-            const fetchOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            };
-
-            fetch(postURL, fetchOptions)
-                .then(response => {
-                    if (response.status === 201) {
-                        return response.json();
-                    } else {
-                        throw new Error("Failed to submit comment: " + response.status);
-                    }
-                })
-                .then(data => {
-                    console.log("Comment submitted successfully:", data);
-                    alert("Comment submitted successfully!");
-                    document.getElementById('comment').value = ""; // Clear input
-                })
-
-                .catch(error => {
-                    console.error(error);
-                    alert("Error submitting comment. See console for details.");
-                });
-        }
 
         /**
         * Add a delay due to SQL Lock in the backend.
