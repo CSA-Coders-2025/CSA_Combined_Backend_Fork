@@ -181,7 +181,7 @@ public class AssignmentSubmissionAPIController {
         submission.setFeedback(feedback);
         submissionRepo.save(submission);
 
-        for (Person student : submission.getStudents()) {
+        for (Person student : submission.getSubmitter().getMembers()) {
             SynergyGrade assignedGrade = gradesRepo.findByAssignmentAndStudent(submission.getAssignment(), student);
             if (assignedGrade != null) {
                 // the assignment has a previously assigned grade, so we are just updating it

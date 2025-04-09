@@ -46,12 +46,14 @@ import io.github.cdimascio.dotenv.Dotenv;
 import com.nighthawk.spring_portfolio.mvc.assignments.AssignmentSubmission;
 import com.nighthawk.spring_portfolio.mvc.bathroom.Tinkle;
 import com.nighthawk.spring_portfolio.mvc.groups.Groups;
+import com.nighthawk.spring_portfolio.mvc.groups.Submitter;
 import com.nighthawk.spring_portfolio.mvc.student.StudentInfo;
 import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
 
 import jakarta.persistence.FetchType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
@@ -67,12 +69,13 @@ import lombok.NonNull;
  * --- @Entity annotation is used to mark the class as a persistent Java class.
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Convert(attributeName = "person", converter = JsonType.class)
 @JsonIgnoreProperties({"submissions"})
-public class Person implements Comparable<Person> {
+public class Person extends Submitter implements Comparable<Person> {
 
 //////////////////////////////////////////////////////////////////////////////////
 /// Columns stored on Person
@@ -179,12 +182,6 @@ public class Person implements Comparable<Person> {
     @JsonIgnore
     private List<SynergyGrade> grades;
     
-
-    @ManyToMany(mappedBy="students", cascade=CascadeType.MERGE)
-    @JsonIgnore
-    private List<AssignmentSubmission> submissions;
-    
-
     @ManyToMany(fetch = EAGER)
     @JoinTable(
         name = "person_person_sections",  // unique name to avoid conflicts
@@ -253,7 +250,6 @@ public class Person implements Comparable<Person> {
         this.pfp = pfp;
         this.balance = balance;
         this.roles.add(role);
-        this.submissions = new ArrayList<>();
 
         this.timeEntries = new Tinkle(this, "");
     }
@@ -348,21 +344,8 @@ public class Person implements Comparable<Person> {
 
 
 //////////////////////////////////////////////////////////////////////////////////
-/// other methods
-
-
-    // removes this user from all submission when deleted
-    @PreRemove
-    private void removePersonFromSubmissions() {
-        if (submissions != null) {
-            // if a user is deleted, remove them from everything they've submitted
-            for (AssignmentSubmission submission : submissions) {
-                submission.getStudents().remove(this);
-            }
-        }
-    }
-
-  
+    // other methods  
+    
     /** Custom hasRoleWithName method to find if a role exists on user
      * @param roleName, a String with the name of the role
      * @return boolean, the result of the search
@@ -463,5 +446,14 @@ public class Person implements Comparable<Person> {
             System.out.println(person);  // print object
             System.out.println();
         }
+    }
+
+    public List<AssignmentSubmission> getAllSubmissions() {
+        // gets all the individual submissions and also the group submissions
+        List<AssignmentSubmission> all = new ArrayList<>(super.getSubmissions());
+        for (Groups group : groups) {
+            all.addAll(group.getSubmissions());
+        }
+        return all;
     }
 }

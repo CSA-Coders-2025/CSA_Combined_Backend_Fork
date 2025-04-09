@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.nighthawk.spring_portfolio.mvc.groups.Submitter;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
 
@@ -206,7 +207,7 @@ public class AssignmentsApiController {
         Assignment assignment = assignmentRepo.findById(assignmentId).orElse(null);
         Person student = personRepo.findById(studentId).orElse(null);
         if (assignment != null) {
-            AssignmentSubmission submission = new AssignmentSubmission(assignment, List.of(student), content, comment, isLate);
+            AssignmentSubmission submission = new AssignmentSubmission(assignment, student, content, comment, isLate);
             AssignmentSubmission savedSubmission = submissionRepo.save(submission);
             return new ResponseEntity<>(savedSubmission, HttpStatus.CREATED);
         }
@@ -445,15 +446,20 @@ public class AssignmentsApiController {
 
         
         // Keep latest submission
-        Map<Long, AssignmentSubmission> latestSubmissions = submissions.stream()
-        .collect(Collectors.toMap(
-            submission -> submission.getStudents().get(0).getId(), // Get the first student's ID
-            submission -> submission,
-            (existing, replacement) -> replacement
-        ));
-    
-        List<AssignmentSubmission> uniqueSubmissions = new ArrayList<>(latestSubmissions.values());
+        Map<Long, AssignmentSubmission> latestSubmissions = new HashMap<>();
 
+        for (AssignmentSubmission submission : submissions) {
+            Submitter submitter = submission.getSubmitter();
+            if (submitter == null) continue;
+
+            Long submitterId = submitter.getId();
+
+            // for now we just overwrite w/ the latest submission but we should ideally eventually actually check the timestamp
+            latestSubmissions.put(submitterId, submission);
+        }
+        
+        List<AssignmentSubmission> uniqueSubmissions = new ArrayList<>(latestSubmissions.values());
+                      
     
         Collections.shuffle(uniqueSubmissions);
     
@@ -462,7 +468,7 @@ public class AssignmentsApiController {
             
             // grader whos not the asme persoon
             List<AssignmentSubmission> possibleGraders = uniqueSubmissions.stream()
-                .filter(submission -> !submission.getStudents().get(0).equals(currentSubmission.getStudents().get(0))) // just check if the FIRST student is different, will make this better later
+                .filter(submission -> !submission.getSubmitter().equals(currentSubmission.getSubmitter())) // just check if the FIRST student is different, will make this better later
                 .collect(Collectors.toList());
     
             if (possibleGraders.isEmpty()) {
@@ -476,9 +482,8 @@ public class AssignmentsApiController {
     
             // Assign graders to the current submission
             // Create a new list instead of sharing the existing one
-            currentSubmission.setAssignedGraders(
-                new ArrayList<>(graderSubmission.getStudents())
-            );
+            Submitter submitter = currentSubmission.getSubmitter();
+            currentSubmission.setAssignedGraders(submitter.getMembers());
         }
 
     
