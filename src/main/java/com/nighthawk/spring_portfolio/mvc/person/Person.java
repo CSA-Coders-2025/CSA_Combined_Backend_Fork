@@ -342,7 +342,7 @@ public class Person implements Comparable<Person> {
      * @return String, the updated String
      */
     public String setBalanceString(double updatedBalance) {
-        this.balance = String.valueOf(updatedBalance); // Update the balance as a String
+        this.balance = String.format("%.2f", updatedBalance); // Update the balance as a String rounded to 2 decimal places
         return this.balance; // Return the updated balance as a String
     }
 
