@@ -254,10 +254,7 @@
         * On loading of the page fetch all assginments and filter by teamteach;
         */
         function fetchTeamTeachAssignments() {
-            fetch('/api/assignments/')
-
             fectchtopics();
-            fetchAssignments();
         };
 
         function getItemById(list, id) {
@@ -266,7 +263,7 @@
 
 
         function fectchtopics() {
-            fetch('/api/topics/all')
+            fetch('/api/assignments/')
 
                 .then(response => response.json())
                 .then(grades => {
@@ -302,69 +299,21 @@
                 .then(grades => {
                     submissions = grades;
                     submissions.forEach(submission => {
-                        var studentName = submission.student.name;
-                        var submissionId = submission.id;
-                        const row = document.createElement('tr');
-                        row.id = submissionId;
-                        row.innerHTML = `
-                            <td id="name-studentName">${studentName}</td>
-                            <td><input type=text" id="input-${submissionId}"></td>
-                        `;
-                        tableBody.appendChild(row);
+                        var students = submission.students;
+                        students.forEach(student => {
+                            var studentName = student.name;
+                            var submissionId = submission.id;
+                            const row = document.createElement('tr');
+                            row.id = submissionId;
+                            row.innerHTML = `
+                                <td id="name-studentName">${studentName}</td>
+                                <td><input type=text" id="input-${submissionId}"></td>
+                            `;
+                            tableBody.appendChild(row);
+                        })
                     });
-                    grades.forEach(topic => {
-                        const option = document.createElement('option');
-                        option.value = topic.id
-                        option.text = topic.topicName
-                        selecttopics.appendChild(option);
-                    })
                 });
-        }
-
-        function selectTopic(event) {
-            var selectElement = event.target;
-            var value = selectElement.value;
-            selectedTopic = value;
-            var topic = getItemById(data, value);
-
-            //Clear table
-            const tableBody = document.getElementById('gradingList');
-            tableBody.innerHTML = '';
-            var students = topic.students
-            const studentsArray = students.split(",");
-            for (let i = 0; i < studentsArray.length; i++) {
-                var studentName = studentsArray[i];
-                const row = document.createElement('tr');
-                row.id = studentName;
-                row.innerHTML = `
-                    <td id="name-studentName">${studentName}</td>
-                    <td><input type=text" id="input-${studentName}"></td>
-                `;
-                tableBody.appendChild(row);
             }
-
-        }
-
-        function fetchAssignments() {
-            fetch('/api/teachergradingteamteach/debug')
-                .then(response => response.json())
-                .then(grades => {
-                    const tableBody = document.getElementById('gradingList');
-                    tableBody.innerHTML = '';
-
-                    grades.forEach(grade => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                        <td>${grade.student}</td>
-                        <td>${grade.grade}</td>
-
-                    `;
-                        tableBody.appendChild(row);
-                    });
-                });
-
-        }
-
 
         /**
         * On submit comment get all the Assignmentsubmissions and iterate through 
