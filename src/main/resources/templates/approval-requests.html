@@ -7,24 +7,15 @@
     <title>Approval Requests</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- page scripts located in the header-->
-<head>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-            javaURI = "http://localhost:8085";
-        } else {
-            javaURI = "https://spring2025.nighthawkcodingsociety.com";
-        }
-
         function approveStudent(teacherEmail, studentName) {
             const now = new Date();
             const timeIn = now.toLocaleTimeString('en-US', { hour12: false });
 
-            fetch(javaURI + "/api/approval/approveRequest", {
+            fetch("/api/approval/approveRequest", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ teacherEmail, studentName, timeIn })
+                body: JSON.stringify({ teacherEmail, studentName, timeIn }) 
             }).then(response => {
                 if (response.ok) {
                     console.log(`Approved: ${studentName}`);
@@ -36,7 +27,7 @@
         }
 
         function denyStudent(teacherEmail, studentName) {
-            fetch(javaURI + "/api/approval/denyRequest", {
+            fetch("/api/approval/denyRequest", { 
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ teacherEmail, studentName })
@@ -51,7 +42,7 @@
         }
 
         function fetchPendingRequests() {
-            fetch(javaURI + "/api/approval/pendingRequests")
+            fetch("/api/approval/pendingRequests")
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.querySelector("#approvalTable tbody");
@@ -84,6 +75,7 @@
 </head>
 
 <body>
+<div class="navbar">Tinkle View Navbar</div>
 <div layout:fragment="body" th:remove="tag">
     <div class="container mt-5">
         <h2 class="text-center mb-4">Pending Approval Requests</h2>
