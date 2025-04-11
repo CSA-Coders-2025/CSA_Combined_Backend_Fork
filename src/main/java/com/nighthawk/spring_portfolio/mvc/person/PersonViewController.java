@@ -218,6 +218,12 @@ public class PersonViewController {
         return "person/update";
     }
 
+    @GetMapping("/update/roles/{id}")
+    public String personUpdateRoles(@PathVariable("id") int id, Model model) {
+        model.addAttribute("person", repository.get(id));
+        return "person/update-roles";
+    }
+
     @GetMapping("/update/user")
     public String personUpdate(Authentication authentication, Model model) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
