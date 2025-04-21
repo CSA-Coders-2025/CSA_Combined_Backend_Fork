@@ -472,8 +472,8 @@ public class MiningController {
     @PostMapping("/chooseEnergy/{supplierName}/{eem}")
     public ResponseEntity<?> chooseEnergyPlan(@PathVariable String supplierName, @PathVariable double eem) {
         try {
-            // Simulate getting or creating the mining user
             MiningUser user = getOrCreateMiningUser();
+            if (user != null) { System.out.println("Got the user for chooseEnergy endpoint"); }
 
             // Simulate fetching the chosen energy plan
             List<Energy> matchingPlans = energyRepository.findBySupplierName(supplierName)
