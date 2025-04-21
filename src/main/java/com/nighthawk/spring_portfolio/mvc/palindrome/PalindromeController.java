@@ -47,10 +47,6 @@ public class PalindromeController {
         int left = 0;
         int right = length - 1;
 
-        if (length % 2 != 0) {
-            left++; // Ignore middle character for odd length strings
-        }
-
         while (left < right) {
             if (str.charAt(left) != str.charAt(right)) {
                 return false;
