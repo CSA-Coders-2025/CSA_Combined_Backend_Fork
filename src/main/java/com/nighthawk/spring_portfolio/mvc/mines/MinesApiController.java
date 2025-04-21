@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -55,7 +54,7 @@ public class MinesApiController {
         double betSize = minesRequest.getBet();
         double winnings = board.winnings() * betSize;
         double updatedBalance = user.getBalanceDouble() + winnings;
-        user.setBalanceString(updatedBalance);
+        user.setBalanceString(updatedBalance, "casino");
         personJpaRepository.save(user);
         
         return new ResponseEntity<>(user.getBalanceDouble(), HttpStatus.OK);
@@ -74,7 +73,7 @@ public class MinesApiController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        user.setBalanceString(updatedBalance);
+        user.setBalanceString(updatedBalance, "mines");
         personJpaRepository.save(user);
         board = new MinesBoard(stakes);
         
@@ -111,7 +110,7 @@ public class MinesApiController {
         }
 
         // Save updated balance
-        person.setBalanceString(updatedBalance);
+        person.setBalanceString(updatedBalance, "mines");
         personJpaRepository.save(person);
 
         // Return response
