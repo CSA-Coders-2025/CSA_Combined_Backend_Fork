@@ -18,7 +18,10 @@ public class CalendarEventService {
 
     @Autowired
     private SlackService slackService; // Assuming you have a Slack service to send messages
-
+    private final String CSA_WEBHOOK_URL = "https://hooks.slack.com/services/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"; 
+    private final String CSP_WEBHOOK_URL = "https://hooks.slack.com/services/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";
+    private final String CSSE_WEBHOOK_URL = "https://hooks.slack.com/services/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"; 
+    private String SLACK_WEBHOOK_URL = CSA_WEBHOOK_URL;
     // Save a new event
     public CalendarEvent saveEvent(CalendarEvent event) {
         CalendarEvent savedEvent = calendarEventRepository.save(event);
@@ -27,7 +30,7 @@ public class CalendarEventService {
                 "Description: " + savedEvent.getDescription() + "\n" +
                 "Date: " + savedEvent.getDate() + "\n" +
                 "Type: " + savedEvent.getType() + "\n" +
-                "Period: " + savedEvent.getPeriod());
+                "Period: " + savedEvent.getPeriod(), SLACK_WEBHOOK_URL);
         return savedEvent;
     }
 
@@ -59,7 +62,7 @@ public class CalendarEventService {
                     "Type: " + event.getType() + "\n" +
                     "Period: " + event.getPeriod();
 
-            slackService.sendMessage("Event Updated:\n" + oldDetails + "\n\n" + newDetails);
+            slackService.sendMessage("Event Updated:\n" + oldDetails + "\n\n" + newDetails, SLACK_WEBHOOK_URL);
             return true;
         }
         return false;
@@ -75,7 +78,7 @@ public class CalendarEventService {
                     "Description: " + event.getDescription() + "\n" +
                     "Date: " + event.getDate() + "\n" +
                     "Type: " + event.getType() + "\n" +
-                    "Period: " + event.getPeriod());
+                    "Period: " + event.getPeriod(), SLACK_WEBHOOK_URL);
             return true;
         }
         return false;
@@ -131,9 +134,9 @@ public class CalendarEventService {
     //final String CSA_CHANNEL_ID = "C07RRJDU5M5";
     //final String CSSE_CHANNEL_ID = "C07RRJ5GECX";
     // Official
-    final String CSP_CHANNEL_ID = "CUS8E3M6Z";
-    final String CSA_CHANNEL_ID = "CRRJL1F1D";
-    final String CSSE_CHANNEL_ID = "C05MNRWC2A1";
+    private final String CSP_CHANNEL_ID = "CUS8E3M6Z";
+    private final String CSA_CHANNEL_ID = "CRRJL1F1D";
+    private final String CSSE_CHANNEL_ID = "C05MNRWC2A1";
 
     private List<CalendarEvent> extractEventsFromText(Map<String, String> jsonMap, LocalDate weekStartDate) {
         String text = jsonMap.get("text");
@@ -156,12 +159,15 @@ public class CalendarEventService {
                 switch(jsonMap.get("channel")) {
                     case(CSP_CHANNEL_ID):
                         period = "CSP";
+                        SLACK_WEBHOOK_URL = CSP_WEBHOOK_URL;
                         break;
                     case(CSA_CHANNEL_ID):
                         period = "CSA";
+                        SLACK_WEBHOOK_URL = CSA_WEBHOOK_URL;    
                         break;
                     case(CSSE_CHANNEL_ID):
                         period = "CSSE";
+                        SLACK_WEBHOOK_URL = CSSE_WEBHOOK_URL;
                         break;
                 }
                 String type = "daily plan";
