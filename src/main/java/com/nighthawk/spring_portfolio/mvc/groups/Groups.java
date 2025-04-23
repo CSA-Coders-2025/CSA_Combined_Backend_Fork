@@ -27,17 +27,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Groups extends Submitter {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "group_members", 
         joinColumns = @JoinColumn(name = "group_id"), 
         inverseJoinColumns = @JoinColumn(name = "person_id")
     )
-
     @JsonIgnore
     private List<Person> groupMembers = new ArrayList<>();
 

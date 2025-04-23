@@ -96,21 +96,7 @@ public class Person extends Submitter implements Comparable<Person> {
 //////////////////////////////////////////////////////////////////////////////////
 /// Columns stored on Person
 
-
-    /** Automatic unique identifier for Person record 
-     * --- Id annotation is used to specify the identifier property of the entity.
-     * ----GeneratedValue annotation is used to specify the primary key generation
-     * strategy to use.
-     * ----- The strategy is to have the persistence provider pick an appropriate
-     * strategy for the particular database.
-     * ----- GenerationType.AUTO is the default generation type and it will pick the
-     * strategy based on the used database.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-/**
+    /**
      * email, password, roles are key attributes to login and authentication
      * --- @NotEmpty annotation is used to validate that the annotated field is not
      * null or empty, meaning it has to have a value.

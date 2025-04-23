@@ -20,6 +20,15 @@ import lombok.Getter;
 })
 @Getter
 public abstract class Submitter {
+    /** Automatic unique identifier for Person or group record 
+     * --- Id annotation is used to specify the identifier property of the entity.
+     * ----GeneratedValue annotation is used to specify the primary key generation
+     * strategy to use.
+     * ----- The strategy is to have the persistence provider pick an appropriate
+     * strategy for the particular database.
+     * ----- GenerationType.AUTO is the default generation type and it will pick the
+     * strategy based on the used database.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
