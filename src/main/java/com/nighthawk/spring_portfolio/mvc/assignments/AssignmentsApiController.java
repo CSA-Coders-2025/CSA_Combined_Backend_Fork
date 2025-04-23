@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.nighthawk.spring_portfolio.mvc.groups.GroupsJpaRepository;
 import com.nighthawk.spring_portfolio.mvc.groups.Submitter;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
@@ -39,6 +40,9 @@ import lombok.Setter;
 public class AssignmentsApiController {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private GroupsJpaRepository groupRepo;
 
     @Autowired
     private AssignmentJpaRepository assignmentRepo;
@@ -136,10 +140,22 @@ public class AssignmentsApiController {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @Transactional
     @GetMapping("/submissions/student/{studentId}")
-    public ResponseEntity<?> getStudentSubmissions(@PathVariable Long studentId) {
-        List<AssignmentSubmission> submissions = submissionRepo.findByStudentId(studentId);
-        return new ResponseEntity<>(submissions, HttpStatus.OK);
+    public ResponseEntity<?> getSubmissions(@PathVariable Long studentId) {
+        if (personRepo.findById(studentId).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found");
+        }
+
+        List<AssignmentSubmissionReturnDto> dtos = Stream.concat(
+            submissionRepo.findBySubmitterId(studentId).stream(),
+            groupRepo.findGroupsByPersonId(studentId).stream()
+                .flatMap(group -> submissionRepo.findBySubmitterId(group.getId()).stream())
+        )
+        .map(AssignmentSubmissionReturnDto::new)
+        .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}")

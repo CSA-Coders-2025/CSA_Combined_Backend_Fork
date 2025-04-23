@@ -2,10 +2,13 @@ package com.nighthawk.spring_portfolio.mvc.assignments;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.nighthawk.spring_portfolio.mvc.groups.Groups;
+import com.nighthawk.spring_portfolio.mvc.groups.GroupsJpaRepository;
+import com.nighthawk.spring_portfolio.mvc.groups.Submitter;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
 import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
@@ -50,6 +56,9 @@ public class AssignmentSubmissionAPIController {
 
     @Autowired
     private PersonJpaRepository personRepo;
+
+    @Autowired
+    private GroupsJpaRepository groupRepo;
 
     @Autowired
     private SynergyGradeJpaRepository gradesRepo;
@@ -101,10 +110,19 @@ public class AssignmentSubmissionAPIController {
     @Transactional
     @GetMapping("/getSubmissions/{studentId}")
     public ResponseEntity<?> getSubmissions(@PathVariable Long studentId) {
-        List<AssignmentSubmissionReturnDto> submissions = submissionRepo.findByStudentId(studentId).stream()
+        if (personRepo.findById(studentId).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found");
+        }
+
+        List<AssignmentSubmissionReturnDto> dtos = Stream.concat(
+            submissionRepo.findBySubmitterId(studentId).stream(),
+            groupRepo.findGroupsByPersonId(studentId).stream()
+                .flatMap(group -> submissionRepo.findBySubmitterId(group.getId()).stream())
+        )
         .map(AssignmentSubmissionReturnDto::new)
-        .toList();;
-        return new ResponseEntity<>(submissions, HttpStatus.OK);
+        .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 
     /**
@@ -123,7 +141,8 @@ public class AssignmentSubmissionAPIController {
     @Setter
     public static class SubmissionRequestDto {
         public Long assignmentId;
-        public List<Long> studentIds;
+        public Long submitterId;
+        public Boolean isGroupSubmission;
         public String content;
         public String comment;
         public Boolean isLate;
@@ -138,14 +157,21 @@ public class AssignmentSubmissionAPIController {
      * @param comment      any comments related to the submission
      * @return a ResponseEntity containing the created submission or an error if the assignment is not found
      */
-    @PostMapping("/submit/{assignmentId}")
+    @PostMapping("/{assignmentId}")
     public ResponseEntity<?> submitAssignment(
             @RequestBody SubmissionRequestDto requestData
     ) {
         Assignment assignment = assignmentRepo.findById(requestData.assignmentId).orElse(null);
-        List<Person> students = personRepo.findAllById(requestData.studentIds);
+
         if (assignment != null) {
-            AssignmentSubmission submission = new AssignmentSubmission(assignment, students, requestData.content, requestData.comment,requestData.isLate);
+            Submitter submitter;
+            if (requestData.isGroupSubmission) {
+                submitter = groupRepo.findById(requestData.submitterId).orElse(null);
+            } else {
+                submitter = personRepo.findById(requestData.submitterId).orElse(null);
+            }
+
+            AssignmentSubmission submission = new AssignmentSubmission(assignment, submitter, requestData.content, requestData.comment,requestData.isLate);
             AssignmentSubmission savedSubmission = submissionRepo.save(submission);
             return new ResponseEntity<>(new AssignmentSubmissionReturnDto(savedSubmission), HttpStatus.CREATED);
         }
