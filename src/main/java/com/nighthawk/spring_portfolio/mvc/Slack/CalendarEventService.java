@@ -30,7 +30,7 @@ public class CalendarEventService {
                 "Description: " + savedEvent.getDescription() + "\n" +
                 "Date: " + savedEvent.getDate() + "\n" +
                 "Type: " + savedEvent.getType() + "\n" +
-                "Period: " + savedEvent.getPeriod(), SLACK_WEBHOOK_URL);
+                "Period: " + savedEvent.getPeriod(), SLACK_WEBHOOK_URL
         return savedEvent;
     }
 
@@ -143,7 +143,6 @@ public class CalendarEventService {
         List<CalendarEvent> events = new ArrayList<>();
         Pattern dayPattern = Pattern.compile("\\[(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?: - (Mon|Tue|Wed|Thu|Fri|Sat|Sun))?\\]:\\s*(\\*\\*|\\*)?\\s*(.+)");
         Pattern descriptionPattern = Pattern.compile("(\\*\\*|\\*)?\\s*\\u2022\\s*(.+)");
-
         String[] lines = text.split("\\n");
         CalendarEvent lastEvent = null;
 
