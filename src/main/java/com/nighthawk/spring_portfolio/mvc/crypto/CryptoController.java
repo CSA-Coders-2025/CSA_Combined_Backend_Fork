@@ -131,7 +131,7 @@ public class CryptoController {
     
         // Deduct balance and update user's holdings
         double updatedBalance = person.getBalanceDouble() - usdAmount;
-        person.setBalanceString(updatedBalance);
+        person.setBalanceString(updatedBalance, "crypto");
     
         userStocksTable userStocks = person.getUser_stocks();
         if (userStocks == null) {
@@ -188,6 +188,9 @@ public class CryptoController {
 
         return ResponseEntity.ok("{ \"email\": \"" + email + "\", \"holdings\": \"" + userStocks.getCrypto().replace("\n", "\\n") + "\" }");
     }
+
+    
+
     @PostMapping("/sell")
     public ResponseEntity<?> sellCrypto(@RequestBody SellRequest sellRequest) {
         String email = sellRequest.getEmail();
@@ -236,7 +239,7 @@ public class CryptoController {
         // Update balance
         double totalValueSold = cryptoPrice * cryptoAmount;
         double updatedBalance = person.getBalanceDouble() + totalValueSold;
-        person.setBalanceString(updatedBalance);
+        person.setBalanceString(updatedBalance, "crypto");
         userStocks.setCrypto(updatedCrypto);
         userStocks.setBalance(String.valueOf(updatedBalance));
     
@@ -254,19 +257,14 @@ public class CryptoController {
     }
     @GetMapping("/history")
     public ResponseEntity<?> getCryptoTransactionHistory(@RequestParam String email) {
-        Person person = personRepository.findByEmail(email);
-        if (person == null) {
-            return ResponseEntity.status(404).body("User not found: " + email);
-        }
-
-        userStocksTable userStocks = person.getUser_stocks();
-        if (userStocks == null || userStocks.getCryptoHistory() == null || userStocks.getCryptoHistory().isEmpty()) {
-            return ResponseEntity.status(404).body("No transaction history found for email: " + email);
-        }
-
-        return ResponseEntity.ok("{ \"email\": \"" + email + "\", \"cryptoHistory\": \"" + userStocks.getCryptoHistory().replace("\n", "\\n") + "\" }");
+    userStocksTable userStocks = userStocksRepo.findByEmail(email);
+    
+    if (userStocks == null || userStocks.getCryptoHistory() == null || userStocks.getCryptoHistory().isEmpty()) {
+        return ResponseEntity.status(404).body("No transaction history found for email: " + email);
     }
-
+    
+    return ResponseEntity.ok("{ \"email\": \"" + email + "\", \"cryptoHistory\": \"" + userStocks.getCryptoHistory().replace("\n", "\\n") + "\" }");
+}
 
     // Utility method to resolve crypto ID to ticker symbol
     private String resolveCryptoId(String cryptoId) {
