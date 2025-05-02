@@ -167,10 +167,8 @@ public class PersonViewController {
     @Getter
     public static class PersonRoleDto {
         private String uid;
-        private String roleName;
         PersonRoleDto(String uid){
             this.uid = uid;
-            this.roleName = "ROLE_USER";
         }
     }
 
@@ -181,15 +179,15 @@ public class PersonViewController {
      * @return String indicating success or failure
      */
     @PostMapping("/update/role")
-    public String personRoleUpdateSave(@Valid PersonRoleDto roleDto) {
+    public String personRoleUpdateSave(@Valid PersonRoleDto roleDto,@RequestParam("roleName") String roleName) {
 
         Person personToUpdate = repository.getByUid(roleDto.getUid());
         if (personToUpdate == null) {
             return "person/update-roles";  // Return error if person not found
         }
 
-        System.out.println(roleDto.getRoleName());
-        repository.addRoleToPerson(roleDto.getUid(), roleDto.getRoleName());  // Add the role to the person
+        System.out.println(roleName);
+        repository.addRoleToPerson(roleDto.getUid(), roleName);  // Add the role to the person
 
         return "redirect:/mvc/person/read"; // Redirect to the read page after updating
     }
