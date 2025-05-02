@@ -168,24 +168,30 @@ public class PersonViewController {
     public static class PersonRoleDto {
         private String uid;
         private String roleName;
+        PersonRoleDto(String uid){
+            this.uid = uid;
+            this.roleName = "ROLE_USER";
+        }
     }
 
     /**
      * Updates a specific role for a person via a RESTful request.
      *
      * @param roleDto the DTO containing the GitHub ID and role name
-     * @return ResponseEntity indicating success or failure
+     * @return String indicating success or failure
      */
     @PostMapping("/update/role")
-    public ResponseEntity<Object> personRoleUpdateSave(@RequestBody PersonRoleDto roleDto) {
+    public String personRoleUpdateSave(@Valid PersonRoleDto roleDto) {
+
         Person personToUpdate = repository.getByUid(roleDto.getUid());
         if (personToUpdate == null) {
-            return new ResponseEntity<>(personToUpdate, HttpStatus.CONFLICT);  // Return error if person not found
+            return "person/update-roles";  // Return error if person not found
         }
 
+        System.out.println(roleDto.getRoleName());
         repository.addRoleToPerson(roleDto.getUid(), roleDto.getRoleName());  // Add the role to the person
 
-        return new ResponseEntity<>(personToUpdate, HttpStatus.OK);  // Return success response
+        return "redirect:/mvc/person/read"; // Redirect to the read page after updating
     }
 
     @Getter
@@ -208,7 +214,7 @@ public class PersonViewController {
         }
 
         // Add all roles to the person
-        for (String roleName : rolesDto.getRoleNames()) {
+        for (String roleName : rolesDto.getRoleNames()) { //I will assume that the roleNames is made of
             repository.addRoleToPerson(rolesDto.getUid(), roleName);
         }
 
@@ -223,7 +229,8 @@ public class PersonViewController {
     
     @GetMapping("/update/roles/{id}")
     public String personUpdateRoles(@PathVariable("id") int id, Model model) {
-        model.addAttribute("person", repository.get(id));
+        PersonRoleDto roleDto = new PersonRoleDto(repository.get(id).getUid());
+        model.addAttribute("roleDto", roleDto);
         return "person/update-roles";
     }
 
@@ -237,7 +244,8 @@ public class PersonViewController {
     @GetMapping("/update/roles/user")
     public String personUpdateRoles(Authentication authentication, Model model) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        model.addAttribute("person", repository.getByUid(userDetails.getUsername()));  // Add the person to the model
+        PersonRoleDto roleDto = new PersonRoleDto(userDetails.getUsername());
+        model.addAttribute("roleDto", roleDto);
         return "person/update-roles";
     }
 
