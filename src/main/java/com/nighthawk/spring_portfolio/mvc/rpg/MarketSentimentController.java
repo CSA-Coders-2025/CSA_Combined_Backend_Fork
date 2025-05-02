@@ -9,7 +9,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/rpg_answer")
-@CrossOrigin(origins = {"http://localhost:8085", "http://127.0.0.1:5501"})
+@CrossOrigin(origins = {
+
+    "http://localhost:8085",
+    "http://127.0.0.1:5501",
+    "http://127.0.0.1:4100",
+    "http://localhost:4100",
+    "https://nighthawkcoders.github.io",
+    "https://spring2025.nighthawkcodingsociety.com"
+})
+
 public class MarketSentimentController {
     
     // Simple in-memory storage for votes
