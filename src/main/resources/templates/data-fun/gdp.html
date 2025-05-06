@@ -6,11 +6,33 @@
 <th:block layout:fragment="style" th:remove="tag"></th:block>
 
 <!-- page title -->
-<th:block layout:fragment="title" th:remove="tag">U.S. Gross Domestic Product</th:block>
+<th:block layout:fragment="title" th:remove="tag">Data Fun</th:block>
 
 <!-- The 'body' section is defined using Thymeleaf's layout fragment. It will replace the 'body' content in the base layout -->
 <th:block layout:fragment="body" th:remove="tag">
     <canvas id="myChart"></canvas>
+    <form>
+        <select name="Series" id="series">
+            <option value="NY.GDP.MKTP.CD" id="NY.GDP.MKTP.CD" selected>Gross Domestic Product (US dollar)</option>
+            <option value="NY.GDP.PCAP.CD" id="NY.GDP.PCAP.CD">GDP per capita (US dollar)</option>
+            <option value="FP.CPI.TOTL.ZG" id="FP.CPI.TOTL.ZG">Inflation % (consumer prices)</option>
+            <option value="CM.MKT.TRAD.GD.ZS" id="CM.MKT.TRAD.GD.ZS">Stocks Traded (% of GDP)</option>
+            <option value="SI.POV.GINI" id="SI.POV.GINI">Gini Index (income disparity)</option>
+            <option value="SP.URB.TOTL.IN.ZS" id="SP.URB.TOTL.IN.ZS">Urban Population (% of total population)</option>
+        </select>
+        <select name="Country" id="country">
+            <option value="us" id="us" selected>United States</option>
+            <option value="gb" id="gb">United Kingdom</option>
+            <option value="cn" id="cn">China</option>
+            <option value="ca" id="ca">Canada</option>
+            <option value="ru" id="ru">Russia</option>
+            <option value="de" id="de">Germany</option>
+            <option value="fr" id="fr">France</option>
+            <option value="jp" id="jp">Japan</option>
+            <option value="mx" id="mx">Mexico</option>
+        </select>
+        <button type="submit">Update Chart</button>
+    </form>
 </th:block>
 <!-- End of the body fragment -->
 
@@ -18,8 +40,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-
-
         function formatGDPData(data){
             let resultX = [];
             let resultY = [];
@@ -41,9 +61,10 @@
             return [resultX,resultY];
         }
 
-        async function fetchData(){
+        async function fetchData(url){
+            url = url?url:"https://api.worldbank.org/v2/country/us/indicator/NY.GDP.MKTP.CD?format=json"
             let formattedData;
-            await fetch("https://api.worldbank.org/v2/country/us/indicator/NY.GDP.MKTP.CD?format=json", {
+            await fetch(url, {
                 method: "GET",
                 cache: "no-cache",
                 }).then((response) => response.json()).then((data) => {
@@ -52,18 +73,26 @@
             return formattedData;
         }
 
+        let chart = null;
         // Your Function
-        async function drawChart() {
-            let dataArray = await fetchData();
+        async function drawChart(url,dataLabel,title) {
+            //check for an existing chart
+            if(chart != null){
+                //remove any found
+                chart.destroy();
+            }
+
+            let dataArray = await fetchData(url);
             let xValues = dataArray[0];
             let yValues = dataArray[1];
 
-            new Chart("myChart", {
+
+            chart = new Chart("myChart", {
             type: "line",
             data: {
                 labels: xValues,
                 datasets: [{
-                    label: 'Gross Domestic Product (US dollar)',
+                    label: dataLabel?dataLabel:'Gross Domestic Product (US dollar)',
                     fill: false,
                     lineTension: 0,
                     backgroundColor: "grey",
@@ -73,14 +102,28 @@
             },
             options: {
                 legend: {display: false},
-                scales: {
-                    yAxes: [{ticks: {min: 6, max:16}}],
-                }
-            }
+                plugins: {
+                    title: {
+                        display: true,
+                        color: "white",
+                        text: title?title:"United States: Gross Domestic Product (US dollar)",
+                    }
+                },
+            },
             });
         } 
 
-        drawChart();
+        document.querySelector("form").addEventListener("submit",(event)=>{
+            event.preventDefault();
+            let country = document.getElementById("country").value;
+            let series = document.getElementById("series").value;
+            let dataLabel = document.getElementById(series).innerText;
+            let title = document.getElementById(country).innerText+": "+dataLabel;
+            let url = "https://api.worldbank.org/v2/country/"+country+"/indicator/"+series+"?format=json";
+            drawChart(url,dataLabel,title);
+        })
+
+        drawChart(null,null,null); //fill chart with default data
     </script>
 </th:block>
 
