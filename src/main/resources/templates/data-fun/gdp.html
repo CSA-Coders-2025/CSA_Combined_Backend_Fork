@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml"
+    layout:decorate="~{layouts/base}" lang="en">
+
+<!-- page style -->
+<th:block layout:fragment="style" th:remove="tag"></th:block>
+
+<!-- page title -->
+<th:block layout:fragment="title" th:remove="tag">U.S. Gross Domestic Product</th:block>
+
+<!-- The 'body' section is defined using Thymeleaf's layout fragment. It will replace the 'body' content in the base layout -->
+<th:block layout:fragment="body" th:remove="tag">
+    <canvas id="myChart"></canvas>
+</th:block>
+<!-- End of the body fragment -->
+
+<th:block layout:fragment="script" th:remove="tag">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+
+        function formatGDPData(data){
+            let resultX = [];
+            let resultY = [];
+
+            //assume data is an array
+            if(!Array.isArray(data)){console.warn("unexpected format"); return;};
+            //and should be holding an array within the second index ([_,ME])
+            if(!Array.isArray(data[1])){console.warn("unexpected format"); return;};
+            //decrement so that oldest values are first added
+            for(let i=data[1].length-1; i>=0; i--){
+                const obj = data[1][i];
+                if(!obj.hasOwnProperty("date")){continue;}
+                if(!obj.hasOwnProperty("value")){continue;}
+                if(obj.value == null){continue;}
+                resultX.push(Number(obj.date));
+                resultY.push(Number(obj.value))
+            }
+
+            return [resultX,resultY];
+        }
+
+        async function fetchData(){
+            let formattedData;
+            await fetch("https://api.worldbank.org/v2/country/us/indicator/NY.GDP.MKTP.CD?format=json", {
+                method: "GET",
+                cache: "no-cache",
+                }).then((response) => response.json()).then((data) => {
+                    formattedData = formatGDPData(data);
+            })
+            return formattedData;
+        }
+
+        // Your Function
+        async function drawChart() {
+            let dataArray = await fetchData();
+            let xValues = dataArray[0];
+            let yValues = dataArray[1];
+
+            new Chart("myChart", {
+            type: "line",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    label: 'Gross Domestic Product (US dollar)',
+                    fill: false,
+                    lineTension: 0,
+                    backgroundColor: "grey",
+                    borderColor: "green",
+                    data: yValues
+                }]
+            },
+            options: {
+                legend: {display: false},
+                scales: {
+                    yAxes: [{ticks: {min: 6, max:16}}],
+                }
+            }
+            });
+        } 
+
+        drawChart();
+    </script>
+
+
+<script>
+
+</script>
+</th:block>
+
+</html>
