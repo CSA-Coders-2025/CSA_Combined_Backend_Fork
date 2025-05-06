@@ -8,7 +8,6 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.synergy.SynergyGrade;
 
@@ -25,23 +24,14 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+// @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Getter
 @Setter
 public class Assignment {
-    // @JsonInclude(JsonInclude.Include.NON_NULL)
-    @NotNull
-    @JsonPropertyOrder({"id", "name", "type", "description", "dueDate", "timestamp", "submissions"})
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
