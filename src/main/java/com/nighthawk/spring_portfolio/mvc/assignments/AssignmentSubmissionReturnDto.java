@@ -18,7 +18,6 @@ public class AssignmentSubmissionReturnDto {
     public String comment;
     public Double grade;
     public String feedback;
-    public Boolean isLate;
 
     public AssignmentSubmissionReturnDto(AssignmentSubmission submission) {
         this.id = submission.getId();
@@ -28,6 +27,5 @@ public class AssignmentSubmissionReturnDto {
         this.comment = submission.getComment();
         this.grade = submission.getGrade();
         this.feedback = submission.getFeedback();
-        this.isLate = submission.getIsLate();
     }
 }

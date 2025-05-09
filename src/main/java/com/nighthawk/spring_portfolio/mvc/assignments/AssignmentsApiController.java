@@ -206,7 +206,7 @@ public class AssignmentsApiController {
         Assignment assignment = assignmentRepo.findById(assignmentId).orElse(null);
         Person student = personRepo.findById(studentId).orElse(null);
         if (assignment != null) {
-            AssignmentSubmission submission = new AssignmentSubmission(assignment, List.of(student), content, comment, isLate);
+            AssignmentSubmission submission = new AssignmentSubmission(assignment, List.of(student), content, comment);
             AssignmentSubmission savedSubmission = submissionRepo.save(submission);
             return new ResponseEntity<>(savedSubmission, HttpStatus.CREATED);
         }

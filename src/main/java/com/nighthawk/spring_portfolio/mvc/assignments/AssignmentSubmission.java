@@ -61,8 +61,6 @@ public class AssignmentSubmission {
 
     private Long assignmentid;
 
-    private Boolean isLate;
-
     @PreRemove
     private void removeStudentsFromSubmission() {
         if (students != null) {
@@ -73,20 +71,18 @@ public class AssignmentSubmission {
         }
     }
     
-    public AssignmentSubmission(Assignment assignment, List<Person> students, String content, String comment, boolean isLate) {
+    public AssignmentSubmission(Assignment assignment, List<Person> students, String content, String comment) {
         this.assignment = assignment;
         this.students = students;
         this.content = content;
         this.grade = null;
         this.feedback = null;
         this.comment = comment;
-        this.assignmentid=assignment.getId();
-        this.isLate=isLate;
-
+        this.assignmentid = assignment.getId();
     }
 
     // Getter for assignment_id (foreign key column)
     public Long getAssignmentId2() {
         return assignment != null ? assignment.getId() : null;
-    }    
+    }
 }
