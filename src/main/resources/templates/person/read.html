@@ -5,16 +5,7 @@
 
 <!-- page style -->
 <th:block layout:fragment="style" th:remove="tag">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
     <style>
-        /* Ensures that the custom checkbox images are appropriately sized */
-        .custom-checkbox {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-
         /* Initial styling for the profile picture */
         .profile-picture-container img {
             width: 64px;
@@ -83,7 +74,7 @@
                         <td th:text="${person.email}">Email</td>
                         <td>
                             <img th:src="@{${person.kasmServerNeeded} ? 'https://github.com/user-attachments/assets/da1c6827-8c47-4ba9-a979-980eb3c685cd' : 'https://github.com/user-attachments/assets/53e808fc-3c01-4cae-b403-73116a71122f'}"
-                                class="custom-checkbox" alt="KSM Status" />
+                                class="custom-checkbox" alt="KSM Status" style="width: 20px; height: 20px;" />
                         </td>
                         <td>
                             <div class="profile-picture-container">
@@ -97,8 +88,10 @@
                         <td th:text="${person.sid}">Student ID</td>
                         <td th:text="${person.balance}">Balance</td>
                         <td>
-                            <a th:href="@{/mvc/person/update/{id}(id = ${person.id})}"
-                                class="btn btn-warning btn-sm">Update</a>
+                            <a th:href="@{/mvc/person/update/{id}(id = ${person.id})}" class="btn btn-warning btn-sm"
+                                name="update">Update</a>
+                            <a th:href="@{/mvc/person/update/roles/{id}(id = ${person.id})}" class="btn btn-warning btn-sm"
+                                name="update">Update Roles</a>
                             <a th:href="@{/mvc/person/delete/{id}(id = ${person.id})}"
                                 class="btn btn-danger btn-sm">Delete</a>
                         </td>
@@ -107,8 +100,15 @@
             </table>
         </div>
     </div>
+</th:block>
 
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<!-- Overlay for update page-->
+<th:block layout:fragment="overlay-body" th:remove="tag">
+    <div id="overlay-Container"></div>
+</th:block>
+
+<!-- scripts -->
+<th:block layout:fragment="script" th:remove="tag">
 
     <script>
         $(document).ready(function () {
@@ -129,6 +129,41 @@
                 $(this).toggleClass('inactive', isVisible);
             });
         });
+    </script>
+
+    <script>
+        document.getElementsByName("update").forEach((button) => {
+            button.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                fetch(button.getAttribute("href"), {
+                    method: "GET",
+                    credentials: "include",
+                    cache: "no-cache",
+                    headers: new Headers({
+                        "content-type": "application/json"
+                    })
+                }).then(function (response) {
+                    if (response.status !== 200) {
+                        alert("GET update page failed");
+                    }
+                    else {
+                        // clear overlay
+                        const overlay = document.getElementById("overlay-Container");
+                        while (overlay.lastElementChild) {
+                            overlay.removeChild(overlay.lastElementChild);
+                        }
+                        
+                        response.text().then((text)=>{
+                            overlay.innerHTML = text;
+                        })
+
+                        document.getElementById("overlay").style.display="block";
+                        return;
+                    }
+                })
+            })
+        })
     </script>
 </th:block>
 
