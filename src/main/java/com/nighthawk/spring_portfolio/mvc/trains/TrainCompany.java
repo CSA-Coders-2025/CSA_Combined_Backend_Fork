@@ -1,0 +1,39 @@
+package com.nighthawk.spring_portfolio.mvc.trains;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.nighthawk.spring_portfolio.mvc.person.Person;
+
+import java.util.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TrainCompany {
+    @Id
+    private Long id;
+
+    @OneToOne
+    @MapsId
+    @JsonIgnore
+    private Person owner;
+
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Train> trains;
+
+    @Column
+    private String companyName;
+}
