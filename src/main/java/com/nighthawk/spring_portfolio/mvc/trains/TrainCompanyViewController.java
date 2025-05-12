@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.nighthawk.spring_portfolio.mvc.person.Person;
@@ -111,7 +112,7 @@ public class TrainCompanyViewController {
             defaultProduct.setName("Banana");
             defaultProduct.setPrice(Float.valueOf((float)0.62));
             defaultProduct.setDescription("A radioactive yellow fruit that grows on trees.");
-            map.put("Banana", List.of(defaultProduct));
+            map.put("banana", List.of(defaultProduct));
             //////
             trainStation.setProducts(map);
            
@@ -122,6 +123,25 @@ public class TrainCompanyViewController {
         TrainStation trainStation = trainStationRepository.getById(company.getId());
 
         ResponseEntity<TrainStation> responseEntity = new ResponseEntity<TrainStation>(trainStation, HttpStatus.OK);
+        return responseEntity;
+    }
+
+    @GetMapping("/get/station/byProduct/{productName}")
+    public ResponseEntity<List<TrainStation>> getStationsWithProduct(@PathVariable String productName) {
+        String param = productName.toLowerCase(); //keys should always be lower case
+        List<TrainStation> stations = trainStationRepository.findAll();
+        List<TrainStation> stationsWithProduct = new ArrayList<TrainStation>(0);
+        for(int i = 0; i<stations.size(); i++){
+            TrainStation station = stations.get(i);
+            Map<String, List<Product>> products = station.getProducts();
+            if(products.containsKey(param)){
+                if(products.get(param).size() > 0){
+                    stationsWithProduct.add(station);
+                }
+            }
+        }
+
+        ResponseEntity<List<TrainStation>> responseEntity = new ResponseEntity<List<TrainStation>>(stationsWithProduct, HttpStatus.OK);
         return responseEntity;
     }
 }

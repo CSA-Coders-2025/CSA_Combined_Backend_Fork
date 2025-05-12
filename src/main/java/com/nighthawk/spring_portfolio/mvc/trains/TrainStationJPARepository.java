@@ -8,5 +8,6 @@ public interface TrainStationJPARepository extends JpaRepository<TrainStation,Lo
     TrainStation getById(Long id);
     boolean existsById(Long id);
     List<TrainStation> getAllByPosition(Float position);
+    List<TrainStation> findAll();
 }
 
