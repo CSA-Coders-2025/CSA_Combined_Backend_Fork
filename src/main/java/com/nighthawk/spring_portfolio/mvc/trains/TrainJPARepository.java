@@ -9,5 +9,6 @@ public interface TrainJPARepository extends JpaRepository<Train,Long>{
     boolean existsById(Long id);
     List<Train> getAllByCompanyId(Long companyId);
     boolean existsByCompanyId(Long companyId);
+    List<Train> getAllByPosition(Float position);
 }
 

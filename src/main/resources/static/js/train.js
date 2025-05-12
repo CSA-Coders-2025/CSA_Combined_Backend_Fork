@@ -20,6 +20,17 @@ async function getTrains() {
     return dataOut;
 }
 
+async function getStation() {
+    let dataOut;
+    await fetch("/mvc/train/get/station", {
+        method: "GET",
+        cache: "no-cache",
+    }).then((response) => response.json()).then((data) => {
+        dataOut = data;
+    })
+    return dataOut;
+}
+
 function fillCompanyHtml(container,companyInfo){
     console.log(companyInfo);
     let h1 = document.createElement("h1");
@@ -69,9 +80,11 @@ function fillTrainsHtml(container,trainsInfo){
 async function setUp(){
     let company = await getCompany();
     let trains = await getTrains();
+    let station = await getStation();
 
     fillCompanyHtml(document.getElementById("companyContainer"),company);
     fillTrainsHtml(document.getElementById("trainsContainer"),trains);
+    console.log(station);
 }
 
 setUp();

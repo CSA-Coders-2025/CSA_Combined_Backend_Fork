@@ -1,8 +1,9 @@
 package com.nighthawk.spring_portfolio.mvc.trains;
 
-import java.util.List;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators.Integral;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,9 @@ public class TrainCompanyViewController {
 
     @Autowired
     private TrainJPARepository trainRepository;
+
+    @Autowired
+    private TrainStationJPARepository trainStationRepository;
 
     @Autowired
     private TrainCompanyJPARepository repository;
@@ -73,12 +77,51 @@ public class TrainCompanyViewController {
             Train train = new Train();
             train.setCompany(company);
             train.setPosition(Float.valueOf(0));
+            train.setCargo(new HashMap<String,List<Product>>());
             trainRepository.save(train);
         }
         
         List<Train> trains = trainRepository.getAllByCompanyId(company.getId());
 
         ResponseEntity<List<Train>> responseEntity = new ResponseEntity<List<Train>>(trains, HttpStatus.OK);
+        return responseEntity;
+    }
+
+    @GetMapping("/get/station")
+    @Transactional
+    public ResponseEntity<TrainStation> getStation(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Person person = personRepository.getByUid(userDetails.getUsername());
+        Long id = person.getId();
+
+        if (!repository.existsById(id)) {
+            ResponseEntity<TrainStation> responseEntity = new ResponseEntity<TrainStation>(HttpStatus.FAILED_DEPENDENCY);
+            return responseEntity;
+        }
+
+        TrainCompany company = repository.getById(id);
+
+        if(!trainStationRepository.existsById(company.getId())){
+            TrainStation trainStation = new TrainStation();
+            trainStation.setCompany(company);
+            trainStation.setPosition(Float.valueOf((float)(Math.random()*20000)-10000)); //random position between -10000, 10000
+            //////default product at station
+            HashMap<String,List<Product>> map = new HashMap<String,List<Product>>();
+            Product defaultProduct = new Product();
+            defaultProduct.setName("Banana");
+            defaultProduct.setPrice(Float.valueOf((float)0.62));
+            defaultProduct.setDescription("A radioactive yellow fruit that grows on trees.");
+            map.put("Banana", List.of(defaultProduct));
+            //////
+            trainStation.setProducts(map);
+           
+            trainStation.setTerrain(Integer.valueOf((int)(Math.random()*11)));
+            trainStationRepository.save(trainStation);
+        }
+        
+        TrainStation trainStation = trainStationRepository.getById(company.getId());
+
+        ResponseEntity<TrainStation> responseEntity = new ResponseEntity<TrainStation>(trainStation, HttpStatus.OK);
         return responseEntity;
     }
 }
