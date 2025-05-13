@@ -1,5 +1,6 @@
 package com.nighthawk.spring_portfolio.mvc.trains;
 
+import java.time.Instant;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonDetailsService;
+import com.nighthawk.spring_portfolio.mvc.trains.TrainOrders.MoveOrder;
+
+import jakarta.validation.Valid;
+import lombok.Getter;
 
 @Controller
 @RequestMapping("/api/train")
@@ -198,6 +204,55 @@ public class TrainCombinedApiController {
         List<TrainOrder> trainOrders =  trainOrderRepository.getAllByTrain(trainRepository.getById(trainId));
 
         ResponseEntity<List<TrainOrder>> responseEntity = new ResponseEntity<List<TrainOrder>>(trainOrders, HttpStatus.OK);
+        return responseEntity;
+    }
+
+    @Getter
+    public class MoveOrderDto {
+        private Long startId;
+        private Long endId;
+        private boolean repeat;
+    }
+
+    @PostMapping("/add/train/{id}/order/move")
+    @Transactional
+    public ResponseEntity<TrainOrder> addMoveOrder(@PathVariable("id") long trainId, @Valid MoveOrderDto moveOrderDto, Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Person person = personRepository.getByUid(userDetails.getUsername());
+        Long id = person.getId();
+
+        if (!repository.existsById(id)) {
+            ResponseEntity<TrainOrder> responseEntity = new ResponseEntity<TrainOrder>(HttpStatus.FAILED_DEPENDENCY);
+            return responseEntity;
+        }
+
+        TrainCompany company = repository.getById(id);
+
+        if(!trainRepository.existsByCompanyId(company.getId())){
+            ResponseEntity<TrainOrder> responseEntity = new ResponseEntity<TrainOrder>(HttpStatus.FAILED_DEPENDENCY);
+            return responseEntity;
+        }
+
+        if(!company.getTrains().stream().anyMatch(train -> Long.valueOf(trainId).equals(train.getId()))){
+            ResponseEntity<TrainOrder> responseEntity = new ResponseEntity<TrainOrder>(HttpStatus.FORBIDDEN);
+            return responseEntity; 
+        }
+
+        Train train = trainRepository.getById(trainId);
+       
+        MoveOrder moveOrder =  new MoveOrder();
+        moveOrder.setTrain(train);
+        HashMap<String,String> orderInfo = new HashMap<>();
+        orderInfo.put("start",moveOrderDto.getStartId().toString());
+        orderInfo.put("end",moveOrderDto.getEndId().toString());
+        orderInfo.put("type","MoveOrder");
+        moveOrder.setOrderInfo(orderInfo);
+        moveOrder.setRepeat(moveOrderDto.isRepeat());
+        moveOrder.setLastTime(Date.from(Instant.now()));
+
+        trainOrderRepository.save(moveOrder);
+
+        ResponseEntity<TrainOrder> responseEntity = new ResponseEntity<TrainOrder>((TrainOrder)moveOrder, HttpStatus.OK);
         return responseEntity;
     }
 }
