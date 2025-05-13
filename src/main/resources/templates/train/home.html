@@ -12,12 +12,23 @@
 <th:block layout:fragment="body" th:remove="tag">
     <div id="companyContainer"></div>
     <div id="trainsContainer"></div>
-    <button id="moveOrderButton"></button>
+    <div id="moveOrderContainer">
+        <label for="trainId">Train Id</label>
+        <input type="number" id="trainId">
+        <label for="startId">Starting Station Id</label>
+        <input type="number" id="startId">
+        <label for="endId">Ending Station Id</label>
+        <input type="number" id="endId">
+        <label for="repeat">Should the Order Repeat?</label>
+        <input type="checkbox" id="repeat">
+        <button id="moveOrderButton">add Move Order</button>
+    </div>
 </th:block>
 <!-- End of the body fragment -->
 
 <!-- page style -->
 <th:block layout:fragment="script" th:remove="tag">
     <script type="text/javascript" src="/static/js/train.js" th:src="@{/js/train.js}"></script>
+    <script type="text/javascript" src="/static/js/move-order.js" th:src="@{/js/move-order.js}"></script>
 </th:block>
 </html>

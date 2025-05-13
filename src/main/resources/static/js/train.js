@@ -79,8 +79,9 @@ function fillTrainsHtml(container,trainsInfo){
 
 async function setUp(){
     let company = await getCompany();
-    let trains = await getTrains();
     let station = await getStation();
+    let trains = await getTrains();
+    
 
     fillCompanyHtml(document.getElementById("companyContainer"),company);
     fillTrainsHtml(document.getElementById("trainsContainer"),trains);
