@@ -37,9 +37,6 @@ public abstract class TrainOrder {
     @DateTimeFormat(iso = DateTimeFormat.ISO.NONE)
     private Date lastTime;
 
-    @Min(-1) //always delete position -1;
-    private Long orderPosition;
-
     private boolean repeat; //may have different effects depending on SubClass interpretation
 
     @JdbcTypeCode(SqlTypes.JSON)

@@ -37,7 +37,7 @@ public class Train {
 
     @OneToMany(mappedBy = "train", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<TrainOrder> trainOrders;
+    private Queue<TrainOrder> trainOrders;
 
     @Min(value=-10000)
     @Max(value=10000)

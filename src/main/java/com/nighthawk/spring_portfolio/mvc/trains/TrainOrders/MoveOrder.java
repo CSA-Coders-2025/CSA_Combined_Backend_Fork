@@ -31,26 +31,16 @@ public class MoveOrder extends TrainOrder{
         Train train = this.getTrain();
 
         if(!orderInfo.containsKey("end") || !orderInfo.containsKey("start")){
-            List<TrainOrder> trainOrders = repository.getAllByTrain(this.getTrain());
-            for(int i=0; i<trainOrders.size(); i++){
-                trainOrders.get(i).setOrderPosition(trainOrders.get(i).getOrderPosition()-1);
-            }
-            repository.saveAll(trainOrders);
-            repository.deleteAllByOrderPosition(-1);
-            return true;
+            this.setRepeat(false);
+            return true; //end segment, don't update timer, prepare to remove order
         }
         
         Long stationId = Long.valueOf(orderInfo.get("end"));
         Long startStationId = Long.valueOf(orderInfo.get("start"));
 
         if(!trainStationJPARepository.existsById(stationId) || !trainStationJPARepository.existsById(startStationId)){
-            List<TrainOrder> trainOrders = repository.getAllByTrain(this.getTrain());
-            for(int i=0; i<trainOrders.size(); i++){
-                trainOrders.get(i).setOrderPosition(trainOrders.get(i).getOrderPosition()-1);
-            }
-            repository.saveAll(trainOrders);
-            repository.deleteAllByOrderPosition(-1);
-            return true;
+            this.setRepeat(false);
+            return true; //end segment, don't update timer, prepare to remove order
         }
 
         TrainStation trainStation = trainStationJPARepository.getById(stationId);
@@ -75,20 +65,11 @@ public class MoveOrder extends TrainOrder{
         } else {
             train.setPosition(trainStation.getPosition()); //set the train's position
             trainJPARepository.save(train); //save the train
-
-            List<TrainOrder> trainOrders = repository.getAllByTrain(this.getTrain());
-            for(int i=0; i<trainOrders.size(); i++){
-                trainOrders.get(i).setOrderPosition(trainOrders.get(i).getOrderPosition()-1);
-            }
             if(this.isRepeat()){
                 this.setLastTime(Date.from(startTime.toInstant().plusSeconds((long)calcTime))); //update time
                 this.getOrderInfo().replace("start",String.valueOf(stationId));
                 this.getOrderInfo().replace("end",String.valueOf(startStationId));
-                this.setOrderPosition(Long.valueOf(trainOrders.size()));
-                trainOrders.add(this);
             }
-            repository.saveAll(trainOrders);
-            repository.deleteAllByOrderPosition(-1);
             return true; //since we finished the segment, return true
         }
     }

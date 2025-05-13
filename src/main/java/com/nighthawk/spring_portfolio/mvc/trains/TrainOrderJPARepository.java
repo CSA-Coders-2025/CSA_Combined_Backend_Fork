@@ -7,5 +7,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TrainOrderJPARepository extends JpaRepository<TrainOrder,Long> {
     TrainOrder getById(Long id);
     List<TrainOrder> getAllByTrain(Train train);
-    void deleteAllByOrderPosition(long orderPosition);
 }
