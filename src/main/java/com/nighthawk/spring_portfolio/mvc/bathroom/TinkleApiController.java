@@ -2,6 +2,8 @@ package com.nighthawk.spring_portfolio.mvc.bathroom;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +51,26 @@ public class TinkleApiController {
         } else {
             return new ResponseEntity<>("Student not found", HttpStatus.NOT_FOUND);
         }
+    }
+
+    //NEW: initialize endpoint to seed multiple students at once
+    @PostMapping("/initialize")
+    public ResponseEntity<Object> initialize(@RequestBody List<TinkleDto> tinkleDtos) {
+        List<Tinkle> initialized = new ArrayList<>();
+        for (TinkleDto dto : tinkleDtos) {
+            // if existing, use it; otherwise construct via no-arg + setter
+            Optional<Tinkle> existing = repository.findByPersonName(dto.getStudentEmail());
+            Tinkle tinkle = existing.orElseGet(() -> {
+                Tinkle tmp = new Tinkle();                     // no-arg constructor
+                tmp.setPersonName(dto.getStudentEmail());      // set via setter
+                return tmp;
+            });
+            // now record their initial timeIn
+            tinkle.addTimeIn(dto.getTimeIn());
+            repository.save(tinkle);
+            initialized.add(tinkle);
+        }
+        return new ResponseEntity<>(initialized, HttpStatus.OK);
     }
 
     //GET Request to get all of the tinkle objects
