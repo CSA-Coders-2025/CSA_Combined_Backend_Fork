@@ -25,8 +25,6 @@ public class TrainStation {
     @Id
     private Long id;
 
-        
-
     @OneToOne
     @MapsId
     @JsonIgnore

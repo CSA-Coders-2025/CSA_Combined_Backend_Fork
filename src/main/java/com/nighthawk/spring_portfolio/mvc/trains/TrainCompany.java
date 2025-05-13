@@ -6,7 +6,6 @@ import com.nighthawk.spring_portfolio.mvc.person.Person;
 import java.util.*;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -40,6 +39,7 @@ public class TrainCompany {
     @JsonIgnore
     TrainStation station;
 
-    @Column
     private String companyName;
+
+    private Float balance;
 }
