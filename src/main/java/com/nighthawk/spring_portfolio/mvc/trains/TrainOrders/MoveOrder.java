@@ -65,11 +65,7 @@ public class MoveOrder extends TrainOrder{
         } else {
             train.setPosition(trainStation.getPosition()); //set the train's position
             trainJPARepository.save(train); //save the train
-            if(this.isRepeat()){
-                this.setLastTime(Date.from(startTime.toInstant().plusSeconds((long)calcTime))); //update time
-                this.getOrderInfo().replace("start",String.valueOf(stationId));
-                this.getOrderInfo().replace("end",String.valueOf(startStationId));
-            }
+            this.setLastTime(Date.from(startTime.toInstant().plusSeconds((long)calcTime))); //update time
             return true; //since we finished the segment, return true
         }
     }
