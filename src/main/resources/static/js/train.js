@@ -1,6 +1,6 @@
 async function getCompany() {
     let dataOut;
-    await fetch("/mvc/train/get/company", {
+    await fetch("/api/train/get/company", {
         method: "GET",
         cache: "no-cache",
     }).then((response) => response.json()).then((data) => {
@@ -11,7 +11,7 @@ async function getCompany() {
 
 async function getTrains() {
     let dataOut;
-    await fetch("/mvc/train/get/trains", {
+    await fetch("/api/train/get/trains", {
         method: "GET",
         cache: "no-cache",
     }).then((response) => response.json()).then((data) => {
@@ -22,7 +22,7 @@ async function getTrains() {
 
 async function getStation() {
     let dataOut;
-    await fetch("/mvc/train/get/station", {
+    await fetch("/api/train/get/station", {
         method: "GET",
         cache: "no-cache",
     }).then((response) => response.json()).then((data) => {

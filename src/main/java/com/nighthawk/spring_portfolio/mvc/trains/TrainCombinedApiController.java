@@ -3,7 +3,6 @@ package com.nighthawk.spring_portfolio.mvc.trains;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators.Integral;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,8 +17,8 @@ import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonDetailsService;
 
 @Controller
-@RequestMapping("/mvc/train")
-public class TrainCompanyViewController {
+@RequestMapping("/api/train")
+public class TrainCombinedApiController {
     @Autowired
     private PersonDetailsService personRepository;
 
@@ -31,12 +30,6 @@ public class TrainCompanyViewController {
 
     @Autowired
     private TrainCompanyJPARepository repository;
-
-    @GetMapping("/home")
-    public String getTrainHomePage(){
-        return "train/home";
-    }
-
 
     //idk why this one only works with transactional annotation, its probally to do with the one-to-one relationship betweeen TrainCompany and Person
     @GetMapping("/get/company")
