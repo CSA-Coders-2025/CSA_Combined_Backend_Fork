@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.nighthawk.spring_portfolio.mvc.person.Person;
 import com.nighthawk.spring_portfolio.mvc.person.PersonDetailsService;
 import com.nighthawk.spring_portfolio.mvc.trains.TrainOrders.MoveOrder;
 
-import jakarta.validation.Valid;
 import lombok.Getter;
 
 @Controller
@@ -53,6 +53,7 @@ public class TrainCombinedApiController {
             TrainCompany company = new TrainCompany();
             company.setCompanyName("Company " + id.toString());
             company.setOwner(person);
+            company.setBalance(Float.valueOf(0));
 
             repository.save(company);
         }
@@ -208,7 +209,7 @@ public class TrainCombinedApiController {
     }
 
     @Getter
-    public class MoveOrderDto {
+    public static class MoveOrderDto {
         private Long startId;
         private Long endId;
         private boolean repeat;
@@ -216,31 +217,43 @@ public class TrainCombinedApiController {
 
     @PostMapping("/add/train/{id}/order/move")
     @Transactional
-    public ResponseEntity<TrainOrder> addMoveOrder(@PathVariable("id") long trainId, @Valid MoveOrderDto moveOrderDto, Authentication authentication) {
+    public ResponseEntity<TrainOrder> addMoveOrder(@PathVariable("id") long trainId, @RequestBody MoveOrderDto moveOrderDto, Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Person person = personRepository.getByUid(userDetails.getUsername());
         Long id = person.getId();
 
+        //does the person have a train company in the database
         if (!repository.existsById(id)) {
             ResponseEntity<TrainOrder> responseEntity = new ResponseEntity<TrainOrder>(HttpStatus.FAILED_DEPENDENCY);
             return responseEntity;
         }
 
-        TrainCompany company = repository.getById(id);
+         System.out.println("I am Here 0");
 
-        if(!trainRepository.existsByCompanyId(company.getId())){
+        TrainCompany company = repository.getById(id); //companies' ids are mapped to the id of the owners
+
+
+         System.out.println("I am Here 0.5");
+
+        //check if the company even has a train
+        if(!trainRepository.existsByCompanyId(id)){ 
             ResponseEntity<TrainOrder> responseEntity = new ResponseEntity<TrainOrder>(HttpStatus.FAILED_DEPENDENCY);
             return responseEntity;
         }
 
+        //check if the requested train is owned by the company
         if(!company.getTrains().stream().anyMatch(train -> Long.valueOf(trainId).equals(train.getId()))){
             ResponseEntity<TrainOrder> responseEntity = new ResponseEntity<TrainOrder>(HttpStatus.FORBIDDEN);
             return responseEntity; 
         }
 
+        //if all previous checks are passed, then get the train
         Train train = trainRepository.getById(trainId);
        
-        MoveOrder moveOrder =  new MoveOrder();
+        System.out.println("I am Here");
+
+        //build the move order
+        TrainOrder moveOrder =  new TrainOrder();
         moveOrder.setTrain(train);
         HashMap<String,String> orderInfo = new HashMap<>();
         orderInfo.put("start",moveOrderDto.getStartId().toString());
@@ -250,9 +263,12 @@ public class TrainCombinedApiController {
         moveOrder.setRepeat(moveOrderDto.isRepeat());
         moveOrder.setLastTime(Date.from(Instant.now()));
 
+        //save the move order
         trainOrderRepository.save(moveOrder);
 
-        ResponseEntity<TrainOrder> responseEntity = new ResponseEntity<TrainOrder>((TrainOrder)moveOrder, HttpStatus.OK);
+        System.out.println("banananananananan");
+
+        ResponseEntity<TrainOrder> responseEntity = new ResponseEntity<TrainOrder>(moveOrder, HttpStatus.OK);
         return responseEntity;
     }
 }

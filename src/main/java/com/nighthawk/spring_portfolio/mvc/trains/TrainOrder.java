@@ -22,7 +22,7 @@ import lombok.Data;
 @Entity
 @Data
 @Convert(attributeName = "train", converter = JsonType.class)
-public abstract class TrainOrder {
+public class TrainOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="order_id")
@@ -33,7 +33,7 @@ public abstract class TrainOrder {
     @JoinColumn(name="train_id")
     private Train train;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.NONE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date lastTime;
 
     private boolean repeat; //may have different effects depending on SubClass interpretation
@@ -42,5 +42,7 @@ public abstract class TrainOrder {
     @Column(columnDefinition = "jsonb")
     private Map<String,String> orderInfo; //Key, Value
 
-    public abstract boolean doSimulation(); //do a single/partial simulation step, returns completion status
+    public boolean doSimulation(){
+        return true;
+    }; //do a single/partial simulation step, returns completion status
 }

@@ -7,6 +7,8 @@ import com.nighthawk.spring_portfolio.mvc.trains.TrainOrderJPARepository;
 import com.nighthawk.spring_portfolio.mvc.trains.TrainStation;
 import com.nighthawk.spring_portfolio.mvc.trains.TrainStationJPARepository;
 
+import jakarta.persistence.Entity;
+
 import java.time.Instant;
 import java.util.*;
 
