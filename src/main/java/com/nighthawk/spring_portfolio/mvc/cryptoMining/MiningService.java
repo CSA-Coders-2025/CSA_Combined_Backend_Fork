@@ -37,8 +37,8 @@ public class MiningService {
     // Fine-tune constants
     public static final double HASH_TO_BTC_RATE = 0.0001; // Current rate
     public static final double DIFFICULTY_FACTOR = 1.0;
-    public static final int MINING_INTERVAL = 10000; // 10 seconds
-    public static final int BALANCE_TRANSFER_INTERVAL = 60000; // 10 sec
+    public static final int MINING_INTERVAL = 900000; // 15 minutes
+    public static final int BALANCE_TRANSFER_INTERVAL = 900000; // 15 minutes
     public static final double ELECTRICITY_RATE = 0.12; // USD per kWh
     public static final double BTC_PRICE = 45000.0;
 
