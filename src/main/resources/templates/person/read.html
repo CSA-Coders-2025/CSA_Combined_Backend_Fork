@@ -45,7 +45,9 @@
             <button class="btn btn-secondary toggle-column inactive" data-column="6">SID</button>
             <button class="btn btn-secondary toggle-column inactive" data-column="7">Balance</button>
             <button class="btn btn-secondary toggle-column active" data-column="8">Action</button>
-        </div>
+        </div> <br>
+
+        <button id="export-all">export all people</button>
 
         <div class="row align-items-md-stretch">
             <!-- Table displaying the list of persons -->
@@ -109,6 +111,7 @@
 
 <!-- scripts -->
 <th:block layout:fragment="script" th:remove="tag">
+    <script type="module" src="/static/js/person-extraction.js" th:src="@{/js/person-extraction.js}"></script>
 
     <script>
         $(document).ready(function () {
