@@ -51,7 +51,6 @@ private GroupsJpaRepository groupsJpaRepository;
         private String name;
         private String pfp;
         private String sid;
-        private Date dob;
         private Boolean kasmServerNeeded;
         private Map<String, Map<String, Object>> stats;
     }
@@ -84,8 +83,7 @@ private GroupsJpaRepository groupsJpaRepository;
             person.getEmail(), 
             person.getName(), 
             person.getPfp(), 
-            person.getSid(), 
-            person.getDob(), 
+            person.getSid(),  
             person.getKasmServerNeeded(), 
             person.getStats());
         return new ResponseEntity<PersonEmpty>(personEmpty,HttpStatus.OK);
@@ -105,7 +103,6 @@ private GroupsJpaRepository groupsJpaRepository;
             person.getName(), 
             person.getPfp(), 
             person.getSid(), 
-            person.getDob(), 
             person.getKasmServerNeeded(), 
             person.getStats());
         return new ResponseEntity<PersonEmpty>(personEmpty,HttpStatus.OK);
@@ -128,7 +125,6 @@ private GroupsJpaRepository groupsJpaRepository;
             person.getName(), 
             person.getPfp(), 
             person.getSid(), 
-            person.getDob(), 
             person.getKasmServerNeeded(), 
             person.getStats()));
         });
