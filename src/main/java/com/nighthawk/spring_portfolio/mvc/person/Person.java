@@ -235,14 +235,7 @@ public class Person implements Comparable<Person> {
     private List<AssignmentSubmission> submissions;
     
 
-    @ManyToMany(fetch = EAGER)
-    @JoinTable(
-        name = "person_person_sections",  // unique name to avoid conflicts
-        joinColumns = @JoinColumn(name = "person_id"),
-        inverseJoinColumns = @JoinColumn(name = "section_id")
-    )
-    private Collection<PersonSections> sections = new ArrayList<>();
-
+ 
 
     /**
      * Many to Many relationship with PersonRole
