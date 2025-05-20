@@ -15,7 +15,7 @@ export default class BlobBuilder{
         if(!Number.isInteger(fileTypeEnum)){
             console.warn("Not an expected file type. Defaulting to plain text");
         }
-        else if(!Object.keys(BlobBuilder.fileTypeEnum).includes(fileTypeEnum)){
+        else if(!Object.values(BlobBuilder.fileTypeEnum).includes(fileTypeEnum)){
             console.warn("Not an expected file type. Defaulting to plain text");
         }
 
