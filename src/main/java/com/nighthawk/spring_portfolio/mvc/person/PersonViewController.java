@@ -287,7 +287,7 @@ public class PersonViewController {
             return "redirect:/logout"; //logout the user
         }
         
-        return "person/read";  // Redirect to the read page after deletion
+        return "redirect:/mvc/person/read";  // Redirect to the read page after deletion
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
