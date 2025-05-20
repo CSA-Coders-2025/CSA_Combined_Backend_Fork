@@ -16,6 +16,7 @@ import com.vladmihalcea.hibernate.type.json.JsonType;
 
 ///// entity classes
 import com.nighthawk.spring_portfolio.mvc.person.Person;
+import com.nighthawk.spring_portfolio.mvc.groups.Groups;
 
 ///// repositories
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
@@ -90,22 +91,13 @@ private GroupsJpaRepository groupsJpaRepository;
     }
 
     @GetMapping("/group/{id}")
-    public ResponseEntity<PersonEmpty> extractGroupById(@PathVariable("id") long id){
-        if(!personJpaRepository.existsById(id)){
-            new ResponseEntity<PersonEmpty>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<GroupEmpty> extractGroupById(@PathVariable("id") long id){
+        if(!groupsJpaRepository.findById(id).isPresent()){
+            new ResponseEntity<GroupEmpty>(HttpStatus.NOT_FOUND);
         }
-        Person person = personJpaRepository.findById(id).get();
-        PersonEmpty personEmpty = new PersonEmpty(
-            person.getId(), 
-            person.getUid(), 
-            person.getPassword(), 
-            person.getEmail(), 
-            person.getName(), 
-            person.getPfp(), 
-            person.getSid(), 
-            person.getKasmServerNeeded(), 
-            person.getStats());
-        return new ResponseEntity<PersonEmpty>(personEmpty,HttpStatus.OK);
+        Groups group = groupsJpaRepository.findById(id).get();
+        GroupEmpty groupEmpty = new GroupEmpty(group.getId(),group.getName(),group.getPeriod());
+        return new ResponseEntity<GroupEmpty>(groupEmpty,HttpStatus.OK);
     }
    
 /////////////////////////////////////////
@@ -114,9 +106,9 @@ private GroupsJpaRepository groupsJpaRepository;
 
     @GetMapping("all/person")
     public ResponseEntity<List<PersonEmpty>> extractAllPerson(){
-        List<Person> personlList = personJpaRepository.findAll();
+        List<Person> personList = personJpaRepository.findAll();
         ArrayList<PersonEmpty> personEmpties = new ArrayList<PersonEmpty>(0);
-        personlList.stream().forEach(person ->{
+        personList.stream().forEach(person ->{
             personEmpties.add(new PersonEmpty(
             person.getId(), 
             person.getUid(), 
@@ -129,5 +121,18 @@ private GroupsJpaRepository groupsJpaRepository;
             person.getStats()));
         });
         return new ResponseEntity<List<PersonEmpty>>(personEmpties,HttpStatus.OK);
+    }
+
+    @GetMapping("all/group")
+    public ResponseEntity<List<GroupEmpty>> extractAllGroups(){
+        List<Groups> groupsList = groupsJpaRepository.findAll();
+        ArrayList<GroupEmpty> groupEmpties = new ArrayList<GroupEmpty>(0);
+        groupsList.stream().forEach(group ->{
+            groupEmpties.add(new GroupEmpty(
+            group.getId(),
+            group.getName(),
+            group.getPeriod()));
+        });
+        return new ResponseEntity<List<GroupEmpty>>(groupEmpties,HttpStatus.OK);
     }
 }
