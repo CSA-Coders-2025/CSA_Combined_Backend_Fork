@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.Convert;
 
@@ -67,6 +68,15 @@ private GroupsJpaRepository groupsJpaRepository;
     }
 
 
+//group members class based on group table schema (no relationships)
+    @Data
+    @AllArgsConstructor
+    @Convert(attributeName = "group_members", converter = JsonType.class)
+    public class GroupMemberEmpty {
+        private Long person_id;
+        private Long group_id;
+    }
+
 /////////////////////////////////////////
 /// Single Extracts
 
@@ -98,6 +108,20 @@ private GroupsJpaRepository groupsJpaRepository;
         Groups group = groupsJpaRepository.findById(id).get();
         GroupEmpty groupEmpty = new GroupEmpty(group.getId(),group.getName(),group.getPeriod());
         return new ResponseEntity<GroupEmpty>(groupEmpty,HttpStatus.OK);
+    }
+
+    @GetMapping("/group/{id}/members")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<GroupMemberEmpty>> extractGroupMembersById(@PathVariable("id") long id){
+        if(!groupsJpaRepository.findById(id).isPresent()){
+            new ResponseEntity<List<GroupMemberEmpty>>(HttpStatus.NOT_FOUND);
+        }
+        Groups group = groupsJpaRepository.findById(id).get();
+        ArrayList<GroupMemberEmpty> groupMemberEmpties = new ArrayList<GroupMemberEmpty>(0);
+        group.getGroupMembers().stream().forEach(groupMember ->{
+            groupMemberEmpties.add(new GroupMemberEmpty(groupMember.getId(), id));
+        });
+        return new ResponseEntity<List<GroupMemberEmpty>>(groupMemberEmpties,HttpStatus.OK);
     }
    
 /////////////////////////////////////////
