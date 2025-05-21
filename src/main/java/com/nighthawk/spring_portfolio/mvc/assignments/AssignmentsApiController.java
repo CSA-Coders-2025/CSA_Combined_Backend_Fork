@@ -138,6 +138,7 @@ public class AssignmentsApiController {
     @GetMapping("/submissions/student/{studentId}")
     @Transactional
     public ResponseEntity<?> getStudentSubmissions(@PathVariable Long studentId) {
+        // Note: Need to change this to be just 1 API call rather than repeatedly calling
         List<AssignmentSubmission> submissions = submissionRepo.findByStudentId(studentId);
         
         // Convert to dtos to avoid some bugs
