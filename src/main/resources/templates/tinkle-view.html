@@ -209,19 +209,30 @@
                 }
 
 
-                // Initialize Chart.js for Average Weekly Duration Visualization
                 const labels = /*[[${chartLabels}]]*/ [];
                 const data = /*[[${chartData}]]*/ [];
                 const formattedData = data.map(seconds => (seconds / 60).toFixed(2));
 
+                // Sort the data from greatest to least
+                const sortedEntries = labels
+                    .map((label, index) => ({ label, value: parseFloat(formattedData[index]) }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Pagination variables
+                const pageSize = 15;
+                let currentPage = 0;
+
+                const totalPages = Math.ceil(sortedEntries.length / pageSize);
+
+                // Create Chart instance
                 const ctx = $('#weeklyDurationChart')[0].getContext('2d');
-                new Chart(ctx, {
+                const chart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels: [],
                         datasets: [{
                             label: 'Average Weekly Duration (Minutes)',
-                            data: formattedData,
+                            data: [],
                             backgroundColor: 'rgba(40, 167, 69, 0.2)',
                             borderColor: 'rgba(40, 167, 69, 1)',
                             borderWidth: 1
@@ -239,6 +250,45 @@
                         }
                     }
                 });
+
+                function updateChartPage(page) {
+                    const start = page * pageSize;
+                    const end = start + pageSize;
+                    const pageData = sortedEntries.slice(start, end);
+
+                    chart.data.labels = pageData.map(entry => entry.label);
+                    chart.data.datasets[0].data = pageData.map(entry => entry.value);
+                    chart.update();
+
+                    $('#chartPagination').text(`Page ${page + 1} of ${totalPages}`);
+                }
+
+                // Add pagination controls
+                const paginationControls = `
+                    <div class="text-center mt-3">
+                        <button id="prevPage" class="btn btn-light btn-sm me-2">Prev</button>
+                        <span id="chartPagination"></span>
+                        <button id="nextPage" class="btn btn-light btn-sm ms-2">Next</button>
+                    </div>
+                `;
+                $('.chart-container').after(paginationControls);
+
+                $('#prevPage').click(() => {
+                    if (currentPage > 0) {
+                        currentPage--;
+                        updateChartPage(currentPage);
+                    }
+                });
+
+                $('#nextPage').click(() => {
+                    if (currentPage < totalPages - 1) {
+                        currentPage++;
+                        updateChartPage(currentPage);
+                    }
+                });
+
+                // Initialize first page
+                updateChartPage(currentPage);
 
                 // Weekday tabs functionality
                 $('.weekday-tab').click(function() {
