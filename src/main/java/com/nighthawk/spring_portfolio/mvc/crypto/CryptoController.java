@@ -1,7 +1,10 @@
 package com.nighthawk.spring_portfolio.mvc.crypto;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,7 +134,7 @@ public class CryptoController {
     
         // Deduct balance and update user's holdings
         double updatedBalance = person.getBalanceDouble() - usdAmount;
-        person.setBalanceString(updatedBalance, "crypto");
+        person.setBalanceString(updatedBalance);
     
         userStocksTable userStocks = person.getUser_stocks();
         if (userStocks == null) {
@@ -178,6 +181,7 @@ public class CryptoController {
         return ResponseEntity.ok(selectedCrypto);
     }
 
+   
     @GetMapping("/holdings")
     public ResponseEntity<?> getUserHoldings(@RequestParam String email) {
         userStocksTable userStocks = userStocksRepo.findByEmail(email);
@@ -188,8 +192,26 @@ public class CryptoController {
 
         return ResponseEntity.ok("{ \"email\": \"" + email + "\", \"holdings\": \"" + userStocks.getCrypto().replace("\n", "\\n") + "\" }");
     }
-
-    
+    @GetMapping("/compare")
+    public ResponseEntity<?> compareCryptos(@RequestParam String cryptoId1, @RequestParam String cryptoId2, @RequestParam int days) {
+        List<Double> crypto1Trend = cryptoService.getCryptoHistoricalData(cryptoId1, days);
+        List<Double> crypto2Trend = cryptoService.getCryptoHistoricalData(cryptoId2, days);
+        if (crypto1Trend == null || crypto1Trend.size() < 2 || crypto2Trend == null || crypto2Trend.size() < 2) {
+            return ResponseEntity.status(500).body("Failed to fetch sufficient historical data for comparison.");
+        }
+        double crypto1StartPrice = crypto1Trend.get(0);
+        double crypto1EndPrice = crypto1Trend.get(crypto1Trend.size() - 1);
+        double crypto2StartPrice = crypto2Trend.get(0);
+        double crypto2EndPrice = crypto2Trend.get(crypto2Trend.size() - 1);
+        double crypto1Change = ((crypto1EndPrice - crypto1StartPrice) / crypto1StartPrice) * 100;
+        double crypto2Change = ((crypto2EndPrice - crypto2StartPrice) / crypto2StartPrice) * 100;
+        Map<String, Object> comparisonResult = new HashMap<>();
+        comparisonResult.put("cryptoId1", cryptoId1);
+        comparisonResult.put("cryptoId1ChangePercent", crypto1Change);
+        comparisonResult.put("cryptoId2", cryptoId2);
+        comparisonResult.put("cryptoId2ChangePercent", crypto2Change);
+        return ResponseEntity.ok(comparisonResult);
+    }
 
     @PostMapping("/sell")
     public ResponseEntity<?> sellCrypto(@RequestBody SellRequest sellRequest) {
@@ -239,7 +261,7 @@ public class CryptoController {
         // Update balance
         double totalValueSold = cryptoPrice * cryptoAmount;
         double updatedBalance = person.getBalanceDouble() + totalValueSold;
-        person.setBalanceString(updatedBalance, "crypto");
+        person.setBalanceString(updatedBalance);
         userStocks.setCrypto(updatedCrypto);
         userStocks.setBalance(String.valueOf(updatedBalance));
     
@@ -257,14 +279,23 @@ public class CryptoController {
     }
     @GetMapping("/history")
     public ResponseEntity<?> getCryptoTransactionHistory(@RequestParam String email) {
-    userStocksTable userStocks = userStocksRepo.findByEmail(email);
+        Person person = personRepository.findByEmail(email);
+        if (person == null) {
+            return ResponseEntity.status(404).body("User not found: " + email);
+        }
     
-    if (userStocks == null || userStocks.getCryptoHistory() == null || userStocks.getCryptoHistory().isEmpty()) {
-        return ResponseEntity.status(404).body("No transaction history found for email: " + email);
+        userStocksTable userStocks = person.getUser_stocks();
+        if (userStocks == null || userStocks.getCryptoHistory() == null || userStocks.getCryptoHistory().isEmpty()) {
+            return ResponseEntity.status(404).body("No transaction history found for email: " + email);
+        }
+    
+        return ResponseEntity.ok(Map.of(
+            "email", email,
+            "cryptoHistory", userStocks.getCryptoHistory().split("\n")
+        ));
     }
     
-    return ResponseEntity.ok("{ \"email\": \"" + email + "\", \"cryptoHistory\": \"" + userStocks.getCryptoHistory().replace("\n", "\\n") + "\" }");
-}
+
 
     // Utility method to resolve crypto ID to ticker symbol
     private String resolveCryptoId(String cryptoId) {
@@ -274,76 +305,105 @@ public class CryptoController {
         }
         return crypto != null ? crypto.getSymbol() : null;
     }
+    private String appendTransaction(String existingHistory, String newEntry) {
+    String[] lines = existingHistory == null ? new String[0] : existingHistory.split("\n");
+    List<String> history = new ArrayList<>(List.of(lines));
+
+    history.add(newEntry);
+
+    // Limit to latest 20 entries
+    if (history.size() > 20) {
+        history = history.subList(history.size() - 20, history.size());
+    }
+
+    return String.join("\n", history);
+}
+
 
     private String addOrUpdateCryptoHoldings(String currentCrypto, String cryptoId, double cryptoAmount) {
-        StringBuilder updatedCrypto = new StringBuilder();
-        boolean updated = false;
-
-        if (currentCrypto != null && !currentCrypto.isEmpty()) {
-            String[] holdings = currentCrypto.split(",");
-            for (String holding : holdings) {
-                if (holding.isEmpty()) continue;
-
-                String[] parts = holding.split(":");
-                if (parts.length != 2) continue;
-
-                String id = parts[0];
-                double amount = Double.parseDouble(parts[1]);
-
-                if (id.equalsIgnoreCase(cryptoId)) {
-                    amount += cryptoAmount;
-                    updated = true;
-                }
-                updatedCrypto.append(id).append(":").append(amount).append(",");
-            }
-        }
-
-        if (!updated) {
-            updatedCrypto.append(cryptoId).append(":").append(cryptoAmount).append(",");
-        }
-
-        return updatedCrypto.toString().replaceAll(",$", "");
-    }
-
-    private String removeOrUpdateCryptoHoldings(String currentCrypto, String cryptoId, double cryptoAmount) {
-        StringBuilder updatedCrypto = new StringBuilder();
-        boolean removed = false;
+        Map<String, Double> holdings = new HashMap<>();
     
-        if (currentCrypto != null && !currentCrypto.trim().isEmpty()) {
-            String[] holdings = currentCrypto.split(",");
-            for (String holding : holdings) {
-                if (holding == null || holding.trim().isEmpty()) continue;
-    
-                String[] parts = holding.split(":");
+        // Parse existing holdings
+        if (currentCrypto != null && !currentCrypto.isBlank()) {
+            String[] entries = currentCrypto.split(",");
+            for (String entry : entries) {
+                String[] parts = entry.trim().split(":");
                 if (parts.length != 2) continue;
     
-                String id = parts[0].trim();
-                double amount = Double.parseDouble(parts[1].trim());
-    
-                // Reduce the crypto amount if the ID matches
-                if (id.equalsIgnoreCase(cryptoId)) {
-                    if (amount < cryptoAmount) {
-                        return null; // Insufficient balance to sell
+                try {
+                    String id = parts[0].trim();
+                    double amount = Double.parseDouble(parts[1].trim());
+                    if (!id.isEmpty() && amount > 0) {
+                        holdings.put(id, holdings.getOrDefault(id, 0.0) + amount);
                     }
-                    amount -= cryptoAmount;
-                    removed = true;
-                }
-    
-                // Append only non-zero amounts
-                if (amount > 0) {
-                    updatedCrypto.append(id).append(":").append(amount).append(",");
-                }
+                } catch (NumberFormatException ignored) {}
             }
         }
     
-        if (!removed) {
-            return null; // Crypto ID not found in holdings
+        // Add or update the holding
+        holdings.put(cryptoId, holdings.getOrDefault(cryptoId, 0.0) + cryptoAmount);
+    
+        // Rebuild the string and sanitize
+        StringBuilder updated = new StringBuilder();
+        for (Map.Entry<String, Double> entry : holdings.entrySet()) {
+            updated.append(entry.getKey())
+                   .append(":")
+                   .append(String.format("%.8f", entry.getValue()))
+                   .append(",");
         }
     
-        // Remove trailing comma and return
-        return updatedCrypto.toString().replaceAll(",$", "");
+        return CryptoUtils.sanitizeCryptoHoldings(updated.toString());
     }
     
+    
+        private String removeOrUpdateCryptoHoldings(String currentCrypto, String cryptoId, double cryptoAmount) {
+            Map<String, Double> holdings = new HashMap<>();
+            boolean found = false;
+    
+            if (currentCrypto != null && !currentCrypto.isBlank()) {
+                String[] entries = currentCrypto.split(",");
+                for (String entry : entries) {
+                    String[] parts = entry.trim().split(":");
+                    if (parts.length != 2) continue;
+    
+                    try {
+                        String id = parts[0].trim();
+                        double amount = Double.parseDouble(parts[1].trim());
+                        if (!id.isEmpty() && amount > 0) {
+                            holdings.put(id, amount);
+                        }
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+    
+            // Validate existence and amount
+            if (!holdings.containsKey(cryptoId)) {
+                return null; // Token not found
+            }
+    
+            double currentAmount = holdings.get(cryptoId);
+            if (cryptoAmount > currentAmount) {
+                return null; // Attempting to sell more than owned
+            }
+    
+            double newAmount = currentAmount - cryptoAmount;
+            if (newAmount > 0) {
+                holdings.put(cryptoId, newAmount);
+            } else {
+                holdings.remove(cryptoId); // Auto-remove when it hits zero
+            }
+    
+            // Rebuild and sanitize
+            StringBuilder updated = new StringBuilder();
+            for (Map.Entry<String, Double> entry : holdings.entrySet()) {
+                updated.append(entry.getKey())
+                    .append(":")
+                    .append(String.format("%.8f", entry.getValue()))
+                    .append(",");
+            }
+    
+            return CryptoUtils.sanitizeCryptoHoldings(updated.toString());
+        }
 
     // Inner DTO class for BuyRequest
     static class BuyRequest {
