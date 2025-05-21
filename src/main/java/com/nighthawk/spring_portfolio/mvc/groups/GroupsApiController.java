@@ -225,6 +225,7 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
         // Return the list of group maps
         return new ResponseEntity<>(groupsList, HttpStatus.OK);
     }
+
     /**
      * Add people to an existing group
      */
