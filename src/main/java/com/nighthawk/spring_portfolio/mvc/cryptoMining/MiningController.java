@@ -122,22 +122,32 @@ public class MiningController {
     public ResponseEntity<?> getMiningStats() {
         try {
             MiningUser user = getOrCreateMiningUser();
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "User not authenticated"));
+            }
+
             Map<String, Object> stats = new HashMap<>();
             
             // Group GPUs by ID and count quantities
             Map<Long, Map<String, Object>> gpuGroups = new HashMap<>();
-            for (GPU gpu : user.getOwnedGPUs()) {
-                Long gpuId = gpu.getId();
-                if (!gpuGroups.containsKey(gpuId)) {
-                    Map<String, Object> gpuInfo = new HashMap<>();
-                    gpuInfo.put("id", gpuId);
-                    gpuInfo.put("name", gpu.getName());
-                    gpuInfo.put("hashrate", gpu.getHashRate());
-                    gpuInfo.put("power", gpu.getPowerConsumption());
-                    gpuInfo.put("temp", gpu.getTemp());
-                    gpuInfo.put("quantity", user.getGpuQuantity(gpuId));
-                    gpuInfo.put("isActive", user.getActiveGPUs().contains(gpu));
-                    gpuGroups.put(gpuId, gpuInfo);
+            List<GPU> ownedGPUs = user.getOwnedGPUs();
+            if (ownedGPUs != null) {
+                for (GPU gpu : ownedGPUs) {
+                    if (gpu != null) {
+                        Long gpuId = gpu.getId();
+                        if (!gpuGroups.containsKey(gpuId)) {
+                            Map<String, Object> gpuInfo = new HashMap<>();
+                            gpuInfo.put("id", gpuId);
+                            gpuInfo.put("name", gpu.getName());
+                            gpuInfo.put("hashrate", gpu.getHashRate());
+                            gpuInfo.put("power", gpu.getPowerConsumption());
+                            gpuInfo.put("temp", gpu.getTemp());
+                            gpuInfo.put("quantity", user.getGpuQuantity(gpuId));
+                            gpuInfo.put("isActive", user.getActiveGPUs() != null && user.getActiveGPUs().contains(gpu));
+                            gpuGroups.put(gpuId, gpuInfo);
+                        }
+                    }
                 }
             }
             
@@ -153,10 +163,13 @@ public class MiningController {
             stats.put("averageTemperature", user.getAverageTemperature());
             stats.put("dailyRevenue", user.getDailyRevenue());
             stats.put("powerCost", user.getPowerCost());
-            stats.put("activeGPUsCount", user.getActiveGPUs().size());
+            stats.put("activeGPUsCount", user.getActiveGPUs() != null ? user.getActiveGPUs().size() : 0);
 
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
+            System.out.println("\n=== ERROR in getMiningStats ===");
+            System.out.println("Error type: " + e.getClass().getName());
+            System.out.println("Error message: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", e.getMessage()));
@@ -310,27 +323,35 @@ public class MiningController {
         try {
             System.out.println("\n=== Getting Mining State ===");
             
+            // Step 1: Get or create mining user
+            System.out.println("Step 1: Getting/Creating mining user...");
             MiningUser user = getOrCreateMiningUser();
             if (user == null) {
                 System.out.println("ERROR: getOrCreateMiningUser returned null");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "User not authenticated"));
             }
-
-            System.out.println("Got mining user: " + user.getPerson().getEmail());
+            System.out.println("Successfully got mining user: " + user.getPerson().getEmail());
             
-            // Calculate profitability
+            // Step 2: Calculate profitability
+            System.out.println("Step 2: Calculating profitability...");
             try {
                 miningService.calculateProfitability(user);
+                System.out.println("Successfully calculated profitability");
             } catch (Exception e) {
                 System.out.println("WARNING: Error calculating profitability: " + e.getMessage());
+                e.printStackTrace();
             }
 
-            // Create response
+            // Step 3: Create response
+            System.out.println("Step 3: Creating response...");
             Map<String, Object> stats = new HashMap<>();
             try {
+                System.out.println("Getting balances...");
                 double pendingBTC = user.getPendingBalance();
                 double confirmedBTC = user.getBtcBalance();
+                System.out.println("Pending BTC: " + pendingBTC);
+                System.out.println("Confirmed BTC: " + confirmedBTC);
                 
                 // Add all stats...
                 stats.put("btcBalance", String.format("%.8f", confirmedBTC));
@@ -339,59 +360,74 @@ public class MiningController {
                 stats.put("pendingBalanceUSD", String.format("%.2f", pendingBTC * MiningService.BTC_PRICE));
                 stats.put("totalBalanceUSD", String.format("%.2f", (pendingBTC + confirmedBTC) * MiningService.BTC_PRICE));
                 
+                System.out.println("Getting mining status...");
                 // Mining status
                 stats.put("hashrate", String.format("%.2f", user.getCurrentHashrate()));
                 stats.put("shares", user.getShares());
                 stats.put("isMining", user.isMining());
-                stats.put("currentPool", user.getCurrentPool());
+                stats.put("currentPool", user.getCurrentPool() != null ? user.getCurrentPool() : "default");
                 
+                System.out.println("Getting power and temperature...");
                 // Power and temperature
                 stats.put("powerConsumption", user.getPowerConsumption());
                 stats.put("averageTemperature", user.getAverageTemperature());
                 
+                System.out.println("Getting profitability metrics...");
                 // Profitability
                 stats.put("dailyRevenueBTC", String.format("%.8f", user.getDailyRevenue() / MiningService.BTC_PRICE));
                 stats.put("dailyRevenueUSD", String.format("%.2f", user.getDailyRevenue()));
                 stats.put("powerCost", user.getPowerCost());
                 stats.put("netProfitUSD", String.format("%.2f", user.getDailyRevenue() - user.getPowerCost()));
 
-                // GPU information - Group by ID
+                System.out.println("Processing GPU information...");
+                // GPU information - Group by ID with null checks
                 Map<Long, Map<String, Object>> gpuGroups = new HashMap<>();
-                for (GPU gpu : user.getOwnedGPUs()) {
-                    Long gpuId = gpu.getId();
-                    if (!gpuGroups.containsKey(gpuId)) {
-                        Map<String, Object> gpuInfo = new HashMap<>();
-                        gpuInfo.put("id", gpuId);
-                        gpuInfo.put("name", gpu.getName());
-                        gpuInfo.put("hashrate", gpu.getHashRate());
-                        gpuInfo.put("power", gpu.getPowerConsumption());
-                        gpuInfo.put("temp", gpu.getTemp());
-                        gpuInfo.put("quantity", user.getGpuQuantity(gpuId));
-                        gpuInfo.put("isActive", user.getActiveGPUs().contains(gpu));
-                        gpuGroups.put(gpuId, gpuInfo);
+                List<GPU> ownedGPUs = user.getOwnedGPUs();
+                if (ownedGPUs != null) {
+                    for (GPU gpu : ownedGPUs) {
+                        if (gpu != null) {
+                            Long gpuId = gpu.getId();
+                            if (gpuId != null && !gpuGroups.containsKey(gpuId)) {
+                                Map<String, Object> gpuInfo = new HashMap<>();
+                                gpuInfo.put("id", gpuId);
+                                gpuInfo.put("name", gpu.getName() != null ? gpu.getName() : "Unknown GPU");
+                                gpuInfo.put("hashrate", gpu.getHashRate());
+                                gpuInfo.put("power", gpu.getPowerConsumption());
+                                gpuInfo.put("temp", gpu.getTemp());
+                                gpuInfo.put("quantity", user.getGpuQuantity(gpuId));
+                                gpuInfo.put("isActive", user.getActiveGPUs() != null && user.getActiveGPUs().contains(gpu));
+                                gpuGroups.put(gpuId, gpuInfo);
+                            }
+                        }
                     }
                 }
                 
                 stats.put("gpus", new ArrayList<>(gpuGroups.values()));
 
-                // Group active GPUs by ID
+                System.out.println("Processing active GPUs...");
+                // Group active GPUs by ID with null checks
                 Map<Long, Map<String, Object>> activeGpuGroups = new HashMap<>();
-                for (GPU gpu : user.getActiveGPUs()) {
-                    Long gpuId = gpu.getId();
-                    double eem = user.getEnergyPlan().getEEM();
-                    if (!activeGpuGroups.containsKey(gpuId)) {
-                        Map<String, Object> gpuInfo = new HashMap<>();
-                        gpuInfo.put("id", gpuId);
-                        gpuInfo.put("name", gpu.getName());
-                        gpuInfo.put("hashRate", gpu.getHashRate());
-                        gpuInfo.put("powerConsumption", gpu.getPowerConsumption());
-                        gpuInfo.put("temp", gpu.getTemp());
-                        gpuInfo.put("price", gpu.getPrice());
-                        gpuInfo.put("category", gpu.getCategory());
-                        gpuInfo.put("available", gpu.isAvailable());
-                        gpuInfo.put("efficiency", gpu.getEfficiency() + eem);
-                        gpuInfo.put("quantity", user.getGpuQuantity(gpuId));
-                        activeGpuGroups.put(gpuId, gpuInfo);
+                List<GPU> activeGPUs = user.getActiveGPUs();
+                if (activeGPUs != null) {
+                    for (GPU gpu : activeGPUs) {
+                        if (gpu != null) {
+                            Long gpuId = gpu.getId();
+                            if (gpuId != null && !activeGpuGroups.containsKey(gpuId)) {
+                                Map<String, Object> gpuInfo = new HashMap<>();
+                                gpuInfo.put("id", gpuId);
+                                gpuInfo.put("name", gpu.getName() != null ? gpu.getName() : "Unknown GPU");
+                                gpuInfo.put("hashRate", gpu.getHashRate());
+                                gpuInfo.put("powerConsumption", gpu.getPowerConsumption());
+                                gpuInfo.put("temp", gpu.getTemp());
+                                gpuInfo.put("price", gpu.getPrice());
+                                gpuInfo.put("category", gpu.getCategory() != null ? gpu.getCategory() : "Unknown");
+                                gpuInfo.put("available", gpu.isAvailable());
+                                double eem = user.getEnergyPlan() != null ? user.getEnergyPlan().getEEM() : 0.0;
+                                gpuInfo.put("efficiency", gpu.getEfficiency() + eem);
+                                gpuInfo.put("quantity", user.getGpuQuantity(gpuId));
+                                activeGpuGroups.put(gpuId, gpuInfo);
+                            }
+                        }
                     }
                 }
                 
@@ -402,6 +438,7 @@ public class MiningController {
                 
             } catch (Exception e) {
                 System.out.println("ERROR: Failed to compile mining stats: " + e.getMessage());
+                e.printStackTrace();
                 throw e;
             }
 
