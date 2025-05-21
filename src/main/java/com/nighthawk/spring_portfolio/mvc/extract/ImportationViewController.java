@@ -109,32 +109,6 @@ public class ImportationViewController {
             }
         }
 
-        while (previousThread.isAlive()) {
-            try {
-                Thread.sleep(1000);
-            } catch (Exception e) {
-                // TODO: handle exception
-                System.out.println(e.toString());
-            }
-        }
-
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    public static void main(String[] args) {
-        ImportationViewController ma = new ImportationViewController();
-
-        ArrayList<PersonEmpty> test = new ArrayList<PersonEmpty>(0);
-        PersonEmpty p1 = new PersonEmpty(Long.valueOf(1), "bananan", "test", "test@gmail.com", "123", "pfp", "1234321",
-                true, new HashMap<String, Map<String, Object>>(0));
-        PersonEmpty p2 = new PersonEmpty(Long.valueOf(2), "bananan2", "test2", "test2@gmail.com", "432", "pfp2",
-                "1234321aa", false, new HashMap<String, Map<String, Object>>(0));
-        PersonEmpty p3 = new PersonEmpty(Long.valueOf(2), "banan23an2", "test2", "tes3@gmail.com", "Number 3", "pfp3",
-                "122334321aa", true, new HashMap<String, Map<String, Object>>(0));
-        test.add(p1);
-        test.add(p2);
-        test.add(p3);
-
-        ma.importPeopleToDatabase(test);
     }
 }
