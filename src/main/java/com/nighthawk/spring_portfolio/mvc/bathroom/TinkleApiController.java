@@ -110,7 +110,7 @@ public class TinkleApiController {
         }
     }
 
-    @DeleteMapping("/bulk/clear")
+    @PostMapping("/bulk/clear")
     public ResponseEntity<?> clearTable(HttpServletRequest request) {
         // Check for admin authentication
         String role = (String) request.getAttribute("role");
