@@ -48,10 +48,41 @@
         </div>
         <br>
 
-        <button sec:authorize="hasRole('ROLE_ADMIN')" id="export-mass" class="btn btn-info btn-sm">export mass
-            users</button>
-        <button sec:authorize="hasRole('ROLE_ADMIN')" id="import-mass" class="btn btn-info btn-sm">import mass
-            users</button>
+        <div sec:authorize="hasRole('ROLE_ADMIN')">
+            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#exportCollaspe" aria-expanded="false" aria-controls="exportCollaspe">export mass users</button>
+            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#importCollaspe" aria-expanded="false" aria-controls="importCollaspe">import mass users</button>
+            <br>
+            <div class="collapse" id="exportCollaspe">
+                <div class="card card-body bg-success border-muted">
+                <button id="export-all" class="btn btn-secondary btn-sm">export all</button>
+                <hr>
+                <table class="table table-bordered table-responsive">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Range</th>
+                            <th>-</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exportTableBody">
+                    </tbody>
+                    <tfoot class="thead-secondary">
+                        <tr>
+                            <td>
+                                <button id="export-ranges" class="btn btn-secondary btn-sm">export ranges</button>
+                            </td>
+                            <td>
+                                <button id="exportTableAddRow" class="btn btn-primary btn-sm">+</button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                </div>
+            </div>
+            <div class="collapse" id="importCollaspe">
+                <p> Hello... :D </p>
+            </div>
+            
+        </div>
 
         <div class="row align-items-md-stretch">
             <!-- Table displaying the list of persons -->

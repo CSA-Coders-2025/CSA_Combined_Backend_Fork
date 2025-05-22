@@ -23,25 +23,22 @@ import com.nighthawk.spring_portfolio.mvc.groups.Groups;
 import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
 import com.nighthawk.spring_portfolio.mvc.groups.GroupsJpaRepository;
 
-
-
 @Controller
 @RequestMapping("mvc/extract")
 public class ExtractionViewController {
-/////////////////////////////////////////
-/// Autowired Jpa Repositories
+    /////////////////////////////////////////
+    /// Autowired Jpa Repositories
 
-@Autowired
-private PersonJpaRepository personJpaRepository;
+    @Autowired
+    private PersonJpaRepository personJpaRepository;
 
-@Autowired
-private GroupsJpaRepository groupsJpaRepository;
+    @Autowired
+    private GroupsJpaRepository groupsJpaRepository;
 
-/////////////////////////////////////////
-/// Export Objects
+    /////////////////////////////////////////
+    /// Export Objects
 
-
-//person class based on person table schema (no relationships)
+    // person class based on person table schema (no relationships)
     @Data
     @AllArgsConstructor
     @Convert(attributeName = "person", converter = JsonType.class)
@@ -57,7 +54,7 @@ private GroupsJpaRepository groupsJpaRepository;
         private Map<String, Map<String, Object>> stats;
     }
 
-//group class based on group table schema (no relationships)
+    // group class based on group table schema (no relationships)
     @Data
     @AllArgsConstructor
     @Convert(attributeName = "group", converter = JsonType.class)
@@ -67,8 +64,7 @@ private GroupsJpaRepository groupsJpaRepository;
         private String period;
     }
 
-
-//group members class based on group table schema (no relationships)
+    // group members class based on group table schema (no relationships)
     @Data
     @AllArgsConstructor
     @Convert(attributeName = "group_members", converter = JsonType.class)
@@ -77,86 +73,121 @@ private GroupsJpaRepository groupsJpaRepository;
         private Long group_id;
     }
 
-/////////////////////////////////////////
-/// Single Extracts
+    /////////////////////////////////////////
+    /// Single Extracts
 
-    
     @GetMapping("/person/{id}")
-    public ResponseEntity<PersonEmpty> extractPersonById(@PathVariable("id") long id){
-        if(!personJpaRepository.existsById(id)){
+    public ResponseEntity<PersonEmpty> extractPersonById(@PathVariable("id") long id) {
+        if (!personJpaRepository.existsById(id)) {
             new ResponseEntity<PersonEmpty>(HttpStatus.NOT_FOUND);
         }
         Person person = personJpaRepository.findById(id).get();
+        //build a PersonEmpty based on the person
         PersonEmpty personEmpty = new PersonEmpty(
-            person.getId(), 
-            person.getUid(), 
-            person.getPassword(), 
-            person.getEmail(), 
-            person.getName(), 
-            person.getPfp(), 
-            person.getSid(),  
-            person.getKasmServerNeeded(), 
-            person.getStats());
-        return new ResponseEntity<PersonEmpty>(personEmpty,HttpStatus.OK);
+                person.getId(),
+                person.getUid(),
+                person.getPassword(),
+                person.getEmail(),
+                person.getName(),
+                person.getPfp(),
+                person.getSid(),
+                person.getKasmServerNeeded(),
+                person.getStats());
+                
+        return new ResponseEntity<PersonEmpty>(personEmpty, HttpStatus.OK);
     }
 
     @GetMapping("/group/{id}")
-    public ResponseEntity<GroupEmpty> extractGroupById(@PathVariable("id") long id){
-        if(!groupsJpaRepository.findById(id).isPresent()){
+    public ResponseEntity<GroupEmpty> extractGroupById(@PathVariable("id") long id) {
+        if (!groupsJpaRepository.findById(id).isPresent()) {
             new ResponseEntity<GroupEmpty>(HttpStatus.NOT_FOUND);
         }
         Groups group = groupsJpaRepository.findById(id).get();
-        GroupEmpty groupEmpty = new GroupEmpty(group.getId(),group.getName(),group.getPeriod());
-        return new ResponseEntity<GroupEmpty>(groupEmpty,HttpStatus.OK);
+        GroupEmpty groupEmpty = new GroupEmpty(group.getId(), group.getName(), group.getPeriod());
+        return new ResponseEntity<GroupEmpty>(groupEmpty, HttpStatus.OK);
     }
 
     @GetMapping("/group/{id}/members")
     @Transactional(readOnly = true)
-    public ResponseEntity<List<GroupMemberEmpty>> extractGroupMembersById(@PathVariable("id") long id){
-        if(!groupsJpaRepository.findById(id).isPresent()){
+    public ResponseEntity<List<GroupMemberEmpty>> extractGroupMembersById(@PathVariable("id") long id) {
+        if (!groupsJpaRepository.findById(id).isPresent()) {
             new ResponseEntity<List<GroupMemberEmpty>>(HttpStatus.NOT_FOUND);
         }
         Groups group = groupsJpaRepository.findById(id).get();
         ArrayList<GroupMemberEmpty> groupMemberEmpties = new ArrayList<GroupMemberEmpty>(0);
-        group.getGroupMembers().stream().forEach(groupMember ->{
+        group.getGroupMembers().stream().forEach(groupMember -> {
             groupMemberEmpties.add(new GroupMemberEmpty(groupMember.getId(), id));
         });
-        return new ResponseEntity<List<GroupMemberEmpty>>(groupMemberEmpties,HttpStatus.OK);
+        return new ResponseEntity<List<GroupMemberEmpty>>(groupMemberEmpties, HttpStatus.OK);
     }
-   
-/////////////////////////////////////////
-/// Multi Extracts
 
+    /////////////////////////////////////////
+    /// Multi Extracts (all)
 
     @GetMapping("all/person")
-    public ResponseEntity<List<PersonEmpty>> extractAllPerson(){
+    public ResponseEntity<List<PersonEmpty>> extractAllPerson() {
         List<Person> personList = personJpaRepository.findAll();
         ArrayList<PersonEmpty> personEmpties = new ArrayList<PersonEmpty>(0);
-        personList.stream().forEach(person ->{
+        personList.stream().forEach(person -> {
             personEmpties.add(new PersonEmpty(
-            person.getId(), 
-            person.getUid(), 
-            person.getPassword(), 
-            person.getEmail(), 
-            person.getName(), 
-            person.getPfp(), 
-            person.getSid(), 
-            person.getKasmServerNeeded(), 
-            person.getStats()));
+                    person.getId(),
+                    person.getUid(),
+                    person.getPassword(),
+                    person.getEmail(),
+                    person.getName(),
+                    person.getPfp(),
+                    person.getSid(),
+                    person.getKasmServerNeeded(),
+                    person.getStats()));
         });
-        return new ResponseEntity<List<PersonEmpty>>(personEmpties,HttpStatus.OK);
+        return new ResponseEntity<List<PersonEmpty>>(personEmpties, HttpStatus.OK);
     }
 
     @GetMapping("all/group")
-    public ResponseEntity<List<GroupEmpty>> extractAllGroups(){
+    public ResponseEntity<List<GroupEmpty>> extractAllGroups() {
         List<Groups> groupsList = groupsJpaRepository.findAll();
         ArrayList<GroupEmpty> groupEmpties = new ArrayList<GroupEmpty>(0);
-        groupsList.stream().forEach(group ->{
+        groupsList.stream().forEach(group -> {
             groupEmpties.add(new GroupEmpty(
-            group.getId(),
-            group.getName(),
-            group.getPeriod()));
+                    group.getId(),
+                    group.getName(),
+                    group.getPeriod()));
         });
-        return new ResponseEntity<List<GroupEmpty>>(groupEmpties,HttpStatus.OK);
+        return new ResponseEntity<List<GroupEmpty>>(groupEmpties, HttpStatus.OK);
+    }
+
+    /////////////////////////////////////////
+    /// Multi Extracts (all sets)
+
+    @GetMapping("all/person/fromRanges")
+    public ResponseEntity<List<PersonEmpty>> extractAllPersonFromRanges(
+            @RequestBody List<List<Long>> personIdRanges) {
+        ArrayList<PersonEmpty> personEmpties = new ArrayList<PersonEmpty>(0);
+
+        for (int i = 0; i < personIdRanges.size(); i++) {
+            if (personIdRanges.get(i).size() < 2) {
+                continue;
+            }
+            Long id0 = personIdRanges.get(i).get(0);
+            Long id1 = personIdRanges.get(i).get(1);
+            if (id0 > id1) {
+                continue;
+            }
+            List<Person> personList = personJpaRepository.findAllByIdBetween(id0, id1);
+
+            personList.stream().forEach(person -> {
+                personEmpties.add(new PersonEmpty(
+                        person.getId(),
+                        person.getUid(),
+                        person.getPassword(),
+                        person.getEmail(),
+                        person.getName(),
+                        person.getPfp(),
+                        person.getSid(),
+                        person.getKasmServerNeeded(),
+                        person.getStats()));
+            });
+        }
+        return new ResponseEntity<List<PersonEmpty>>(personEmpties, HttpStatus.OK);
     }
 }
