@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.PostLoad;
 
 @Data
 @Entity
@@ -60,6 +61,43 @@ public class MiningUser {
     private Date miningStartTime;
     private long miningSessionCount = 0;
     
+    // Add this new field to track GPU quantities
+    @ElementCollection
+    private Map<Long, Integer> gpuQuantities = new HashMap<>();
+
+    // Ensure collections are initialized
+    @PostLoad
+    public void initializeCollections() {
+        if (ownedGPUs == null) {
+            ownedGPUs = new ArrayList<>();
+        }
+        if (activeGPUs == null) {
+            activeGPUs = new ArrayList<>();
+        }
+        if (gpuQuantities == null) {
+            gpuQuantities = new HashMap<>();
+        }
+        if (energyPlan == null) {
+            energyPlan = new Energy("Tesla Energy", 0.12);
+        }
+    }
+
+    public MiningUser(Person person) {
+        this.person = person;
+        this.btcBalance = 0.0;
+        this.pendingBalance = 0.0;
+        this.shares = 0;
+        this.isMining = false;
+        this.currentPool = "default";
+        this.ownedGPUs = new ArrayList<>();
+        this.activeGPUs = new ArrayList<>();
+        this.gpuQuantities = new HashMap<>();
+        
+        // Set default energy plan (Tesla Energy with EEM 0.12)
+        Energy defaultEnergy = new Energy("Tesla Energy", 0.12);
+        this.setEnergyPlan(defaultEnergy);
+    }
+
     // New getters for calculated statistics
     public long getCurrentSessionDuration() {
         if (!isMining || miningStartTime == null) {
@@ -80,23 +118,10 @@ public class MiningUser {
         return energyPlan;
     }
 
-    public MiningUser(Person person) {
-        this.person = person;
-        this.btcBalance = 0.0;
-        this.pendingBalance = 0.0;
-        this.shares = 0;
-        this.isMining = false;
-        this.currentPool = "default";
-    }
-
     // Add this explicit getter for the controller
     public List<GPU> getGpus() {
         return this.ownedGPUs;
     }
-
-    // Add this new field to track GPU quantities
-    @ElementCollection
-    private Map<Long, Integer> gpuQuantities = new HashMap<>();
 
     // Modify addGPU method
     public void addGPU(GPU gpu) {
@@ -126,6 +151,9 @@ public class MiningUser {
 
     // Update getGpuQuantity method
     public int getGpuQuantity(Long gpuId) {
+        if (gpuQuantities == null) {
+            gpuQuantities = new HashMap<>();
+        }
         return gpuQuantities.getOrDefault(gpuId, 0);
     }
 
@@ -146,12 +174,14 @@ public class MiningUser {
     }
 
     public double getPowerConsumption() {
+        if (ownedGPUs == null || ownedGPUs.isEmpty()) return 0.0;
         return ownedGPUs.stream()
             .mapToInt(GPU::getPowerConsumption)
             .sum();
     }
 
     public double getAverageTemperature() {
+        if (ownedGPUs == null || ownedGPUs.isEmpty()) return 0.0;
         return ownedGPUs.stream()
             .mapToInt(GPU::getTemp)
             .average()
@@ -159,7 +189,7 @@ public class MiningUser {
     }
 
     public double getCurrentHashrate() {
-        if (!isMining) return 0.0;
+        if (!isMining || activeGPUs == null || activeGPUs.isEmpty()) return 0.0;
         return activeGPUs.stream()
             .mapToDouble(GPU::getHashRate)
             .sum();
@@ -197,6 +227,9 @@ public class MiningUser {
     }
 
     public List<GPU> getActiveGPUs() {
+        if (activeGPUs == null) {
+            activeGPUs = new ArrayList<>();
+        }
         return this.activeGPUs;
     }
 
@@ -239,6 +272,9 @@ public class MiningUser {
     }
 
     public List<GPU> getOwnedGPUs() {
+        if (ownedGPUs == null) {
+            ownedGPUs = new ArrayList<>();
+        }
         return this.ownedGPUs;
     }
 
