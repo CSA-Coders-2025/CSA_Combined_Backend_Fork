@@ -80,6 +80,8 @@
             </div>
             <div class="collapse" id="importCollaspe">
                 <p> Hello... :D </p>
+                <input id="personAllFileUpload" type="file" accept=".json">
+                <button id="import-all" class="btn btn-secondary btn-sm">import persons</button>
             </div>
             
         </div>
@@ -150,9 +152,11 @@
 
 <!-- scripts -->
 <th:block layout:fragment="script" th:remove="tag">
-    <!-- script for extracting people (not included if user is not admin)-->
+    <!-- script for extracting/importing people (not included if user is not admin)-->
     <script sec:authorize="hasRole('ROLE_ADMIN')" type="module" src="/static/js/person-extraction.js"
         th:src="@{/js/person-extraction.js}"></script>
+    <script sec:authorize="hasRole('ROLE_ADMIN')" type="module" src="/static/js/person-importation.js"
+        th:src="@{/js/person-importation.js}"></script>
     <!-- script for filtering columns-->
     <script type="text/javascript" src="/static/js/read-filter.js" th:src="@{/js/read-filter.js}"></script>
     <!-- script for updating overlay (used for update button)-->
