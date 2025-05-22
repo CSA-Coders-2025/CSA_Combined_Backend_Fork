@@ -10,6 +10,7 @@ import com.nighthawk.spring_portfolio.mvc.person.Person;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,7 +28,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Groups extends Submitter {
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "group_members", 
         joinColumns = @JoinColumn(name = "group_id"), 
