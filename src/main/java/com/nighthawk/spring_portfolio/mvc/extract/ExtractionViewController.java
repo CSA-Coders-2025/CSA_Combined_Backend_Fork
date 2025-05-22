@@ -159,9 +159,8 @@ public class ExtractionViewController {
     /////////////////////////////////////////
     /// Multi Extracts (all sets)
 
-    @GetMapping("all/person/fromRanges")
-    public ResponseEntity<List<PersonEmpty>> extractAllPersonFromRanges(
-            @RequestBody List<List<Long>> personIdRanges) {
+    @PostMapping("all/person/fromRanges")
+    public ResponseEntity<List<PersonEmpty>> extractAllPersonFromRanges(@RequestBody List<List<Long>> personIdRanges) {
         ArrayList<PersonEmpty> personEmpties = new ArrayList<PersonEmpty>(0);
 
         for (int i = 0; i < personIdRanges.size(); i++) {
