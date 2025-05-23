@@ -16,6 +16,8 @@ import com.nighthawk.spring_portfolio.mvc.person.PersonJpaRepository;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 
 import jakarta.persistence.Convert;
+import jakarta.validation.Valid;
+
 
 @Controller
 @RequestMapping("mvc/import")
@@ -32,7 +34,7 @@ public class ImportationViewController {
     @Data
     @AllArgsConstructor
     @Convert(attributeName = "person", converter = JsonType.class)
-    public class PersonEmpty {
+    public static class PersonEmpty {
         private Long id;
         private String uid;
         private String password;
@@ -52,7 +54,7 @@ public class ImportationViewController {
         try {
             personJpaRepository.saveAllAndFlush(personList);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getStackTrace());
             return false;
         }
         return true;
@@ -79,9 +81,11 @@ public class ImportationViewController {
 
     @PostMapping("all/person")
     public ResponseEntity<String> importPeopleToDatabase(@RequestBody List<PersonEmpty> body) {
+        System.out.println("fired");
         int entityCount = body.size();
         int batchSize = 10; // how many persons are we saving to the database at a time
 
+        
         int totalBatches = 0;
         int successfulBatches = 0;
         for (int i = 0; i <= entityCount; i++) {
@@ -94,7 +98,7 @@ public class ImportationViewController {
                 } else if (i == entityCount) {
                     //one last batch for any remaining objects
                     List<PersonEmpty> subList = body.subList(batchSize * (i / batchSize), i);
-                    successfulBatches += buildBatchAndSave(subList) ? 1 : 0;
+                    successfulBatches += this.buildBatchAndSave(subList) ? 1 : 0;
                     totalBatches++;
                 }
             }
@@ -104,4 +108,5 @@ public class ImportationViewController {
                 + " successful batches of " + String.valueOf(totalBatches) + " attempted batches";
         return new ResponseEntity<String>(response, HttpStatus.OK);
     }
+    
 }
