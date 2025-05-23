@@ -214,7 +214,6 @@ public class Person implements Comparable<Person> {
 
 
     @OneToOne(mappedBy = "person", cascade=CascadeType.ALL)
-    @JsonIgnore
     private Tinkle timeEntries;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "person")
