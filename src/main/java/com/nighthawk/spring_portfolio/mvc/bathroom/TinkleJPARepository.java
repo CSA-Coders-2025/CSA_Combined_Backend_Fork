@@ -15,5 +15,5 @@ public interface TinkleJPARepository extends JpaRepository<Tinkle, Long> {
     @Modifying
     @Transactional
     @Query("DELETE FROM Tinkle")
-    void clearTinkleTable();
+    void deleteAllRowsInBulk();
 }

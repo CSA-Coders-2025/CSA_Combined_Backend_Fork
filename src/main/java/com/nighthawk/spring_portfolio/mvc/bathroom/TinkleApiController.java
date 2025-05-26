@@ -126,7 +126,7 @@ public class TinkleApiController {
                     .body(Map.of("status", "error", "message", "Unauthorized — Admin access required"));
         }
 
-        repository.clearTinkleTable();
+        repository.deleteAllRowsInBulk();
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
