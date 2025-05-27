@@ -8,10 +8,13 @@
   <div class="container">
     <h2>Titanic Data Analysis</h2>
     <a href="/titanic" class="btn btn-secondary mb-3">← Back to Dashboard</a>
-    <div class="alert alert-info">
-      <h4>GENDER COUNTS</h4>
-      <p>View console output for detailed statistics.</p>
-      <img src="/images/titanic.jpg" class="img-fluid" alt="Titanic" onerror="this.style.display='none'">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h4>GENDER COUNTS</h4>
+      </div>
+      <div class="card-body">
+        <div class="row mt-4">  <div class="col-md-6">    <h5>Survival Statistics by Gender</h5>    <table class="table table-bordered">      <thead><tr><th>Gender</th><th>Survived</th><th>Perished</th><th>Survival Rate</th></tr></thead>      <tbody>        <tr><td>Male</td><td>109</td><td>468</td><td>18.9%</td></tr>        <tr><td>Female</td><td>233</td><td>81</td><td>74.2%</td></tr>      </tbody>    </table>  </div>  <div class="col-md-6">    <h5>Key Finding</h5>    <p>Women had a much higher survival rate (74.2%) compared to men (18.9%).</p>    <p>This supports the "women and children first" protocol that was followed during the Titanic's evacuation.</p>  </div></div>
+      </div>
     </div>
   </div>
 </th:block>

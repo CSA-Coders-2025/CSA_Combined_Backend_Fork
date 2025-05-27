@@ -8,10 +8,13 @@
   <div class="container">
     <h2>Titanic Data Analysis</h2>
     <a href="/titanic" class="btn btn-secondary mb-3">← Back to Dashboard</a>
-    <div class="alert alert-info">
-      <h4>FARE HISTOGRAM</h4>
-      <p>View console output for detailed statistics.</p>
-      <img src="/images/titanic.jpg" class="img-fluid" alt="Titanic" onerror="this.style.display='none'">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h4>FARE HISTOGRAM</h4>
+      </div>
+      <div class="card-body">
+        <div class="row mt-4">  <div class="col-md-6">    <h5>Fare Statistics</h5>    <table class="table table-bordered">      <thead><tr><th>Group</th><th>Mean Fare</th><th>Median Fare</th></tr></thead>      <tbody>        <tr><td>Survivors</td><td>$48.40</td><td>$26.00</td></tr>        <tr><td>Non-Survivors</td><td>$22.12</td><td>$10.50</td></tr>      </tbody>    </table>  </div>  <div class="col-md-6">    <h5>Key Finding</h5>    <p>Passengers who paid higher fares had better chances of survival.</p>    <p>The mean fare for survivors ($48.40) was significantly higher than for non-survivors ($22.12).</p>    <p>This suggests that first-class passengers had priority access to lifeboats.</p>  </div></div>
+      </div>
     </div>
   </div>
 </th:block>

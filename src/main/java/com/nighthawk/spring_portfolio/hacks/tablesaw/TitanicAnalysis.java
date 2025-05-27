@@ -60,7 +60,7 @@ public class TitanicAnalysis {
         
         // Save plot to file instead of showing it
         Figure genderPlot = VerticalBarPlot.create("Count of Passengers by Gender", sexCounts, "Sex", "Count");
-        saveToFile(genderPlot, "titanic_plots/gender_counts.html");
+        saveToFile(genderPlot, "titanic_plots/gender_counts.html", titanic, survived, perished);
         System.out.println("Gender plot saved to: titanic_plots/gender_counts.html");
 
         // 2. Fare analysis: Check survival based on "Fare" mean and median
@@ -71,7 +71,7 @@ public class TitanicAnalysis {
         System.out.println("Median Fare for Non-Survivors: " + perished.numberColumn("Fare").median()); 
         
         Figure farePlot = Histogram.create("Fare Distribution", titanic.numberColumn("Fare"));
-        saveToFile(farePlot, "titanic_plots/fare_histogram.html");
+        saveToFile(farePlot, "titanic_plots/fare_histogram.html", titanic, survived, perished);
         System.out.println("Fare plot saved to: titanic_plots/fare_histogram.html");
 
         // 3. Being alone analysis: Check survival based on "Alone" column
@@ -82,7 +82,7 @@ public class TitanicAnalysis {
         System.out.println("Perished with Family: " + perished.where(perished.booleanColumn("Alone").isFalse()).rowCount());
         
         Figure alonePlot = VerticalBarPlot.create("Count of Passengers by Alone Status", aloneCounts, "Alone", "Count");
-        saveToFile(alonePlot, "titanic_plots/alone_counts.html");
+        saveToFile(alonePlot, "titanic_plots/alone_counts.html", titanic, survived, perished);
         System.out.println("Alone status plot saved to: titanic_plots/alone_counts.html");
 
         // 4. Age analysis: Check survival based on "Age" mean and median
@@ -93,11 +93,11 @@ public class TitanicAnalysis {
         System.out.println("Median Age for Non-Survivors: " + perished.numberColumn("Age").median());
         
         Figure agePlot = Histogram.create("Age Distribution", titanic.numberColumn("Age"));
-        saveToFile(agePlot, "titanic_plots/age_histogram.html");
+        saveToFile(agePlot, "titanic_plots/age_histogram.html", titanic, survived, perished);
         System.out.println("Age plot saved to: titanic_plots/age_histogram.html");
     }
     
-    private static void saveToFile(Figure figure, String filename) {
+    private static void saveToFile(Figure figure, String filename, Table titanic, Table survived, Table perished) {
         String templatesDir = "src/main/resources/templates/";
         new File(templatesDir + "titanic_plots").mkdirs();
         
@@ -108,7 +108,114 @@ public class TitanicAnalysis {
                                 .replace("_", " ")
                                 .toUpperCase();
             
-            // Create a simple template that doesn't use Plotly at all
+            // Create statistics based on the file type
+            StringBuilder stats = new StringBuilder();
+            if (title.contains("GENDER")) {
+                stats.append("<div class=\"row mt-4\">");
+                stats.append("  <div class=\"col-md-6\">");
+                stats.append("    <h5>Survival Statistics by Gender</h5>");
+                stats.append("    <table class=\"table table-bordered\">");
+                stats.append("      <thead><tr><th>Gender</th><th>Survived</th><th>Perished</th><th>Survival Rate</th></tr></thead>");
+                stats.append("      <tbody>");
+                
+                int malesSurvived = survived.where(survived.stringColumn("Sex").isEqualTo("male")).rowCount();
+                int malesPerished = perished.where(perished.stringColumn("Sex").isEqualTo("male")).rowCount();
+                int femalesSurvived = survived.where(survived.stringColumn("Sex").isEqualTo("female")).rowCount();
+                int femalesPerished = perished.where(perished.stringColumn("Sex").isEqualTo("female")).rowCount();
+                
+                double maleSurvivalRate = (double) malesSurvived / (malesSurvived + malesPerished) * 100;
+                double femaleSurvivalRate = (double) femalesSurvived / (femalesSurvived + femalesPerished) * 100;
+                
+                stats.append("        <tr><td>Male</td><td>" + malesSurvived + "</td><td>" + malesPerished + "</td><td>" + String.format("%.1f%%", maleSurvivalRate) + "</td></tr>");
+                stats.append("        <tr><td>Female</td><td>" + femalesSurvived + "</td><td>" + femalesPerished + "</td><td>" + String.format("%.1f%%", femaleSurvivalRate) + "</td></tr>");
+                stats.append("      </tbody>");
+                stats.append("    </table>");
+                stats.append("  </div>");
+                stats.append("  <div class=\"col-md-6\">");
+                stats.append("    <h5>Key Finding</h5>");
+                stats.append("    <p>Women had a much higher survival rate (" + String.format("%.1f%%", femaleSurvivalRate) + ") compared to men (" + String.format("%.1f%%", maleSurvivalRate) + ").</p>");
+                stats.append("    <p>This supports the \"women and children first\" protocol that was followed during the Titanic's evacuation.</p>");
+                stats.append("  </div>");
+                stats.append("</div>");
+            } else if (title.contains("FARE")) {
+                stats.append("<div class=\"row mt-4\">");
+                stats.append("  <div class=\"col-md-6\">");
+                stats.append("    <h5>Fare Statistics</h5>");
+                stats.append("    <table class=\"table table-bordered\">");
+                stats.append("      <thead><tr><th>Group</th><th>Mean Fare</th><th>Median Fare</th></tr></thead>");
+                stats.append("      <tbody>");
+                
+                double survivorMeanFare = survived.numberColumn("Fare").mean();
+                double survivorMedianFare = survived.numberColumn("Fare").median();
+                double perishedMeanFare = perished.numberColumn("Fare").mean();
+                double perishedMedianFare = perished.numberColumn("Fare").median();
+                
+                stats.append("        <tr><td>Survivors</td><td>$" + String.format("%.2f", survivorMeanFare) + "</td><td>$" + String.format("%.2f", survivorMedianFare) + "</td></tr>");
+                stats.append("        <tr><td>Non-Survivors</td><td>$" + String.format("%.2f", perishedMeanFare) + "</td><td>$" + String.format("%.2f", perishedMedianFare) + "</td></tr>");
+                stats.append("      </tbody>");
+                stats.append("    </table>");
+                stats.append("  </div>");
+                stats.append("  <div class=\"col-md-6\">");
+                stats.append("    <h5>Key Finding</h5>");
+                stats.append("    <p>Passengers who paid higher fares had better chances of survival.</p>");
+                stats.append("    <p>The mean fare for survivors ($" + String.format("%.2f", survivorMeanFare) + ") was significantly higher than for non-survivors ($" + String.format("%.2f", perishedMeanFare) + ").</p>");
+                stats.append("    <p>This suggests that first-class passengers had priority access to lifeboats.</p>");
+                stats.append("  </div>");
+                stats.append("</div>");
+            } else if (title.contains("ALONE")) {
+                stats.append("<div class=\"row mt-4\">");
+                stats.append("  <div class=\"col-md-6\">");
+                stats.append("    <h5>Traveling Status Statistics</h5>");
+                stats.append("    <table class=\"table table-bordered\">");
+                stats.append("      <thead><tr><th>Status</th><th>Survived</th><th>Perished</th><th>Survival Rate</th></tr></thead>");
+                stats.append("      <tbody>");
+                
+                int aloneAndSurvived = survived.where(survived.booleanColumn("Alone").isTrue()).rowCount();
+                int aloneAndPerished = perished.where(perished.booleanColumn("Alone").isTrue()).rowCount();
+                int familyAndSurvived = survived.where(survived.booleanColumn("Alone").isFalse()).rowCount();
+                int familyAndPerished = perished.where(perished.booleanColumn("Alone").isFalse()).rowCount();
+                
+                double aloneSurvivalRate = (double) aloneAndSurvived / (aloneAndSurvived + aloneAndPerished) * 100;
+                double familySurvivalRate = (double) familyAndSurvived / (familyAndSurvived + familyAndPerished) * 100;
+                
+                stats.append("        <tr><td>Traveling Alone</td><td>" + aloneAndSurvived + "</td><td>" + aloneAndPerished + "</td><td>" + String.format("%.1f%%", aloneSurvivalRate) + "</td></tr>");
+                stats.append("        <tr><td>With Family</td><td>" + familyAndSurvived + "</td><td>" + familyAndPerished + "</td><td>" + String.format("%.1f%%", familySurvivalRate) + "</td></tr>");
+                stats.append("      </tbody>");
+                stats.append("    </table>");
+                stats.append("  </div>");
+                stats.append("  <div class=\"col-md-6\">");
+                stats.append("    <h5>Key Finding</h5>");
+                stats.append("    <p>Passengers traveling with family had a " + String.format("%.1f%%", familySurvivalRate) + " survival rate compared to " + String.format("%.1f%%", aloneSurvivalRate) + " for those traveling alone.</p>");
+                stats.append("    <p>This suggests that families may have been kept together during evacuation, or that they helped each other survive.</p>");
+                stats.append("  </div>");
+                stats.append("</div>");
+            } else if (title.contains("AGE")) {
+                stats.append("<div class=\"row mt-4\">");
+                stats.append("  <div class=\"col-md-6\">");
+                stats.append("    <h5>Age Statistics</h5>");
+                stats.append("    <table class=\"table table-bordered\">");
+                stats.append("      <thead><tr><th>Group</th><th>Mean Age</th><th>Median Age</th></tr></thead>");
+                stats.append("      <tbody>");
+                
+                double survivorMeanAge = survived.numberColumn("Age").mean();
+                double survivorMedianAge = survived.numberColumn("Age").median();
+                double perishedMeanAge = perished.numberColumn("Age").mean();
+                double perishedMedianAge = perished.numberColumn("Age").median();
+                
+                stats.append("        <tr><td>Survivors</td><td>" + String.format("%.1f", survivorMeanAge) + "</td><td>" + String.format("%.1f", survivorMedianAge) + "</td></tr>");
+                stats.append("        <tr><td>Non-Survivors</td><td>" + String.format("%.1f", perishedMeanAge) + "</td><td>" + String.format("%.1f", perishedMedianAge) + "</td></tr>");
+                stats.append("      </tbody>");
+                stats.append("    </table>");
+                stats.append("  </div>");
+                stats.append("  <div class=\"col-md-6\">");
+                stats.append("    <h5>Key Finding</h5>");
+                stats.append("    <p>The average age of survivors (" + String.format("%.1f", survivorMeanAge) + ") was lower than non-survivors (" + String.format("%.1f", perishedMeanAge) + ").</p>");
+                stats.append("    <p>This supports the priority given to children during evacuation.</p>");
+                stats.append("  </div>");
+                stats.append("</div>");
+            }
+            
+            // Create HTML template with the statistics included
             StringBuilder html = new StringBuilder();
             html.append("<!DOCTYPE html>\n");
             html.append("<html xmlns:layout=\"http://www.w3.org/1999/xhtml\" xmlns:th=\"http://www.thymeleaf.org\"\n");
@@ -118,10 +225,13 @@ public class TitanicAnalysis {
             html.append("  <div class=\"container\">\n");
             html.append("    <h2>Titanic Data Analysis</h2>\n");
             html.append("    <a href=\"/titanic\" class=\"btn btn-secondary mb-3\">← Back to Dashboard</a>\n");
-            html.append("    <div class=\"alert alert-info\">\n");
-            html.append("      <h4>" + title + "</h4>\n");
-            html.append("      <p>View console output for detailed statistics.</p>\n");
-            html.append("      <img src=\"/images/titanic.jpg\" class=\"img-fluid\" alt=\"Titanic\" onerror=\"this.style.display='none'\">\n");
+            html.append("    <div class=\"card\">\n");
+            html.append("      <div class=\"card-header bg-info text-white\">\n");
+            html.append("        <h4>" + title + "</h4>\n");
+            html.append("      </div>\n");
+            html.append("      <div class=\"card-body\">\n");
+            html.append("        " + stats.toString() + "\n");
+            html.append("      </div>\n");
             html.append("    </div>\n");
             html.append("  </div>\n");
             html.append("</th:block>\n");
