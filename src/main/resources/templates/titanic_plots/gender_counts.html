@@ -7,36 +7,12 @@
 <th:block layout:fragment="body" th:remove="tag">
   <div class="container">
     <h2>Titanic Data Analysis</h2>
-    <div id='plot_div'></div>
+    <a href="/titanic" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+    <div class="alert alert-info">
+      <h4>GENDER COUNTS</h4>
+      <p>View console output for detailed statistics.</p>
+      <img src="/images/titanic.jpg" class="img-fluid" alt="Titanic" onerror="this.style.display='none'">
+    </div>
   </div>
-</th:block>
-
-<th:block layout:fragment="script" th:remove="tag">
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var target_plot_div = document.getElementById('plot_div');
-var layout = {
-    title: 'Count of Passengers by Gender',
-    height: 700,
-    width: 900,
-
-
-};
-
-var trace0 =
-{
-x: ["male","female"],
-y: [577.0, 314.0],
-orientation: 'v',
-xaxis: 'x',
-yaxis: 'y',
-type: 'bar',
-name: '',
-};
-
-        var data = [ trace0];
-Plotly.newPlot(target_plot_div, data, layout);            </scri    });
-  </script>
 </th:block>
 </html>

@@ -97,15 +97,18 @@ public class TitanicAnalysis {
         System.out.println("Age plot saved to: titanic_plots/age_histogram.html");
     }
     
-    // Update the saveToFile method in TitanicAnalysis.java
     private static void saveToFile(Figure figure, String filename) {
-        // Path to templates directory
         String templatesDir = "src/main/resources/templates/";
-        // Create directory if it doesn't exist
         new File(templatesDir + "titanic_plots").mkdirs();
         
         try (FileWriter fileWriter = new FileWriter(templatesDir + filename)) {
-            // Create a complete HTML page with Thymeleaf layout
+            // Get the title from the filename instead of the figure
+            String title = filename.substring(filename.lastIndexOf("/") + 1)
+                                .replace(".html", "")
+                                .replace("_", " ")
+                                .toUpperCase();
+            
+            // Create a simple template that doesn't use Plotly at all
             StringBuilder html = new StringBuilder();
             html.append("<!DOCTYPE html>\n");
             html.append("<html xmlns:layout=\"http://www.w3.org/1999/xhtml\" xmlns:th=\"http://www.thymeleaf.org\"\n");
@@ -114,44 +117,20 @@ public class TitanicAnalysis {
             html.append("<th:block layout:fragment=\"body\" th:remove=\"tag\">\n");
             html.append("  <div class=\"container\">\n");
             html.append("    <h2>Titanic Data Analysis</h2>\n");
-            html.append("    <div id='plot_div'></div>\n");
+            html.append("    <a href=\"/titanic\" class=\"btn btn-secondary mb-3\">← Back to Dashboard</a>\n");
+            html.append("    <div class=\"alert alert-info\">\n");
+            html.append("      <h4>" + title + "</h4>\n");
+            html.append("      <p>View console output for detailed statistics.</p>\n");
+            html.append("      <img src=\"/images/titanic.jpg\" class=\"img-fluid\" alt=\"Titanic\" onerror=\"this.style.display='none'\">\n");
+            html.append("    </div>\n");
             html.append("  </div>\n");
-            html.append("</th:block>\n\n");
-            html.append("<th:block layout:fragment=\"script\" th:remove=\"tag\">\n");
-            html.append("  <script src=\"https://cdn.plot.ly/plotly-latest.min.js\"></script>\n");
-            html.append("  <script>\n");
-            html.append("    document.addEventListener('DOMContentLoaded', function() {\n");
-            html.append("      var target_plot_div = document.getElementById('plot_div');\n");
-            html.append("      " + extractJavaScriptFromFigure(figure.asJavascript("plot_div")) + "\n");
-            html.append("    });\n");
-            html.append("  </script>\n");
             html.append("</th:block>\n");
             html.append("</html>");
             
             fileWriter.write(html.toString());
-            System.out.println("Plot saved to templates/titanic_plots/" + filename);
+            System.out.println("Plot saved to templates/" + filename);
         } catch (IOException e) {
             System.err.println("Error saving plot to " + filename + ": " + e.getMessage());
         }
-    }
-
-    // Helper to extract just the JavaScript portion from the Figure
-    private static String extractJavaScriptFromFigure(String figureJs) {
-        // Find the start of the plotly data section
-        int startIndex = figureJs.indexOf("var data");
-        if (startIndex == -1) startIndex = figureJs.indexOf("var layout");
-        
-        // Find the end of the plotly.newPlot call
-        int endIndex = figureJs.indexOf("</script>");
-        if (endIndex == -1) endIndex = figureJs.length();
-        
-        // Extract just the JS code without script tags
-        if (startIndex >= 0 && endIndex > startIndex) {
-            return figureJs.substring(startIndex, endIndex).trim();
-        }
-        
-        // If we can't parse it properly, return a simplified version
-        return "console.log('Error extracting plotly code');\n" + 
-            "Plotly.newPlot(target_plot_div, [{x:[0,1], y:[0,1], type:'scatter'}], {title:'Error Loading Plot'});";
     }
 }

@@ -1,15 +1,27 @@
-// TitanicViewController.java
 package com.nighthawk.spring_portfolio.mvc.titanic;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class TitanicViewController {
 
     @GetMapping("/titanic")
-    public String titanicDashboard() {
-        return "titanic_plots/gender_counts";
+    public String titanicDashboard(Model model) {
+        // Add metadata for the dashboard
+        model.addAttribute("title", "Titanic Analysis Dashboard");
+        model.addAttribute("description", "Interactive data analysis of the Titanic dataset");
+        
+        // Define the charts available in the dashboard
+        model.addAttribute("charts", new String[][]{
+            {"Gender Analysis", "/titanic/gender", "Comparison of survival rates by gender"},
+            {"Age Distribution", "/titanic/age", "Analysis of passenger ages and survival rates"},
+            {"Fare Analysis", "/titanic/fare", "Ticket prices and their impact on survival"},
+            {"Traveling Status", "/titanic/alone", "Survival rates for solo travelers vs families"}
+        });
+        
+        return "titanic_plots/dashboard";
     }
     
     @GetMapping("/titanic/gender")
