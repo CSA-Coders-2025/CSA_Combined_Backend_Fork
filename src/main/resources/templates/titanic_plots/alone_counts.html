@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+    layout:decorate="~{layouts/base}" lang="en">
+
+<th:block layout:fragment="title" th:remove="tag">Titanic Analysis</th:block>
+
+<th:block layout:fragment="body" th:remove="tag">
+  <div class="container">
+    <h2>Titanic Data Analysis</h2>
+    <div id='plot_div'></div>
+  </div>
+</th:block>
+
+<th:block layout:fragment="script" th:remove="tag">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var target_plot_div = document.getElementById('plot_div');
+var layout = {
+    title: 'Count of Passengers by Alone Status',
+    height: 700,
+    width: 900,
+
+
+};
+
+var trace0 =
+{
+x: ["false","true"],
+y: [354.0, 537.0],
+orientation: 'v',
+xaxis: 'x',
+yaxis: 'y',
+type: 'bar',
+name: '',
+};
+
+        var data = [ trace0];
+Plotly.newPlot(target_plot_div, data, layout);            </scri    });
+  </script>
+</th:block>
+</html>
