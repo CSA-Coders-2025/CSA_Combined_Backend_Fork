@@ -1,4 +1,4 @@
-package com.open.spring.mvc.Slack;
+package com.open.spring.mvc.slack;
 
 import java.time.*;
 import java.util.regex.*;
@@ -44,18 +44,6 @@ public class SlackService {
             return LocalDate.of(year, month, day);
         }
         // Default: use current week's Monday
-        return today.with(DayOfWeek.MONDAY);
+        return today.with(DayOfWeek.SUNDAY);
     }
-
-    // In your main parsing method, replace the week start logic:
-    // LocalDate weekStart = getWeekStartDateFromMessage(message);
-    // Then, for each [Mon], [Tue], etc.:
-    // Map<String, Integer> dayOffsets = Map.of(
-    //    "Mon", 0, "Tue", 1, "Wed", 2, "Thu", 3, "Fri", 4, "Sat", 5, "Sun", 6
-    // );
-    // for (String day : daysFoundInMessage) {
-    //    int offset = dayOffsets.get(day);
-    //    LocalDate eventDate = weekStart.plusDays(offset);
-    //    // Use eventDate for calendar_events
-    // }
 }
