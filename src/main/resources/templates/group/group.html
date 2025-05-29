@@ -13,6 +13,18 @@
     <div class="container mt-4">
         <h2 class="mb-4">Group Management</h2>
 
+
+
+        <!-- Admin Import Buttons -->
+        <div class="mb-3" sec:authorize="hasAuthority('ROLE_ADMIN')">
+            <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#importModal">
+                Import Groups
+            </button>
+        </div>
+
+
+
+
         <!-- Search bar -->
         <input type="text" id="searchInput" class="form-control mb-3"
             placeholder="Search by Group ID or Member Name/Email">
@@ -158,6 +170,36 @@
             </div>
         </div>
     </div>
+
+
+
+        <!-- Import Modal -->
+    <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="color: #212529; background-color: #fff;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importModalLabel">Import Groups</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="importForm">
+                        <div class="mb-3">
+                            <label for="importFile" class="form-label">Select File</label>
+                            <input type="file" class="form-control" id="importFile" name="file" accept=".csv, .xlsx">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="importBtn">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
 </th:block>
 <th:block layout:fragment="script" th:remove="tag">
     <script>
@@ -191,6 +233,45 @@
                 }
             });
         });
+
+
+
+                // Import Button Handler
+        document.getElementById("importBtn").addEventListener("click", function () {
+            const fileInput = document.getElementById("importFile");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a file to import.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch("/api/groups/import", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Failed to import groups.");
+                return response.text();
+            })
+            .then(message => {
+                alert("Groups imported successfully!");
+                document.getElementById("importFile").value = "";
+                var importModal = bootstrap.Modal.getInstance(document.getElementById("importModal"));
+                importModal.hide();
+                location.reload();
+            })
+            .catch(error => {
+                console.error("Import error:", error);
+                alert("An error occurred during import.");
+            });
+        });
+
+
+
 
         const personURL = javaURI + "/api/people"; // Replace with your actual user API endpoint
 
