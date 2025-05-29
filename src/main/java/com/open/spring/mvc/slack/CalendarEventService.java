@@ -153,8 +153,20 @@ public class CalendarEventService {
                 }
 
                 for (LocalDate date : getDatesInRange(startDay, endDay, weekStartDate)) {
-                    lastEvent = new CalendarEvent(date, currentTitle, "", type, period);
-                    events.add(lastEvent);
+                    CalendarEvent event = new CalendarEvent(date, currentTitle, "", type, period);
+                    events.add(event);
+                    lastEvent = event; // Update lastEvent to the current event
+                }
+
+                // Ensure description is applied to all events in the current date range
+                Matcher descMatcher = descriptionPattern.matcher(line);
+                if (descMatcher.find()) {
+                    String description = descMatcher.group(2).trim();
+                    for (CalendarEvent event : events) {
+                        if (event.getDate().isAfter(weekStartDate.minusDays(1)) && event.getDate().isBefore(weekStartDate.plusDays(7))) {
+                            event.setDescription(description); // Apply description to all events in the range
+                        }
+                    }
                 }
             } else {
                 Matcher descMatcher = descriptionPattern.matcher(line);
@@ -176,6 +188,12 @@ public class CalendarEventService {
                 }
             }
         }
+
+        // Log the events and their descriptions
+        for (CalendarEvent event : events) {
+            System.out.println("Event: " + event.getDate() + ", Title: " + event.getTitle() + ", Description: " + event.getDescription());
+        }
+
         return events;
     }
 
