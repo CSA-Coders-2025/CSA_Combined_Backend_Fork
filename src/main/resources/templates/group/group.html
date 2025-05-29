@@ -17,14 +17,13 @@
 
         <!-- Admin Import Buttons -->
         <div class="mb-3" sec:authorize="hasAuthority('ROLE_ADMIN')">
+            <a class="btn btn-outline-success" th:href="@{/api/groups/export}" download>
+                Export Groups
+            </a>
             <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#importModal">
                 Import Groups
             </button>
         </div>
-
-
-
-
         <!-- Search bar -->
         <input type="text" id="searchInput" class="form-control mb-3"
             placeholder="Search by Group ID or Member Name/Email">
