@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import jakarta.transaction.Transactional; 
 
+import jakarta.transaction.Transactional; 
+
 /**
  * Repository interface for managing Tinkle entities in the database.
  * Handles bathroom request records, tracking student requests, approvals, and history.
