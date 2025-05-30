@@ -205,33 +205,6 @@ public class AssignmentsApiController {
         }
         return new ResponseEntity<>(simple, HttpStatus.OK);
     }
-    
-    /**
-     * A POST endpoint to submit an assignment.
-     * @param assignmentId The ID of the assignment being submitted.
-     * @param studentId The ID of the student submitting the assignment.
-     * @param content The content of the student's submission.
-     * @return The saved submission, if it successfully submitted.
-     */
-    @PostMapping("/submit/{assignmentId}")
-    public ResponseEntity<?> submitAssignment(
-            @PathVariable Long assignmentId,
-            @RequestParam Long studentId,
-            @RequestParam String content,
-            @RequestParam String comment,
-            @RequestParam Boolean isLate
-            ) {
-        Assignment assignment = assignmentRepo.findById(assignmentId).orElse(null);
-        Person student = personRepo.findById(studentId).orElse(null);
-        if (assignment != null) {
-            AssignmentSubmission submission = new AssignmentSubmission(assignment, student, content, comment, isLate);
-            AssignmentSubmission savedSubmission = submissionRepo.save(submission);
-            return new ResponseEntity<>(savedSubmission, HttpStatus.CREATED);
-        }
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "Assignment not found");
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-    }
 
     /**
      * A GET endpoint to retrieve all submissions for the assignment.

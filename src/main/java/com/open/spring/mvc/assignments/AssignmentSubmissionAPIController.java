@@ -126,15 +126,48 @@ public class AssignmentSubmissionAPIController {
     }
 
     /**
-     * Create a new assignment submission.
-     * 
-     * @param submission the AssignmentSubmission object to be created
-     * @return a ResponseEntity containing the created submission and HTTP status CREATED
+     * A POST endpoint to submit an assignment.
+     * @param assignmentId The ID of the assignment being submitted.
+     * @param studentId The ID of the student submitting the assignment.
+     * @param content The content of the student's submission.
+     * @return The saved submission, if it successfully submitted.
      */
-    @PostMapping("/Submit")
-    public ResponseEntity<AssignmentSubmission> createAssignment(@RequestBody AssignmentSubmission submission) {
-        submissionRepo.save(submission);
-        return new ResponseEntity<>(submission, HttpStatus.CREATED);
+    @PostMapping("/submit/{assignmentId}")
+    public ResponseEntity<?> submitAssignment(
+        @PathVariable Long assignmentId,
+        @RequestParam Long submitterId,
+        @RequestParam String content,
+        @RequestParam String comment,
+        @RequestParam Boolean isLate
+    ) {
+        Assignment assignment = assignmentRepo.findById(assignmentId).orElse(null);
+
+        // TODO: A better way to do this would be to have this be part of some sort of SubmitterService
+        Submitter submitter = null;
+        Optional<Groups> groupOpt = groupRepo.findById(submitterId);
+        if (groupOpt.isPresent()) {
+            submitter = groupOpt.get();
+        } else {
+            Optional<Person> personOpt = personRepo.findById(submitterId);
+            if (personOpt.isPresent()) {
+                submitter = personOpt.get();
+            }
+        }
+
+        if (submitter == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Submitter not found");
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
+        if (assignment != null) {
+            AssignmentSubmission submission = new AssignmentSubmission(assignment, submitter, content, comment, isLate);
+            AssignmentSubmission savedSubmission = submissionRepo.save(submission);
+            return new ResponseEntity<>(savedSubmission, HttpStatus.CREATED);
+        }
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Assignment not found");
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @Getter
