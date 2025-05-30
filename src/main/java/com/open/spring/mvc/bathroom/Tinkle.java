@@ -48,13 +48,17 @@ public class Tinkle {
     @Column
     private String personName;
 
+    @Column(nullable = false)
+    private String sid;
+
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public Tinkle(Person person, String statsInput) {
         this.person = person;
         this.personName = person.getName();
+        this.sid = person.getSid();
         this.timeIn = statsInput;
-        parseAndStoreTimeInOut(statsInput);
+        parseAndStoreTimeInOut(statsInput);               
     }
 
 
@@ -142,10 +146,11 @@ public class Tinkle {
     @Override
     public String toString() {
         return "Tinkle{" +
-                "id=" + id +
-                ", personName='" + personName + '\'' +
-                ", timeInOutPairs size=" + (timeInOutPairs != null ? timeInOutPairs.size() : 0) +
-                '}';
+            "id=" + id +
+            ", personName='" + personName + '\'' +
+            ", sid='" + sid + '\'' +
+            ", timeInOutPairs size=" + (timeInOutPairs != null ? timeInOutPairs.size() : 0) +
+            '}';
     }
 
     public static Tinkle[] init(Person[] persons) {
