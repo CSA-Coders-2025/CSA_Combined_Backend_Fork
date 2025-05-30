@@ -16,7 +16,7 @@
 
         .btn {
             background-color: #4CAF50;
-            border: none;
+            border-style: solid;
             color: white;
             padding: 10px 20px;
             text-align: center;
@@ -55,6 +55,19 @@
             margin: 0 10px;
             background-color: #f2f2f2;
             border: 1px solid #ddd;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .btn-export {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
             cursor: pointer;
             border-radius: 4px;
         }
@@ -177,6 +190,7 @@
         <div id="assignmentView">
             <h1>Assignment Tracker</h1>
             <button class="btn" onclick="showAddAssignmentModal()">Add Assignment</button>
+            <button class="btn-export" onclick="exportAssignments()">Export Assignments as CSV</button>
 
             <!-- Add Assignment Modal -->
             <div id="addAssignmentModal" class="modal">
@@ -783,6 +797,64 @@
             const day = String(date.getDate()).padStart(2, '0');
             const year = date.getFullYear();
             return `${month}/${day}/${year}`;
+        }
+
+        function exportAssignments() {
+            // Make the button say loading
+            const exportButton = document.querySelector('.btn-export');
+            const originalText = exportButton.textContent;
+            exportButton.textContent = 'Exporting...';
+            exportButton.disabled = true;
+
+            fetch('/api/assignments/bulk/extract', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!Array.isArray(data)) throw new Error("Invalid response format");
+
+                const headers = Object.keys(data[0]);
+                const csvRows = [];
+
+                csvRows.push(headers.join(','));
+
+                data.forEach(row => {
+                    const values = headers.map(header => {
+                        const val = row[header];
+                        if (val == null) return '';
+                        const strVal = String(val);
+                        return /[",\n]/.test(strVal) ? `"${strVal.replace(/"/g, '""')}"` : strVal;
+                    });
+                    csvRows.push(values.join(','));
+                });
+
+                const csvString = csvRows.join('\n');
+                const blob = new Blob([csvString], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'assignments.csv';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error exporting assignments:', error);
+                alert('Failed to export assignments.');
+            })
+            .finally(() => {
+                exportButton.textContent = originalText;
+                exportButton.disabled = false;
+            });
         }
         
 
