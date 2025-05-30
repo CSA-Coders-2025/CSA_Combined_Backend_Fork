@@ -182,8 +182,7 @@
                     <form id="importForm">
                         <div class="mb-3">
                             <label for="importFile" class="form-label">Select File</label>
-                            <input type="file" class="form-control" id="importFile" name="file" accept=".csv, .xlsx">
-                        </div>
+                            <input type="file" class="form-control" id="importFile" name="file" accept=".json">
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -233,39 +232,57 @@
 
 
 
-                // Import Button Handler
-        document.getElementById("importBtn").addEventListener("click", function () {
-            const fileInput = document.getElementById("importFile");
-            const file = fileInput.files[0];
+ document.getElementById("importBtn").addEventListener("click", async () => {
+    const fileInput = document.getElementById("importFile");
+    const file = fileInput.files[0];
 
-            if (!file) {
-                alert("Please select a file to import.");
-                return;
-            }
+    if (!file) {
+        alert("Please select a file to import.");
+        return;
+    }
 
-            const formData = new FormData();
-            formData.append("file", file);
+    try {
+        const text = await file.text();
+        const json = JSON.parse(text);
 
-            fetch("/api/groups/import", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) throw new Error("Failed to import groups.");
-                return response.text();
-            })
-            .then(message => {
-                alert("Groups imported successfully!");
-                document.getElementById("importFile").value = "";
-                var importModal = bootstrap.Modal.getInstance(document.getElementById("importModal"));
-                importModal.hide();
-                location.reload();
-            })
-            .catch(error => {
-                console.error("Import error:", error);
-                alert("An error occurred during import.");
-            });
+        if (!Array.isArray(json)) {
+            alert("Import file must be a JSON array.");
+            return;
+        }
+
+        const response = await fetch("/api/groups/bulk/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(json),
         });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || `HTTP error ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        let msg = "";
+        if (result.created?.length) msg += `Created: ${result.created.join(", ")}.\n`;
+        if (result.duplicates?.length) msg += `Duplicates: ${result.duplicates.join(", ")}.\n`;
+        if (result.errors?.length) msg += `Errors: ${result.errors.join(", ")}.\n`;
+
+        alert(msg || "Groups imported successfully!");
+
+        fileInput.value = "";
+        var importModal = bootstrap.Modal.getInstance(document.getElementById("importModal"));
+        importModal.hide();
+        location.reload();
+
+    } catch (error) {
+        console.error("Import error:", error);
+        alert("An error occurred during import: " + error.message);
+    }
+});
+
 
 
 

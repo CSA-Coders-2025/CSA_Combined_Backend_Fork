@@ -12,8 +12,17 @@ async function getAllGroup() {
 }
 
 document.getElementById("export-all-groups").addEventListener("click", async () => {
-    let content = await getAllGroup();
-    const blob = new BlobBuilder(BlobBuilder.fileTypeEnum.json, content);
+    let groups = await getAllGroup();
+
+    // Map groups to expected import format
+    let exportData = groups.map(group => ({
+        name: group.name,
+        period: group.period,
+        personUids: group.members ? group.members.map(member => member.uid) : []
+    }));
+
+    const blob = new BlobBuilder(BlobBuilder.fileTypeEnum.json, exportData);
     blob.downloadBlob("groups");
-})
+});
+
 
