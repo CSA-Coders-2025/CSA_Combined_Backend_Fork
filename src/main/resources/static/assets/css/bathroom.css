@@ -15,7 +15,7 @@
 .weekday-tabs {
     display: flex;
     margin-bottom: 1rem;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid #404040;
 }
 
 .weekday-tab {
@@ -37,7 +37,7 @@
 .weekday-tab.active {
     color: #28a745;
     background-color: #fff;
-    border-color: #dee2e6 #dee2e6 #fff;
+    border-color: #404040 #404040 #fff;
     font-weight: bold;
 }
 

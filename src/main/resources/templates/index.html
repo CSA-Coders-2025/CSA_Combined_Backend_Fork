@@ -3,44 +3,10 @@
 <html xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml"
     layout:decorate="~{layouts/base}" lang="en">
 
-<!-- page style -->
-<th:block layout:fragment="style" th:remove="tag">
-    <style>
-        /* Ensures the images in the cards are responsive and maintain their aspect ratio */
-        .card-img-top {
-            width: 100%;
-            /* Makes the image fill the width of the container */
-            height: auto;
-            /* Maintains the aspect ratio of the image */
-            object-fit: cover;
-            /* Ensures the image covers the container without stretching */
-        }
-
-        /* Aligns and spaces the cards within a flex container */
-        .card-deck {
-            display: flex;
-            justify-content: center;
-            /* Centers the cards horizontally */
-            gap: 20px;
-            /* Adds space between the cards */
-        }
-
-        /* Ensures the center card takes up available space and is positioned in the center */
-        .center-card {
-            order: 0;
-            /* Ensures the Java card appears in the center */
-            flex: 1;
-            /* Makes this card take up available space */
-        }
-
-        /* Styles the other two cards (Spring and POJO) in a vertical stack */
-        .other-cards {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-    </style>
-</th:block>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+</head>
 
 <!-- page title -->
 <th:block layout:fragment="title" th:remove="tag">Spring 2025</th:block>
@@ -50,38 +16,54 @@
 
 <!-- define removable layout to change default body-->
 <th:block layout:fragment="removable-body" th:remove="tag"><!-- Start of body content specific to the page -->
-    <div class="px-5 py-5 mx-auto">
+    <div class="px-5 py-5 mx-auto bg-neutral-900">
         <h1><strong>Java Home Page</strong></h1>
-        <div class="card-deck">
-            <!-- Left Column: Spring -->
-            <div class="col-4 other-cards">
-                <div class="card text-light bg-primary">
-                    <img class="card-img-top" th:src="@{/images/spring.png}" alt="Spring Development" height="250">
-                    <div class="card-body">
-                        <h5 class="card-title">What is Spring?</h5>
-                        <p class="card-text">
-                        <ol>
+        <div class="grid sm:grid-cols-1 lg:grid-cols-3 sm:grid-rows-1 lg:grid-rows-1  gap-4 sm:gap-6">
+            <!-- card -->
+            <div class="row-span-2 col-start-1 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 animate__animated animate__fadeInUp">
+                <div class="p-4 md:p-5 flex flex-col h-full">
+                    <div class="mt-1 flex items-center justify-center">
+                        <img th:src="@{/images/spring.png}" class="rounded-xl" style="height: 250px;">
+                    </div>
+
+                    <div class="mt-1 flex items-center gap-x-2">
+                        <h3 class="text-xl sm:text-2xl font-medium text-neutral-200">What is Spring?</h3>
+                    </div>
+
+                    <div class="mt-1 flex items-center gap-x-2">
+                        <ul class="list-decimal text-neutral-200">
                             <li>Spring Framework is the most popular application development framework in Java.</li>
                             <li>Spring Boot helps to create stand-alone applications with minimal configuration.</li>
                             <li>Spring MVC is a web framework based on the Model-View-Controller pattern under the
                                 Spring framework.</li>
                             <li>ThymeLeaf is a server-side Java template engine that supports HTML5 JVM web development
                                 and integrates with Spring Framework.</li>
-                        </ol>
-                        </p>
-                        <a href="https://spring.io/guides/tutorials/rest" class="btn btn-secondary">Spring + Restful</a>
+                        </ul>
+                    </div>
+
+                    <!-- use mt-auto to push the button to the bottom -->
+                    <div class="mt-auto flex items-center gap-x-2">
+                        <a href="https://spring.io/guides/tutorials/rest">
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Spring + Restful
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Center Column: Java (Main focus) -->
-            <div class="col-4 center-card">
-                <div class="card text-light bg-primary">
-                    <img class="card-img-top" th:src="@{/images/java.png}" alt="Java Development" height="250">
-                    <div class="card-body">
-                        <h5 class="card-title">What should Java Developers learn?</h5>
-                        <p class="card-text">
-                        <ol>
+            <div class="row-span-2 col-start-2 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 animate__animated animate__fadeInUp">
+                <div class="p-4 md:p-5 flex flex-col h-full">
+                    <div class="mt-1 flex items-center justify-center">
+                        <img th:src="@{/images/java.png}" class="rounded-xl" style="height: 250px;">
+                    </div>
+
+                    <div class="mt-1 flex items-center gap-x-2">
+                        <h3 class="text-xl sm:text-2xl font-medium text-neutral-200">What should Java Developers learn?</h3>
+                    </div>
+
+                    <div class="mt-1 flex items-center gap-x-2">
+                        <ul class="list-decimal text-neutral-200">
                             <li>Java 11-17 is used for PBL. Java 8 is often the College Board standard. Features like
                                 Reactive Streams, HTTP2 client, JShell, and React JS are more recent than Java 8.</li>
                             <li>GitHub: Learning to manage code changes, branches, pull requests, and more is crucial.
@@ -90,22 +72,33 @@
                                 automation tools like Git, Maven, and Docker.</li>
                             <li>REST and Microservices with Spring: Learn how to create and consume RESTful APIs
                                 effectively.</li>
-                        </ol>
-                        </p>
-                        <a href="https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28"
-                            class="btn btn-secondary">How to: RESTful API</a>
+                        </ul>
+                    </div>
+
+                    <!-- use mt-auto to push the button to the bottom -->
+                    <div class="mt-auto flex items-center gap-x-2">
+                        <a
+                            href="https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28">
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                How to: RESTful API
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: POJO -->
-            <div class="col-4 other-cards">
-                <div class="card text-light bg-primary">
-                    <img class="card-img-top" th:src="@{/images/pojo.png}" alt="Java Persistence" height="250">
-                    <div class="card-body">
-                        <h5 class="card-title">How do you create Persistent data?</h5>
-                        <p class="card-text">
-                        <ol>
+            <div class="row-span-2 col-start-3 flex flex-col border shadow-2xs rounded-xl bg-neutral-800 border-neutral-700 animate__animated animate__fadeInUp">
+                <div class="p-4 md:p-5 flex flex-col h-full">
+                    <div class="mt-1 flex items-center justify-center">
+                        <img th:src="@{/images/pojo.png}" class="rounded-xl" style="height: 250px;">
+                    </div>
+
+                    <div class="mt-1 flex items-center gap-x-2">
+                        <h3 class="text-xl sm:text-2xl font-medium text-neutral-200">How do you create Persistent data?</h3>
+                    </div>
+
+                    <div class="mt-1 flex items-center gap-x-2">
+                        <ul class="list-decimal text-neutral-200">
                             <li>The Java Persistence API (JPA) provides a query language for CRUD operations on objects
                                 in a database.</li>
                             <li>Beans, Controller Code, and Business Logic interact with JPA to manage data flow to and
@@ -113,12 +106,17 @@
                             <li>Object-Relational Mapping (ORM) maps Java classes (entities) to a relational database
                                 structure.</li>
                             <li>Plain Old Java Objects (POJO) are the basic building blocks of JPA and ORM. These
-                                classes are typically annotated with @Entity to mark them as persistent data classes.
-                            </li>
-                        </ol>
-                        </p>
-                        <a href="https://docs.spring.io/spring-data/jpa/docs/current-SNAPSHOT/reference/html/#reference"
-                            class="btn btn-secondary">Spring + JPA</a>
+                                classes are typically annotated with @Entity to mark them as persistent data classes.</li>
+                        </ul>
+                    </div>
+
+                    <!-- use mt-auto to push the button to the bottom -->
+                    <div class="mt-auto flex items-center gap-x-2">
+                        <a href="https://docs.spring.io/spring-data/jpa/docs/current-SNAPSHOT/reference/html/#reference">
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Spring + JPA
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>
