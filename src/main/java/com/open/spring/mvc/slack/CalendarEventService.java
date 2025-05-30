@@ -123,6 +123,7 @@ public class CalendarEventService {
         Pattern descriptionPattern = Pattern.compile("(\\*\\*|\\*)?\\s*\\u2022\\s*(.+)");
         String[] lines = text.split("\\n");
         CalendarEvent lastEvent = null;
+        List<CalendarEvent> lastEventRange = new ArrayList<>();
 
         for (String line : lines) {
             Matcher dayMatcher = dayPattern.matcher(line);
@@ -152,25 +153,23 @@ public class CalendarEventService {
                     type = "grade";
                 }
 
-                for (LocalDate date : getDatesInRange(startDay, endDay, weekStartDate)) {
-                    CalendarEvent event = new CalendarEvent(date, currentTitle, "", type, period);
-                    events.add(event);
-                    lastEvent = event; // Update lastEvent to the current event
+                // Find description for this line (if any)
+                Matcher descMatcher = descriptionPattern.matcher(line);
+                String description = "";
+                if (descMatcher.find()) {
+                    description = descMatcher.group(2).trim();
                 }
 
-                // Ensure description is applied to all events in the current date range
-                Matcher descMatcher = descriptionPattern.matcher(line);
-                if (descMatcher.find()) {
-                    String description = descMatcher.group(2).trim();
-                    for (CalendarEvent event : events) {
-                        if (event.getDate().isAfter(weekStartDate.minusDays(1)) && event.getDate().isBefore(weekStartDate.plusDays(7))) {
-                            event.setDescription(description); // Apply description to all events in the range
-                        }
-                    }
+                lastEventRange.clear(); // Clear previous range
+                for (LocalDate date : getDatesInRange(startDay, endDay, weekStartDate)) {
+                    CalendarEvent event = new CalendarEvent(date, currentTitle, description, type, period);
+                    events.add(event);
+                    lastEvent = event; // Update lastEvent to the current event
+                    lastEventRange.add(event); // Add to current range
                 }
             } else {
                 Matcher descMatcher = descriptionPattern.matcher(line);
-                if (descMatcher.find() && lastEvent != null) {
+                if (descMatcher.find() && !lastEventRange.isEmpty()) {
                     String description = descMatcher.group(2).trim();
                     String asterisks = descMatcher.group(1);
 
@@ -181,10 +180,12 @@ public class CalendarEventService {
                         type = "grade";
                     }
 
-                    lastEvent.setDescription(lastEvent.getDescription() +
-                            (lastEvent.getDescription().isEmpty() ? "" : ", ") +
-                            description);
-                    lastEvent.setType(type);
+                    for (CalendarEvent event : lastEventRange) {
+                        event.setDescription(event.getDescription() +
+                                (event.getDescription().isEmpty() ? "" : ", ") +
+                                description);
+                        event.setType(type);
+                    }
                 }
             }
         }
