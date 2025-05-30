@@ -17,9 +17,7 @@
 
         <!-- Admin Import Buttons -->
         <div class="mb-3" sec:authorize="hasAuthority('ROLE_ADMIN')">
-            <a class="btn btn-outline-success" th:href="@{/api/groups/export}" download>
-                Export Groups
-            </a>
+            <button id="export-all-groups" class="btn btn-secondary btn-sm">export groups</button>
             <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#importModal">
                 Import Groups
             </button>
@@ -487,6 +485,8 @@
             });
         });
     </script>
+       <script sec:authorize="hasRole('ROLE_ADMIN')" type="module" src="/static/js/group-extraction.js"
+        th:src="@{/js/group-extraction.js}"></script>
 </th:block>
 
 </html>
