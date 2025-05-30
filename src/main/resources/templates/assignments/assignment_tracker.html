@@ -308,13 +308,12 @@
                     .then(assignments => {
                         assignmentTable.clear();
                         assignments.forEach(assignment => {
-                            const formattedDueDate = formatDate(assignment.dueDate);
                             assignmentTable.row.add([
                                 assignment.name,
                                 assignment.type,
                                 assignment.description || '',
                                 assignment.points,
-                                formattedDueDate,
+                                assignment.dueDate,
                                 `
                                     <button class="btn btn-view-submissions" onclick="viewSubmissions(${assignment.id})">View Submissions</button>
                                     <button class="btn btn-delete" onclick="deleteAssignment(${assignment.id})">Delete</button>
@@ -362,7 +361,7 @@
                 const type = document.getElementById('assignmentType').value;
                 const description = document.getElementById('assignmentDescription').value;
                 const points = document.getElementById('assignmentPoints').value;
-                const dueDate = document.getElementById('assignmentDueDate').value;
+                const dueDate = formatDate(document.getElementById('assignmentDueDate').value);
 
                 const params = new URLSearchParams({
                     name, type, description, points, dueDate
