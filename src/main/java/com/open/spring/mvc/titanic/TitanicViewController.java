@@ -1,4 +1,4 @@
-package com.open.spring.titanic;
+package com.open.spring.mvc.titanic;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
