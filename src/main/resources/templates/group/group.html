@@ -74,9 +74,9 @@
                     </td>
                 </tr>
             </tbody>
-
         </table>
     </div>
+
     <!-- Create Group Button -->
     <div class="d-flex justify-content-center mb-3">
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createGroupModal">
@@ -84,7 +84,7 @@
         </button>
     </div>
 
-    <!-- Modal -->
+    <!-- Create Group Modal -->
     <div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -161,26 +161,27 @@
         </div>
     </div>
 </th:block>
+
 <th:block layout:fragment="script" th:remove="tag">
     <script>
-        // setup
         if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
             javaURI = "http://localhost:8585";
         } else {
             javaURI = "https://spring.opencodingsociety.com";
         }
 
-        const javaURL = javaURI + "/api/groups"
+        const javaURL = javaURI + "/api/groups";
+        const personURL = javaURI + "/api/people";
 
-        // get table
+        // Get table
         const $tableBody = $("#groupTableBody");
 
         // Filter groups
         $("#searchInput").on("keyup", function () {
             const search = $(this).val().toLowerCase();
             $("#groupTableBody tr.group-row").each(function () {
-                const groupId = $(this).data("groupid").toString();
-                const members = $(this).data("members");
+                const groupId = $(this).data("groupid") ? $(this).data("groupid").toString() : "";
+                const members = $(this).data("members") || "";
                 const match = groupId.includes(search) || members.includes(search);
                 $(this).toggle(match);
 
@@ -193,8 +194,6 @@
                 }
             });
         });
-
-        const personURL = javaURI + "/api/people"; // Replace with your actual user API endpoint
 
         // Populate user list in modal
         function fetchUsers() {
@@ -223,6 +222,7 @@
                 })
                 .catch(error => {
                     console.error("Error loading users:", error);
+                    alert("Failed to load users. Please try again.");
                 });
         }
 
@@ -250,36 +250,38 @@
                 const response = await fetch(javaURL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        personUids: [], 
-                        name: document.getElementById("groupNameInput").value, 
-                        period: document.getElementById("groupPeriodInput").value 
+                    body: JSON.stringify({
+                        personUids: [],
+                        name: document.getElementById("groupNameInput").value,
+                        period: document.getElementById("groupPeriodInput").value
                     })
                 });
-
-                if (!response.ok) throw new Error("Failed to create group");
-                return response.json();
-            })
-            .then(newGroup => {
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to create group: ${response.status} ${response.statusText}`);
+                }
+                
+                const newGroup = await response.json();
                 const groupId = newGroup.id;
 
                 // Step 2: Add people to group
-                return fetch(`${javaURL}/${groupId}/addPeople`, {
+                const addPeopleResponse = await fetch(`${javaURL}/${groupId}/addPeople`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(selectedUserIds)
-                })
-                .then(addPeopleResp => {
-                    if (!addPeopleResp.ok) throw new Error("Failed to add people to group");
-                    alert("Group created successfully!");
-                    $('#createGroupModal').modal('hide');
-                    location.reload();
                 });
-            })
-            .catch(error => {
+
+                if (!addPeopleResponse.ok) {
+                    throw new Error("Failed to add people to group");
+                }
+
+                alert("Group created successfully!");
+                $('#createGroupModal').modal('hide');
+                location.reload();
+
+            } catch (error) {
                 console.error("Error creating group:", error);
-                alert("An error occurred. See console.");
-            });
+            }
         });
 
         // Open edit modal and pre-fill
@@ -307,7 +309,7 @@
                 const editUserList = document.getElementById("editUserList");
                 editUserList.innerHTML = "";
 
-                const memberIds = groupData.members.map(m => m.uid);
+                const memberIds = groupData.members ? groupData.members.map(m => m.uid) : [];
 
                 allUsers.forEach(user => {
                     const div = document.createElement("div");
@@ -345,7 +347,7 @@
                 return resp.json();
             })
             .then(group => {
-                const currentIds = group.members.map(m => m.id);
+                const currentIds = group.members ? group.members.map(m => m.id) : [];
 
                 const toRemove = currentIds.filter(id => !newUserIds.includes(id));
                 const toAdd = newUserIds.filter(id => !currentIds.includes(id));
@@ -358,17 +360,20 @@
                 })
                 .then(response => {
                     if (!response.ok) throw new Error("Failed to update group");
+                    
                     // 3. Remove users if any
                     if (toRemove.length > 0) {
                         return fetch(`${javaURL}/${groupId}/removePeople`, {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(toRemove)
-                        })
+                        }).then(resp => {
+                            if (!resp.ok) throw new Error("Failed to remove people");
+                        });
                     }
                 })
                 .then(() => {
-                    // Add users if any
+                    // 4. Add users if any
                     if (toAdd.length > 0) {
                         return fetch(`${javaURL}/${groupId}/addPeople`, {
                             method: "PUT",
@@ -392,6 +397,7 @@
             });
         });
 
+        // Search functionality for edit modal
         document.getElementById("userSearchEdit").addEventListener("input", function () {
             const searchTerm = this.value.toLowerCase();
             const checkboxes = document.querySelectorAll("#editUserList .form-check-label");
@@ -403,6 +409,7 @@
             });
         });
 
+        // Search functionality for create modal
         document.getElementById("userSearchCreate").addEventListener("input", function () {
             const searchTerm = this.value.toLowerCase();
             const checkboxes = document.querySelectorAll("#createUserList .form-check-label");

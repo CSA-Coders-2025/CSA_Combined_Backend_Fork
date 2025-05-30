@@ -51,6 +51,7 @@ public class GroupsApiController {
         Map<String, Object> personInfo = new HashMap<>();
         personInfo.put("uid", person.getUid());
         personInfo.put("name", person.getName());
+        personInfo.put("email", person.getEmail());
         // Add other Person properties as needed, but exclude the group reference
         return personInfo;
     }
