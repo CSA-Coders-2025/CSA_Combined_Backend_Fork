@@ -526,34 +526,26 @@ public class AssignmentsApiController {
             return ResponseEntity.badRequest().body("Only one submission found for this assignment, can't really do peer grading");
         }
 
-        
-        // Keep latest submission
-        Map<Long, AssignmentSubmission> latestSubmissions = new HashMap<>();
+        Collections.shuffle(submissions);
 
-        for (AssignmentSubmission submission : submissions) {
-            Submitter submitter = submission.getSubmitter();
-            if (submitter == null) continue;
-
-            Long submitterId = submitter.getId();
-
-            // for now we just overwrite w/ the latest submission but we should ideally eventually actually check the timestamp
-            latestSubmissions.put(submitterId, submission);
-        }
-        
-        List<AssignmentSubmission> uniqueSubmissions = new ArrayList<>(latestSubmissions.values());
-                      
-    
-        Collections.shuffle(uniqueSubmissions);
-    
-        for (int i = 0; i < uniqueSubmissions.size(); i++) {
-            AssignmentSubmission currentSubmission = uniqueSubmissions.get(i);
+        for (int i = 0; i < submissions.size(); i++) {
+            AssignmentSubmission currentSubmission = submissions.get(i);
             
             // grader whos not the asme persoon
-            List<AssignmentSubmission> possibleGraders = uniqueSubmissions.stream()
-                .filter(submission -> !submission.getSubmitter().equals(currentSubmission.getSubmitter())) // just check if the FIRST student is different, will make this better later
+            List<AssignmentSubmission> possibleGraders = submissions.stream()
+                .filter(submission -> Collections.disjoint(
+                    submission.getSubmitter().getMembers(), 
+                    currentSubmission.getSubmitter().getMembers()
+                )) // ensure no overlap between the members of the two groups
                 .collect(Collectors.toList());
     
             if (possibleGraders.isEmpty()) {
+                System.out.println("FATAL: No possible graders found for submission by: " + 
+                    currentSubmission.getSubmitter().getMembers().stream()
+                        .map(Person::getName)
+                        .collect(Collectors.joining(", ")));
+
+                // TODO: implement a better randomization strategy. In theory, it is possible that all submissions are from various groups which all include one same person, therefore causing this issue.
                 continue; 
             }
     
@@ -564,12 +556,11 @@ public class AssignmentsApiController {
     
             // Assign graders to the current submission
             // Create a new list instead of sharing the existing one
-            Submitter submitter = currentSubmission.getSubmitter();
-            currentSubmission.setAssignedGraders(submitter.getMembers());
+            currentSubmission.setAssignedGraders(graderSubmission.getSubmitter().getMembers());
         }
 
     
-        submissionRepo.saveAll(uniqueSubmissions);
+        submissionRepo.saveAll(submissions);
         // test debug
         // for (AssignmentSubmission sub : uniqueSubmissions) {
         //     System.out.println("Submission by: " + sub.getStudents().get(0).getName() + 

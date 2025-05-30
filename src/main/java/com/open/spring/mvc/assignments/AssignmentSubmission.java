@@ -7,6 +7,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.open.spring.mvc.groups.Submitter;
 import com.open.spring.mvc.person.Person;
 
@@ -27,6 +29,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@JsonIgnoreProperties({"assignedGraders"})
 public class AssignmentSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -41,6 +44,7 @@ public class AssignmentSubmission {
     @ManyToOne
     @JoinColumn(name = "submitter_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonManagedReference(value = "submitter-submissions")
     private Submitter submitter;
 
     @ManyToMany

@@ -1,16 +1,9 @@
 package com.open.spring.mvc.person;
 
-import static jakarta.persistence.FetchType.EAGER;
-
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +14,15 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.Convert;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.PostPersist;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.open.spring.mvc.assignments.AssignmentSubmission;
@@ -41,10 +33,12 @@ import com.open.spring.mvc.groups.Submitter;
 import com.open.spring.mvc.synergy.SynergyGrade;
 import com.open.spring.mvc.trains.TrainCompany;
 import com.open.spring.mvc.userStocks.userStocksTable;
-import com.vladmihalcea.hibernate.type.json.JsonType;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -67,12 +61,23 @@ import lombok.NonNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Convert(attributeName = "person", converter = JsonType.class)
-@JsonIgnoreProperties({"submissions"})
+@JsonIgnoreProperties({"submissions", "groups"})
 public class Person extends Submitter implements Comparable<Person> {
 
 //////////////////////////////////////////////////////////////////////////////////
 /// Columns stored on Person
+    /** Automatic unique identifier for Person or group record 
+     * --- Id annotation is used to specify the identifier property of the entity.
+     * ----GeneratedValue annotation is used to specify the primary key generation
+     * strategy to use.
+     * ----- The strategy is to have the persistence provider pick an appropriate
+     * strategy for the particular database.
+     * ----- GenerationType.AUTO is the default generation type and it will pick the
+     * strategy based on the used database.
+     */
+    // @Id
+    // @GeneratedValue(strategy = GenerationType.AUTO)
+    // private Long id;
 
     /**
      * email, password, roles are key attributes to login and authentication
@@ -87,8 +92,8 @@ public class Person extends Submitter implements Comparable<Person> {
      */
 
     @NotEmpty
+    @JsonIgnore
     private String password;
-
 
     @NotEmpty
     @Size(min = 1)
@@ -154,11 +159,6 @@ public class Person extends Submitter implements Comparable<Person> {
     @JsonIgnore
     private List<SynergyGrade> grades;
     
-
-    @ManyToMany(mappedBy="students", cascade=CascadeType.MERGE)
-    @JsonIgnore
-    private List<AssignmentSubmission> submissions;
-    
  
 
     /**
@@ -191,6 +191,7 @@ public class Person extends Submitter implements Comparable<Person> {
 
 
     @ManyToMany(mappedBy = "groupMembers")
+    @JsonBackReference
     @JsonIgnore
     private List<Groups> groups = new ArrayList<>();
 
@@ -262,12 +263,6 @@ public class Person extends Submitter implements Comparable<Person> {
 
         return person;
     }
-    
-
-    private static Person createPerson(String name, String email, String uid, String password, Boolean kasmServerNeeded, List<String> asList) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -482,10 +477,15 @@ public class Person extends Submitter implements Comparable<Person> {
         }
     }
 
-    public List<AssignmentSubmission> getAllSubmissions() {
+    @JsonIgnore
+    public List<Groups> getGroups() {
+        return groups;
+    }
+
+    public static List<AssignmentSubmission> getAllSubmissions(Person person) {
         // gets all the individual submissions and also the group submissions
-        List<AssignmentSubmission> all = new ArrayList<>(super.getSubmissions());
-        for (Groups group : groups) {
+        List<AssignmentSubmission> all = new ArrayList<>(person.getSubmissions());
+        for (Groups group : person.getGroups()) {
             all.addAll(group.getSubmissions());
         }
         return all;
