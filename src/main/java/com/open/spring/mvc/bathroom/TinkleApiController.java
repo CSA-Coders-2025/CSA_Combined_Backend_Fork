@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.open.spring.mvc.person.Person;
 import com.open.spring.mvc.person.PersonJpaRepository;
@@ -147,14 +148,12 @@ public class TinkleApiController {
      * Clears all bathroom records from the database.
      * Requires the requester to be an admin (checked via request attribute).
      */
-    @DeleteMapping("/bulk/clear")
-    public ResponseEntity<?> clearTable(@RequestParam(required = false) String role) {
-        if (!"ADMIN".equalsIgnoreCase(role)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("status", "error", "message", "Unauthorized — Admin access required"));
-        }
 
-        repository.deleteAllRowsInBulk();
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/bulk/clear")
+    public ResponseEntity<?> clearTable(HttpServletRequest request) {
+        try {
+            repository.deleteAllInBatch();
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
