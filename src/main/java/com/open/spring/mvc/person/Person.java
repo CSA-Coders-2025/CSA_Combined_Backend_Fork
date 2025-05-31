@@ -92,7 +92,6 @@ public class Person extends Submitter implements Comparable<Person> {
      */
 
     @NotEmpty
-    @JsonIgnore
     private String password;
 
     @NotEmpty
