@@ -30,6 +30,16 @@ public interface TinkleJPARepository extends JpaRepository<Tinkle, Long> {
     Optional<Tinkle> findByPersonName(String personName);
 
     /**
+     * Query method defined by Spring Data JPA naming conventions.
+     * Finds a bathroom request by the person's sid who made the request.
+     * 
+     * @param sid The sid of the person whose bathroom request should be retrieved
+     * @return Optional<Tinkle> containing the request if found, or empty if not found
+     */
+    Optional<Tinkle> findBySid(String sid);
+
+
+    /**
      * Custom bulk delete operation to remove all Tinkle records from the database.
      * Used for administrative purposes like clearing bathroom request history.
      * 
