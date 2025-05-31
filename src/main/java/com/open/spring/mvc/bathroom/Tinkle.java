@@ -49,7 +49,7 @@ public class Tinkle {
     @Column
     private String personName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String sid;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
