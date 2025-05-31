@@ -35,7 +35,10 @@ import com.open.spring.mvc.synergy.SynergyGrade;
 import com.open.spring.mvc.synergy.SynergyGradeJpaRepository;
 
 import jakarta.transaction.Transactional;
+import javassist.tools.web.BadHttpRequest;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -125,6 +128,18 @@ public class AssignmentSubmissionAPIController {
         return ResponseEntity.ok(dtos);
     }
 
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class SubmitAssignmentDto {
+        public Long submitterId;
+        public Boolean isGroup;
+        public String content;
+        public String comment;
+        public Boolean isLate;
+    }
+
     /**
      * A POST endpoint to submit an assignment.
      * @param assignmentId The ID of the assignment being submitted.
@@ -135,25 +150,18 @@ public class AssignmentSubmissionAPIController {
     @PostMapping("/submit/{assignmentId}")
     public ResponseEntity<?> submitAssignment(
         @PathVariable Long assignmentId,
-        @RequestParam Long submitterId,
-        @RequestParam String content,
-        @RequestParam String comment,
-        @RequestParam Boolean isLate
+        @RequestBody SubmitAssignmentDto submissionInfo
     ) {
         Assignment assignment = assignmentRepo.findById(assignmentId).orElse(null);
 
         // TODO: A better way to do this would be to have this be part of some sort of SubmitterService
-        Submitter submitter = null;
-        Optional<Groups> groupOpt = groupRepo.findById(submitterId);
-        if (groupOpt.isPresent()) {
-            submitter = groupOpt.get();
+        Submitter submitter;
+        if (submissionInfo.isGroup) {
+            submitter = groupRepo.findById(submissionInfo.submitterId).orElse(null);
         } else {
-            Optional<Person> personOpt = personRepo.findById(submitterId);
-            if (personOpt.isPresent()) {
-                submitter = personOpt.get();
-            }
+            submitter = personRepo.findById(submissionInfo.submitterId).orElse(null);
         }
-
+        
         if (submitter == null) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "Submitter not found");
@@ -161,7 +169,7 @@ public class AssignmentSubmissionAPIController {
         }
 
         if (assignment != null) {
-            AssignmentSubmission submission = new AssignmentSubmission(assignment, submitter, content, comment, isLate);
+            AssignmentSubmission submission = new AssignmentSubmission(assignment, submitter, submissionInfo.content, submissionInfo.comment, submissionInfo.isLate);
             AssignmentSubmission savedSubmission = submissionRepo.save(submission);
             return new ResponseEntity<>(savedSubmission, HttpStatus.CREATED);
         }
