@@ -30,7 +30,6 @@ import com.open.spring.mvc.person.PersonJpaRepository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -155,11 +154,16 @@ public class TinkleApiController {
         try {
             repository.deleteAllInBatch();
 
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "message", "All bathroom records have been cleared"
-        ));
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "All bathroom records have been cleared"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", "error", "message", e.getMessage()));
+        }
     }
+
 
 
     @GetMapping("/bulk/extract")
