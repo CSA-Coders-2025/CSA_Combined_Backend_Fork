@@ -168,8 +168,6 @@
         </div>
     </div>
 
-
-
         <!-- Import Modal -->
     <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -192,9 +190,6 @@
             </div>
         </div>
     </div>
-
-
-
 
 </th:block>
 <th:block layout:fragment="script" th:remove="tag">
@@ -229,8 +224,6 @@
                 }
             });
         });
-
-
 
  document.getElementById("importBtn").addEventListener("click", async () => {
     const fileInput = document.getElementById("importFile");
@@ -282,10 +275,6 @@
         alert("An error occurred during import: " + error.message);
     }
 });
-
-
-
-
 
         const personURL = javaURI + "/api/people"; // Replace with your actual user API endpoint
 
