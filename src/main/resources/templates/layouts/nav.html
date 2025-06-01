@@ -2,12 +2,20 @@
 <!-- Bootstrap Navigation Code -->
 <th:block xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
     th:fragment="header">
-    <nav class="navbar navbar-expand-lg navbar-light bg-secondary">
+    <nav class="navbar navbar-expand-lg navbar-light border-neutral-700 border-b" style="position: sticky; top: 0; z-index: 1030; backdrop-filter: blur(30px); background: rgba(50, 50, 50, 0.5);">
         <div class="container-fluid">
             <div class="btn-group">
-                <img alt="" class="d-inline-block align-center" src="" th:src="@{/images/ncs_logo.png}" height="50"
-                    width="auto">
-                <a class="navbar-brand" th:href="@{https://opencodingsociety.com}">opencodingsociety Coders</a>
+
+                <div class="flex justify-between items-center gap-x-1">
+                    <img alt="" class="d-inline-block align-center" src="" th:src="@{/images/ncs_logo.png}" height="50" width="auto">
+                    <a class="flex-none font-semibold text-xl text-white focus:outline-hidden focus:opacity-80 dark:text-white"
+                        th:href="@{https://opencodingsociety.com}" aria-label="Brand" style="text-decoration: none;">opencodingsociety Coders</a>
+                </div>
+
+
+
+
+                <!-- <a class="navbar-brand" th:href="@{https://opencodingsociety.com}">opencodingsociety Coders</a> -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false"
                     aria-label="Toggle navigation">
@@ -118,25 +126,38 @@
             </div>
 
             <div class="btn-group">
-                <!-- Search Box -->
-                <div class="px-3" style="height:30px;">
-                    <input id="search" type="search" placeholder="Search" aria-label="Search">
+                <div class="relative">
+                    <!-- magnifying glass icon -->
+                    <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-3.5">
+                        <svg class="shrink-0 size-4 text-white/60" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
+                        </svg>
+                    </div>
+
+                    <!-- the search box input -->
+                    <input type="text" class="py-2 ps-10 pe-16 block w-full rounded-lg text-sm focus:outline-hidden focus:border-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-800 border-neutral-700 text-neutral-400 placeholder:text-neutral-400 focus:ring-neutral-600" 
+                    placeholder="Search" id="search" aria-label="Search">      
                 </div>
-                <!-- Clock display -->
-                <!--                <div class="px-3 text-dark">-->
-                <!--                    <span id="clock"></span>-->
-                <!--                </div>-->
+
+
+
+
                 <!-- Login/Logout -->
                 <!-- If the user is not authenticated, display a "Login" link -->
-                <th:block sec:authorize="isAnonymous()">
-                    <div class="px-3">
-                        <a th:href='@{/login}' class="link-dark">Login</a>
-
-                    </div>
-                    <div class="px-3">
-                        <a th:href='@{/mvc/person/create}' class="link-dark">Sign Up</a>
-                    </div>
-                </th:block>
+                <div class="flex flex-wrap items-center gap-x-1.5">
+                    <th:block sec:authorize="isAnonymous()">
+                        <div class="px-3 py-[7px] px-2.5 inline-flex items-center font-medium text-sm rounded-lg border shadow-2xs disabled:opacity-50 disabled:pointer-events-none bg-neutral-800 focus:outline-hidden border-neutral-700 text-neutral-300 hover:bg-neutral-700 focus:bg-neutral-700">
+                            <a th:href='@{/login}' class="text-sm text-neutral-300" style="text-decoration: none;">Login</a>
+    
+                        </div>
+                        <div class="px-3 py-2 px-2.5 inline-flex items-center font-medium rounded-lg text-white text-sm focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none bg-blue-500 hover:bg-blue-600 focus:bg-blue-600">
+                            <a th:href='@{/mvc/person/create}' class="text-white text-sm" style="text-decoration: none;">Sign Up</a>
+                        </div>
+                    </th:block>
+                </div>
                 <!-- If the user is authenticated, display a dropdown with the user's username and roles, and a "Logout" link -->
                 <th:block sec:authorize="isAuthenticated()">
                     <div class="dropdown px-3">

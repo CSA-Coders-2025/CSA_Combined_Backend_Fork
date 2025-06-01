@@ -3,60 +3,91 @@
     layout:decorate="~{layouts/base}" lang="en">
 
 <!-- page style -->
-<th:block layout:fragment="style" th:remove="tag"></th:block>
+<th:block layout:fragment="style" th:remove="tag">
+    <!-- tailwind and font imports for styling -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css">
+</th:block>
 
 <!-- page title -->
 <th:block layout:fragment="title" th:remove="tag">Login</th:block>
 
 <!-- The 'body' section is defined using Thymeleaf's layout fragment. It will replace the 'body' content in the base layout -->
 <th:block layout:fragment="body" th:remove="tag">
-    <!-- Heading for the login section, with added left margin for spacing -->
-    <h3>Login To Account</h3>
+    <!-- Login form container with rounded corners, shadow, and responsive max width -->
+    <div class="mt-7 border rounded-xl shadow-2xs bg-neutral-900 border-neutral-700 max-w-md mx-auto">
+        <div class="p-4 sm:p-7">
+            <!-- Form heading and subheading with centered text -->
+            <div class="text-center">
+                <h1 class="block text-2xl font-bold text-white">Login</h1>
+                <p class="mt-2 text-sm text-neutral-400">
+                    Don't have an account yet?
+                    <!-- Sign up link with hover and focus effects -->
+                    <a class="decoration-2 hover:underline focus:outline-hidden focus:underline font-medium text-blue-500"
+                        th:href="@{/mvc/person/create}">
+                        Sign up here.
+                    </a>
+                </p>
+            </div>
 
-    <!-- Form for logging in. Uses POST method to submit the data to the /login endpoint -->
-    <form name="f" th:action="@{/login}" method="POST">
+            <div class="">
+                <!-- <div
+                    class="py-3 flex items-center text-xs uppercase before:flex-1 before:border-t before:me-6 after:flex-1 after:border-t after:ms-6 text-neutral-500 before:border-neutral-600 after:border-neutral-600">
+                </div> -->
 
-        <!-- Success message when the user logs out, conditional rendering based on the 'logout' param -->
-        <label for="f" th:if="${param.logout}" class="text-success" style="margin-bottom: 10px; margin-left: 10px;">
-            You have been logged out.
-        </label> <br th:if="${param.logout}">
+                <!-- login form -->
+                <form name="f" th:action="@{/login}" method="POST" class="grid gap-y-4">
+                    <!-- Success message when the user logs out, conditional rendering based on the 'logout' param -->
+                    <label for="f" th:if="${param.logout}" class="block text-sm mb-2 text-green-400">
+                        You have been logged out.
+                    </label>
 
-        <!-- The 'username' input field. The 'uid' field is mapped to 'username' for Spring Security authentication -->
-        <div class="form-group mb-2 mr-sm-2">
-        <input type="text" id='username' name="username" placeholder="GitHub ID" size="20" required
-                    style="margin-bottom: 10px; margin-left: 10px;"> 
+                    <!-- The 'username' input field. The 'uid' field is mapped to 'username' for Spring Security authentication -->
+                    <div>
+                        <label for="username" class="block text-sm mb-2 text-white">GitHub ID</label>
+                        <div class="relative">
+                            <input type="text" id="username" name="username" placeholder="GitHub ID" size="20" required
+                                class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600"
+                                style="margin-bottom: 0;">
+                        </div>
+                    </div>
+
+                    <!-- Password input field with added margin for spacing -->
+                    <div>
+                        <div class="flex flex-wrap justify-between items-center gap-2">
+                            <label for="password" class="block text-sm mb-2 text-white">Password</label>
+                            <!-- Forgot password link with hover and focus effects -->
+                            <a class="inline-flex items-center gap-x-1 text-sm decoration-2 hover:underline focus:outline-hidden focus:underline font-medium text-blue-500"
+                                th:href="@{/mvc/person/reset}">Forgot your password?</a>
+                        </div>
+                        <div class="relative">
+                            <input type="password" id="password" name="password" placeholder="password" size="20" required
+                                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600"
+                                style="margin-bottom: 0;">
+                        </div>
+                    </div>
+
+                    <!-- Error message section displayed when login fails, conditional rendering based on the 'error' param -->
+                    <label for="f" th:if="${param.error}" class="block text-sm mb-2 text-yellow-400">
+                        invalid username and password.
+                    </label>
+
+                    <!-- Submit button for the form, with added margin for spacing -->
+                    <button class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                        type="submit"
+                        style="border-radius: 0.5rem;">
+                        Submit
+                    </button>
+                </form>
+            </div>
         </div>
-        
-
-        <!-- Password input field with added margin for spacing -->
-        <div class="form-group mb-2 mr-sm-2">
-                <input type="password" id="password" name="password" placeholder="Password" size="20" required
-                        style="margin-bottom: 10px; margin-left: 10px;"> 
-        </div>
-
-        <!-- Error message section displayed when login fails, conditional rendering based on the 'error' param -->
-        <label for="f" th:if="${param.error}" class="text-warning" style="margin-bottom: 10px; margin-left: 10px;">
-            Invalid username and password.
-        </label> <br th:if="${param.error}">
-
-        <!-- Submit button for the form, with added margin for spacing -->
-        <button class="btn btn-secondary" type="submit" style="margin-left: 10px;">
-            Submit
-        </button>
-    </form>
-    <div style="margin-top: 10px;">
-        <!-- Link to the signup page for users who don't have an account, with added left margin -->
-        <a th:href="@{/mvc/person/create}" style="margin-left: 10px;">Sign Up</a>
-
-        <!-- Link to the signup page for users who don't have an account, with added left margin -->
-        <a th:href="@{/mvc/person/reset}" style="margin-left: 10px;">Forgot Password?</a>
     </div>
-
 </th:block>
 <!-- End of the body fragment -->
 
 <th:block layout:fragment="script">
     <script>
+        // add spinner to submit button on submit
         const form = document.querySelector("form");
         form.addEventListener("submit", (event) => {
             event.submitter.innerHTML = "<span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span>";

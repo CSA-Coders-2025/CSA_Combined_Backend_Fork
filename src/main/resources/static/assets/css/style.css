@@ -81,7 +81,7 @@ $theme-colors: (
   --bs-dark: #23272A; /* Dark background */
   
   --bs-primary-rgb: 24, 24, 24; /* RGB for primary (background color) */
-  --bs-secondary-rgb: 40, 167, 69; /* RGB for secondary (background color) */
+  --bs-secondary-rgb: 23, 23, 23; /* RGB for secondary (background color) */
   --bs-navbar-rgb: 88, 101, 242; /* RGB for navbar color (Discord Blue) */
   --bs-success-rgb: 40, 40, 40; /* Green in RGB */
   --bs-info-rgb: 0, 188, 212; /* Cyan in RGB */
@@ -104,7 +104,7 @@ $theme-colors: (
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.5;
   --bs-body-color: #DCDDDE; /* Lighter text color */
-  --bs-body-bg: #181818; /* Dark background */
+  --bs-body-bg: #171717; /* Dark background */
 }
 
 
@@ -130,7 +130,7 @@ body {
   line-height: var(--bs-body-line-height);
   color: var(--bs-body-color);
   text-align: var(--bs-body-text-align);
-  background-color: var(--bs-body-bg);
+  background-color: var(--bs-body-bg) !important;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -7720,7 +7720,7 @@ textarea.form-control-lg {
 
 .bg-secondary {
   --bs-bg-opacity: 1;
-  background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity)) !important;
+  /* background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity)) !important; */
 }
 
 .bg-success {
@@ -7765,7 +7765,7 @@ textarea.form-control-lg {
 
 .bg-body {
   --bs-bg-opacity: 1;
-  background-color: rgba(var(--bs-body-bg-rgb), var(--bs-bg-opacity)) !important;
+  /* background-color: rgba(var(--bs-body-bg-rgb), var(--bs-bg-opacity)) !important; */
 }
 
 .bg-transparent {
@@ -7794,7 +7794,7 @@ textarea.form-control-lg {
 }
 
 .bg-gradient {
-  background-image: var(--bs-gradient) !important;
+  /* background-image: var(--bs-gradient) !important; */
 }
 
 .user-select-all {
@@ -11187,8 +11187,8 @@ textarea.form-control-lg {
   }
 }
 html, body {
-  background-image: var(--bs-gradient);
-  background-color: var(--bs-body-bg);
+  /* background-image: var(--bs-gradient); */
+  background-color: var(--bs-body-bg) !important;
 }
 
 .dark-mode {
@@ -11287,7 +11287,7 @@ html, body {
   line-height: var(--bs-body-line-height);
   color: var(--bs-body-color);
   text-align: var(--bs-body-text-align);
-  background-color: var(--bs-body-bg);
+  background-color: var(--bs-body-bg) !important;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -17481,7 +17481,7 @@ a > .dark-mode code {
 }
 .dark-mode .bg-secondary {
   --bs-bg-opacity: 1;
-  background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity)) !important;
+  /* background-color: rgba(var(--bs-secondary-rgb), var(--bs-bg-opacity)) !important; */
 }
 .dark-mode .bg-success {
   --bs-bg-opacity: 1;
@@ -17517,7 +17517,7 @@ a > .dark-mode code {
 }
 .dark-mode .bg-body {
   --bs-bg-opacity: 1;
-  background-color: rgba(var(--bs-body-bg-rgb), var(--bs-bg-opacity)) !important;
+  /* background-color: rgba(var(--bs-body-bg-rgb), var(--bs-bg-opacity)) !important; */
 }
 .dark-mode .bg-transparent {
   --bs-bg-opacity: 1;
@@ -20124,6 +20124,11 @@ a > .dark-mode code {
   .dark-mode .d-print-none {
     display: none !important;
   }
+}
+
+/* tailwind bg-neutral-900 utility */
+.bg-neutral-900 {
+  background-color: #171717 !important;
 }
 
 /*# sourceMappingURL=custom.css.map */

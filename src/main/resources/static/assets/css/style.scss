@@ -51,8 +51,8 @@ $body-bg: #cfd8dc;
 
 // setup default background
 html, body {
-  background-image: var(--bs-gradient);
-  background-color: var(--bs-body-bg);
+  // background-image: var(--bs-gradient);
+  background-color: var(--bs-body-bg) !important;
 }
 
 // setup dark mode styling
