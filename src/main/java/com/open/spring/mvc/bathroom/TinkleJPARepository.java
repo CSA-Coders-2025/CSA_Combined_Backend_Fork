@@ -13,12 +13,29 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import jakarta.transaction.Transactional; 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+
+import jakarta.transaction.Transactional; 
 
 /**
  * Repository interface for managing Tinkle entities in the database.
  * Handles bathroom request records, tracking student requests, approvals, and history.
  */
+/**
+ * Repository interface for managing Tinkle entities in the database.
+ * Handles bathroom request records, tracking student requests, approvals, and history.
+ */
 public interface TinkleJPARepository extends JpaRepository<Tinkle, Long> {
+    
+    /**
+     * Query method defined by Spring Data JPA naming conventions.
+     * Finds a bathroom request by the person's name who made the request.
+     * 
+     * @param personName The name of the person whose bathroom request should be retrieved
+     * @return Optional<Tinkle> containing the request if found, or empty if not found
+     */
     
     /**
      * Query method defined by Spring Data JPA naming conventions.
