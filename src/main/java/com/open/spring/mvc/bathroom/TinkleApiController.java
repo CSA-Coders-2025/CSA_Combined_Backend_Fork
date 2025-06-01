@@ -1,7 +1,6 @@
 package com.open.spring.mvc.bathroom;
 
 import java.io.File;
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -13,11 +12,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +29,7 @@ import com.open.spring.mvc.person.Person;
 import com.open.spring.mvc.person.PersonJpaRepository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -58,17 +51,9 @@ public class TinkleApiController {
     @Autowired
     private EntityManager entityManager;
 
-    @Autowired
-    private BathroomQueueJPARepository bathroomQueue;
-
-    @Autowired
-    private EntityManager entityManager;
-
     @Getter
     @Setter
     public static class TinkleDto {
-        // private String studentEmail;  // Used to identify the person
-        private String sid;
         // private String studentEmail;  // Used to identify the person
         private String sid;
         private String timeIn;        // String of time-in/time-out pairs
@@ -80,22 +65,12 @@ public class TinkleApiController {
     @PostMapping("/add")
     public ResponseEntity<Object> timeInOut(@RequestBody TinkleDto tinkleDto) {
         Optional<Tinkle> student = repository.findBySid(tinkleDto.getSid());
-        Optional<Tinkle> student = repository.findBySid(tinkleDto.getSid());
 
         if (student.isPresent()) {
             student.get().addTimeIn(tinkleDto.getTimeIn());
             repository.save(student.get());
             return new ResponseEntity<>(student.get(), HttpStatus.OK);
         } else {
-            // List<BathroomQueue> queues = bathroomQueue.findAll();
-            // for (BathroomQueue queue : queues) {
-            //     if (queue.getPeopleQueue().contains(tinkleDto.getStudentEmail())) {
-            //         queue.removeStudent(tinkleDto.getStudentEmail());
-            //         bathroomQueue.save(queue);
-            //         break;
-            //     }
-            // }
-            return new ResponseEntity<>("Student not found in Tinkle. Queue entry removed.", HttpStatus.NOT_FOUND);
             // List<BathroomQueue> queues = bathroomQueue.findAll();
             // for (BathroomQueue queue : queues) {
             //     if (queue.getPeopleQueue().contains(tinkleDto.getStudentEmail())) {
@@ -139,9 +114,7 @@ public class TinkleApiController {
 
         for (Person person : personArray) {
             Optional<Tinkle> tinkleFound = repository.findBySid(person.getSid());
-            Optional<Tinkle> tinkleFound = repository.findBySid(person.getSid());
             if (tinkleFound.isEmpty()) {
-                Tinkle tinkle = new Tinkle(person, "");
                 Tinkle tinkle = new Tinkle(person, "");
                 repository.save(tinkle);
             }
@@ -149,7 +122,6 @@ public class TinkleApiController {
 
         return ResponseEntity.ok("Complete");
     }
-
 
 
     /**
@@ -175,22 +147,6 @@ public class TinkleApiController {
      * Clears all bathroom records from the database.
      * Requires the requester to be an admin (checked via request attribute).
      */
-    @DeleteMapping("/bulk/clear")
-    public ResponseEntity<?> clearTable(@RequestParam(required = false) String role) {
-        if (!"ADMIN".equalsIgnoreCase(role)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("status", "error", "message", "Unauthorized — Admin access required"));
-        }
-
-        repository.deleteAllRowsInBulk();
-
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "message", "All bathroom records have been cleared"
-        ));
-    }
-
-
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/bulk/clear")
@@ -218,7 +174,6 @@ public class TinkleApiController {
         for (Tinkle tinkle : tinkleList) {
             TinkleDto dto = new TinkleDto();
             dto.setSid(tinkle.getSid());
-            dto.setSid(tinkle.getSid());
             dto.setTimeIn(tinkle.getTimeIn());
             tinkleDtos.add(dto);
         }
@@ -239,15 +194,7 @@ public class TinkleApiController {
                 continue;
             }
 
-            String sid = tinkleDto.getSid();
-
-            if (sid == null || sid.isEmpty()) {
-                errors.add("Missing sid for entry");
-                continue;
-            }
-
             try {
-                Optional<Tinkle> existingTinkle = repository.findBySid(sid);
                 Optional<Tinkle> existingTinkle = repository.findBySid(sid);
 
                 if (existingTinkle.isPresent()) {
@@ -255,27 +202,19 @@ public class TinkleApiController {
                     tinkle.addTimeIn(tinkleDto.getTimeIn());
                     repository.save(tinkle);
                     createdTinkles.add(sid + " (updated)");
-                    createdTinkles.add(sid + " (updated)");
                 } else {
-                    Person person = personRepository.findBySid(sid);
-                    Optional<Person> personOpt = Optional.ofNullable(person);
                     Person person = personRepository.findBySid(sid);
                     Optional<Person> personOpt = Optional.ofNullable(person);
 
                     if (personOpt.isPresent()) {
                         Tinkle newTinkle = new Tinkle(personOpt.get(), tinkleDto.getTimeIn());
-                    if (personOpt.isPresent()) {
-                        Tinkle newTinkle = new Tinkle(personOpt.get(), tinkleDto.getTimeIn());
                         repository.save(newTinkle);
                         createdTinkles.add(sid);
-                        createdTinkles.add(sid);
                     } else {
-                        errors.add("No person found for sid: " + sid);
                         errors.add("No person found for sid: " + sid);
                     }
                 }
             } catch (Exception e) {
-                errors.add("Exception for sid " + sid + ": " + e.getMessage());
                 errors.add("Exception for sid " + sid + ": " + e.getMessage());
             }
         }
