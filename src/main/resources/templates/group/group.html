@@ -13,9 +13,7 @@
     <div class="container mt-4">
         <h2 class="mb-4">Group Management</h2>
 
-
-
-        <!-- Admin Import Buttons -->
+        <!-- Admin Import/Export Buttons -->
         <div class="mb-3" sec:authorize="hasAuthority('ROLE_ADMIN')">
             <button id="export-all-groups" class="btn btn-secondary btn-sm">export groups</button>
             <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#importModal">
