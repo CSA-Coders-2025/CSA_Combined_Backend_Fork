@@ -63,15 +63,15 @@ public class AssignmentSubmission {
 
     private Boolean isLate;
 
-    @PreRemove
-    private void removeStudentsFromSubmission() {
-        if (students != null) {
-            // before the submission is removed, remove the submission from the students' submissions list
-            for (Person student : students) {
-                student.getSubmissions().remove(this);
-            }
-        }
-    }
+    // @PreRemove
+    // private void removeStudentsFromSubmission() {
+    //     if (students != null) {
+    //         // before the submission is removed, remove the submission from the students' submissions list
+    //         for (Person student : students) {
+    //             student.getSubmissions().remove(this);
+    //         }
+    //     }
+    // }
     
     public AssignmentSubmission(Assignment assignment, List<Person> students, String content, String comment, boolean isLate) {
         this.assignment = assignment;

@@ -47,7 +47,7 @@ import com.open.spring.mvc.bathroom.Tinkle;
 import com.open.spring.mvc.groups.Groups;
 import com.open.spring.mvc.synergy.SynergyGrade;
 import com.open.spring.mvc.trains.TrainCompany;
-import com.open.spring.mvc.userStocks.userStocksTable;
+import com.open.spring.mvc.userStocks.UserStocksTable;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -188,14 +188,7 @@ public class Person implements Comparable<Person> {
     @OneToMany(mappedBy="student", cascade=CascadeType.ALL, orphanRemoval=true)
     @JsonIgnore
     private List<SynergyGrade> grades;
-    
-
-    @ManyToMany(mappedBy="students", cascade=CascadeType.MERGE)
-    @JsonIgnore
-    private List<AssignmentSubmission> submissions;
-    
-
- 
+     
 
     /**
      * Many to Many relationship with PersonRole
@@ -223,7 +216,7 @@ public class Person implements Comparable<Person> {
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "person")
     @JsonIgnore
-    private userStocksTable user_stocks;
+    private UserStocksTable user_stocks;
 
 
     @ManyToMany(mappedBy = "groupMembers")
@@ -254,7 +247,6 @@ public class Person implements Comparable<Person> {
         this.kasmServerNeeded = kasmServerNeeded;
         this.pfp = pfp;
         this.roles.add(role);
-        this.submissions = new ArrayList<>();
 
         this.timeEntries = new Tinkle(this, "");        
         // Create a Bank for this person
@@ -322,15 +314,15 @@ public class Person implements Comparable<Person> {
 
 
     // removes this user from all submission when deleted
-    @PreRemove
-    private void removePersonFromSubmissions() {
-        if (submissions != null) {
-            // if a user is deleted, remove them from everything they've submitted
-            for (AssignmentSubmission submission : submissions) {
-                submission.getStudents().remove(this);
-            }
-        }
-    }
+    // @PreRemove
+    // private void removePersonFromSubmissions() {
+    //     if (submissions != null) {
+    //         // if a user is deleted, remove them from everything they've submitted
+    //         for (AssignmentSubmission submission : submissions) {
+    //             submission.getStudents().remove(this);
+    //         }
+    //     }
+    // }
 
   
     /** Custom hasRoleWithName method to find if a role exists on user
@@ -469,7 +461,7 @@ public class Person implements Comparable<Person> {
             
             
             // Create userStocksTable and set the one-to-one relationship
-            userStocksTable stock = new userStocksTable(
+            UserStocksTable stock = new UserStocksTable(
                 null,
                 (String) data.get("stocks"),
                 person.getEmail(),

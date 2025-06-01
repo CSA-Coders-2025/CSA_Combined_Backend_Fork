@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.open.spring.mvc.userStocks.UserStocksRepository;
-import com.open.spring.mvc.userStocks.userStocksTable;
+import com.open.spring.mvc.userStocks.UserStocksTable;
 
 import lombok.Getter;
 import lombok.Setter;

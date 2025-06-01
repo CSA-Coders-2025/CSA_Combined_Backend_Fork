@@ -34,7 +34,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap; // use this instead of HashMap if multithreaded
 
 
@@ -44,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap; // use this instead of HashMap if
 // http://127.0.0.1:8585/stocks/table/addStock
 @Controller
 @RequestMapping("/stocks/table")
-public class userStocksTableApiController {
+public class UserStocksTableApiController {
 
     // Injecting the service that handles the core logic for stock management
     @Autowired
@@ -213,7 +212,7 @@ class UserLoginRequest {
 @Service
 class UserStocksTableService implements UserDetailsService {
     @Autowired
-private BankJpaRepository bankJpaRepository;
+    private BankJpaRepository bankJpaRepository;
 
     
     // Injecting necessary repositories
@@ -248,7 +247,7 @@ private BankJpaRepository bankJpaRepository;
      */
     @Override
     public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        userStocksTable user = userRepository.findByEmail(username);
+        UserStocksTable user = userRepository.findByEmail(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
@@ -329,7 +328,7 @@ private BankJpaRepository bankJpaRepository;
      * @return Total value of the portfolio.
      */
     public double calculatePortfolioValue(String username) {
-        userStocksTable user = userRepository.findByEmail(username);
+        UserStocksTable user = userRepository.findByEmail(username);
                 if (user == null) {
                     throw new RuntimeException("User not found");
                 }
@@ -359,10 +358,10 @@ private BankJpaRepository bankJpaRepository;
      * @param stockSymbol The symbol of the stock to add.
      */
     public void addStock(String username, int quantity, String stockSymbol) {
-        userStocksTable user = userRepository.findByEmail(username);
-                if (user == null) {
-                    throw new RuntimeException("User not found");
-                }
+        UserStocksTable user = userRepository.findByEmail(username);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
 
         double totalValue = user.getPerson().getBanks().getBalance();
         double stockPrice = getCurrentStockPrice(stockSymbol);
@@ -425,7 +424,7 @@ private BankJpaRepository bankJpaRepository;
      * @param stockSymbol The symbol of the stock to remove.
      */
     public void removeStock(String username, int quantity, String stockSymbol) {
-        userStocksTable user = userRepository.findByEmail(username);
+        UserStocksTable user = userRepository.findByEmail(username);
         if (user == null) {
             throw new RuntimeException("User not found");
         }
@@ -490,7 +489,7 @@ private BankJpaRepository bankJpaRepository;
      * @return A list of UserStockInfo.
      */
     public List<UserStockInfo> getUserStocks(String username) {
-        userStocksTable user = userRepository.findByEmail(username);
+        UserStocksTable user = userRepository.findByEmail(username);
         if (user == null) {
             throw new RuntimeException("User not found");
         }
@@ -516,7 +515,7 @@ private BankJpaRepository bankJpaRepository;
  */
 public void simulateStockValueChange(String username, List<UserStockInfo> stocks) {
     // Force fetch the latest user data to avoid caching issues
-    userStocksTable user = userRepository.findByEmail(username);
+    UserStocksTable user = userRepository.findByEmail(username);
     if (user == null) {
         throw new RuntimeException("User not found");
     }

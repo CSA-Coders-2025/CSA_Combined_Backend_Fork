@@ -9,7 +9,7 @@ import com.open.spring.mvc.bank.BankJpaRepository;
 import com.open.spring.mvc.person.Person;
 import com.open.spring.mvc.person.PersonJpaRepository;
 import com.open.spring.mvc.userStocks.UserStocksRepository;
-import com.open.spring.mvc.userStocks.userStocksTable;
+import com.open.spring.mvc.userStocks.UserStocksTable;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -111,7 +111,7 @@ public class MiningService {
                     double pendingUSD = pending * BTC_PRICE;
                     
                     // Get user's stocks/balance record for USD update
-                    userStocksTable userStocks = userStocksRepo.findByEmail(miner.getPerson().getEmail());
+                    UserStocksTable userStocks = userStocksRepo.findByEmail(miner.getPerson().getEmail());
                     if (userStocks != null) {
                         double oldBalance = userStocks.getPerson().getBanks().getBalance();
                         double newBalance = oldBalance + pendingUSD;
