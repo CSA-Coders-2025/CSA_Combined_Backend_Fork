@@ -13,6 +13,12 @@
         th:src="@{/js/person-verification.js}"></script>
 </head>
 
+<th:block layout:fragment="style" th:remove="tag">
+    <!-- tailwind and font imports for styling -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css">
+</th:block>
+
 <!-- page title -->
 <th:block layout:fragment="title" th:remove="tag">Create Account</th:block>
 
@@ -20,69 +26,110 @@
 <th:block layout:fragment="body" th:remove="tag">
     <!-- Form content container -->
     <div class="container">
-        <h3>Create New Account</h3>
+        <div class="mt-7 border rounded-xl shadow-2xs bg-neutral-900 border-neutral-700 max-w-md mx-auto">
+            <div class="p-4 sm:p-7">
+                <div class="text-center">
+                    <h1 class="block text-2xl font-bold text-white">Signup</h1>
+                    <p class="mt-2 text-sm text-neutral-400">
+                        Already have an account?
+                        <a class="decoration-2 hover:underline focus:outline-hidden focus:underline font-medium text-blue-500"
+                            th:href="@{/login}">
+                            Login here.
+                        </a>
+                    </p>
+                </div>
+                <div>
+                    <form class="grid gap-y-4" action="#" th:action="@{/mvc/person/create}" th:object="${person}"
+                        method="POST" onsubmit="validateForm(event)">
+                        <!-- github id input field -->
+                        <div>
+                            <label for="uid" class="block text-sm mb-2 text-white">GitHub ID</label>
+                            <div class="relative">
+                                <input type="text" th:field="*{uid}" id="uid" placeholder="GitHub ID"
+                                    oninput="handleTyping()"
+                                    class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600"
+                                    style="margin-bottom: 0;">
+                            </div>
+                            <small th:if="${#fields.hasErrors('uid')}" th:errors="*{uid}"
+                                class="text-yellow-400 text-xs">GitHub
+                                ID Error</small>
+                        </div>
+                        <!-- email code input field (if verifying with email) -->
+                        <div id="feild0.5" style="display: none;">
+                            <label for="code" class="block text-sm mb-2 text-white">Verification Code</label>
+                            <input type="text" id="code" placeholder="enter email code" oninput="handleTyping2()"
+                                class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
+                        </div>
+                        <!-- display name input field -->
+                        <div id="feild1" style="display: none;">
+                            <label for="name" class="block text-sm mb-2 text-white">Username (Display Name)</label>
+                            <input type="text" th:field="*{name}" id="name" placeholder="display name"
+                                class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
+                            <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+                                class="text-yellow-400 text-xs">Username Error</small>
+                        </div>
+                        <!-- email input field -->
+                        <div id="feild2" style="display: none;">
+                            <label for="email" class="block text-sm mb-2 text-white">Email Address</label>
+                            <input type="email" th:field="*{email}" id="email" placeholder="email address" required
+                                class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
+                            <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
+                                class="text-yellow-400 text-xs">Email Error</small>
+                        </div>
+                        <!-- password input field -->
+                        <div id="feild3" style="display: none;">
+                            <label for="password" class="block text-sm mb-2 text-white">Password</label>
+                            <input type="password" th:field="*{password}" id="password" placeholder="password"
+                                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
+                            <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                                class="text-yellow-400 text-xs">Password Error</small>
+                        </div>
+                        <!-- confirm password input field -->
+                        <div id="feild4" style="display: none;">
+                            <label for="confirm_password" class="block text-sm mb-2 text-white">Confirm Password</label>
+                            <input type="password" id="confirm_password" placeholder="confirm password"
+                                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
+                        </div>
+                        <!-- student id input field -->
+                        <div id="feild5" style="display: none;">
+                            <label for="sid" class="block text-sm mb-2 text-white">Student ID</label>
+                            <input type="number" th:field="*{sid}" id="sid" placeholder="student id"
+                                class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
+                            <small th:if="${#fields.hasErrors('sid')}" th:errors="*{sid}"
+                                class="text-yellow-400 text-xs">Student ID Error</small>
+                        </div>
+                        <!-- kasm server needed checkbox -->
+                        <div id="feild7" style="display: none;">
+                            <label for="kasmServerNeeded" class="block text-sm mb-2 text-white">Request a Kasm
+                                Server</label>
+                            <input type="checkbox" th:field="*{kasmServerNeeded}" id="kasmServerNeeded"
+                                class="mr-2 accent-blue-500">
+                            <small th:if="${#fields.hasErrors('kasmServerNeeded')}" th:errors="*{ksm}"
+                                class="text-yellow-400 text-xs">Kasm server request error</small>
+                        </div>
+                        <!-- verify account button -->
+                        <button id="verifyButton" onclick="attemptVerify()" type="button"
+                            class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                            style="border-radius: 0.5rem;">
+                            Verify Account
+                        </button>
+                        <!-- create account button -->
+                        <button type="submit"
+                            class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                            id="feild8" style="display: none;">
+                            Create Account
+                        </button>
 
-        <form class="form-inline" action="#" th:action="@{/mvc/person/create}" th:object="${person}" method="POST"
-            onsubmit="validateForm(event)">
-
-            <!-- GitHub ID input field -->
-            <div class="input-group mb-2 mr-sm-2" id="feild0">
-                <input type="text" th:field="*{uid}" id="uid" placeholder="Enter GitHub ID" oninput="handleTyping()">
-                <small th:if="${#fields.hasErrors('uid')}" th:errors="*{uid}">GitHub ID Error</small>
+                        <!-- login button -->
+                        <button type="button"
+                            class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                            style="border-radius: 0.5rem;">
+                            <a th:href="@{/login}" style="color: white; text-decoration: none;">Login</a>
+                        </button>
+                    </form>
+                </div>
             </div>
-
-            <!-- Email Code Input feild for if verifying with email-->
-            <div class="input-group mb-2 mr-sm-2" id="feild0.5" style="display: none;">
-                <input type="text" id="code" placeholder="Enter Email Code" oninput="handleTyping2()">
-            </div>
-
-            <!-- Display Name input field -->
-            <div class="input-group mb-2 mr-sm-2" id="feild1" style="display: none;">
-                <input type="text" th:field="*{name}" id="name" placeholder="Display Name">
-                <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Username Error</small>
-            </div>
-
-            <!-- Email input field -->
-            <div class="input-group mb-2 mr-sm-2" id="feild2" style="display: none;">
-                <input type="email" th:field="*{email}" id="email" placeholder="Email Address" required>
-                <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</small>
-            </div>
-
-            <!-- Password input field -->
-            <div class="form-group mb-2 mr-sm-2" id="feild3" style="display: none;">
-                <input type="password" th:field="*{password}" id="password" placeholder="Password">
-                <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</small>
-            </div>
-
-            <!-- Confirm Password input field -->
-            <div class="form-group mb-2 mr-sm-2" id="feild4" style="display: none;">
-                <input type="password" id="confirm_password" placeholder="Confirm Password">
-            </div>
-
-            <!-- Student Id input field (moved above Kasm Server Request) -->
-            <div class="input-group mb-2 mr-sm-2" id="feild5" style="display: none;">
-                <input type="number" th:field="*{sid}" id="sid" placeholder="Student ID">
-                <small th:if="${#fields.hasErrors('sid')}" th:errors="*{sid}">Student ID Error</small>
-            </div>
-
-            <!-- Kasm Server Needed checkbox -->
-            <div class="input-group mb-2 mr-sm-2" id="feild7" style="display: none;">
-                <label for="kasmServerNeeded"> Request Kasm Server: </label>
-                <input type="checkbox" th:field="*{kasmServerNeeded}" id="kasmServerNeeded">
-                <small th:if="${#fields.hasErrors('kasmServerNeeded')}" th:errors="*{ksm}">Kasm Server Needed
-                    Error</small>
-            </div>
-
-            <!-- Verify Account Button-->
-            <button id="verifyButton" onclick="attemptVerify()">verify</button>
-
-            <!-- Create Account Button -->
-            <button type="submit" class="btn btn-secondary" id="feild8" style="display: none;">Create
-                Account</button>
-
-            <!-- Log In Button aligned to the right -->
-            <a th:href="@{/login}">Log In</a>
-        </form>
+        </div>
     </div>
 </th:block>
 

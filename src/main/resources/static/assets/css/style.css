@@ -476,10 +476,10 @@ legend + * {
   height: auto;
 }
 
-[type=search] {
+/* [type=search] {
   outline-offset: -2px;
   -webkit-appearance: textfield;
-}
+} */
 
 /* rtl:raw:
 [type="tel"],
@@ -489,9 +489,9 @@ legend + * {
   direction: ltr;
 }
 */
-::-webkit-search-decoration {
+/* ::-webkit-search-decoration {
   -webkit-appearance: none;
-}
+} */
 
 ::-webkit-color-swatch-wrapper {
   padding: 0;
@@ -11581,10 +11581,10 @@ a > .dark-mode code {
 .dark-mode ::-webkit-inner-spin-button {
   height: auto;
 }
-.dark-mode [type=search] {
+/* .dark-mode [type=search] {
   outline-offset: -2px;
   -webkit-appearance: textfield;
-}
+} */
 .dark-mode ::-webkit-search-decoration {
   -webkit-appearance: none;
 }
