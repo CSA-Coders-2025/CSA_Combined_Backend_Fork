@@ -68,8 +68,8 @@
                     </div>
 
                     <!-- Error message section displayed when login fails, conditional rendering based on the 'error' param -->
-                    <label for="f" th:if="${param.error}" class="block text-sm mb-2 text-yellow-400">
-                        invalid username and password.
+                    <label for="f" th:if="${param.error}" class="block text-sm mb-2 text-red-400">
+                        Invalid username or password.
                     </label>
 
                     <!-- Submit button for the form, with added margin for spacing -->
