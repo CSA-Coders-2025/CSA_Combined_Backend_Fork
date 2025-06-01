@@ -1,17 +1,17 @@
 package com.open.spring.mvc.groups;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,23 +21,28 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+
 
 import com.open.spring.mvc.person.Person;
 import com.open.spring.mvc.person.PersonDetailsService;
 import com.open.spring.mvc.person.PersonJpaRepository;
 
+
 import lombok.Getter;
+
 
 @RestController
 @RequestMapping("/api/groups")
 public class GroupsApiController {
 
+
     @Autowired
     private GroupsJpaRepository groupsRepository;
 
+
     @Autowired
     private PersonJpaRepository personRepository;
+
 
     // DTO for creating a new group
     @Getter
@@ -46,15 +51,20 @@ public class GroupsApiController {
             private String name;
             private String period;
 
+
             public List<String> getPersonUids() { return personUids; }
             public void setPersonUids(List<String> personUids) { this.personUids = personUids; }
+
 
             public String getName() { return name; }
             public void setName(String name) { this.name = name; }
 
+
             public String getPeriod() { return period; }
             public void setPeriod(String period) { this.period = period; }
         }
+
+
 
 
     /**
@@ -62,6 +72,7 @@ public class GroupsApiController {
      */
     private Map<String, Object> getPersonBasicInfo(Person person) {
         Map<String, Object> personInfo = new HashMap<>();
+        personInfo.put("id", person.getId());
         personInfo.put("uid", person.getUid());
         personInfo.put("name", person.getName());
         personInfo.put("email", person.getEmail());
@@ -69,47 +80,35 @@ public class GroupsApiController {
         return personInfo;
     }
 
+
     /**
      * Get all groups with their members
      */
     @GetMapping
     @Transactional(readOnly = true)
-    public ResponseEntity<List<Map<String, Object>>> getAllGroups(@AuthenticationPrincipal UserDetails userDetails) {
-        String uid = userDetails.getUsername();
-        Person grader = personRepository.findByUid(uid);
-        if (grader == null) {
-            throw new ResponseStatusException(
-                HttpStatus.FORBIDDEN, "You must be a logged in user to retrieve the groups"
-            );
-        }
-        
-        List<Groups> groups;
-        if (grader.hasRoleWithName("ROLE_TEACHER") || grader.hasRoleWithName("ROLE_ADMIN")) {
-            groups = groupsRepository.findAll();
-        } else {
-            groups = groupsRepository.findGroupsByPersonId(grader.getId());
-        }
-        
+    public ResponseEntity<List<Map<String, Object>>> getAllGroups() {
+        List<Groups> groups = groupsRepository.findAll();
         List<Map<String, Object>> groupsWithMembers = new ArrayList<>();
-        
+       
         for (Groups group : groups) {
             Map<String, Object> groupMap = new HashMap<>();
             groupMap.put("id", group.getId());
             groupMap.put("name", group.getName());
             groupMap.put("period", group.getPeriod());
-            
+           
             // Extract basic info from each person to avoid serialization issues
             List<Map<String, Object>> membersList = new ArrayList<>();
             for (Person person : group.getGroupMembers()) {
                 membersList.add(getPersonBasicInfo(person));
             }
-            
+           
             groupMap.put("members", membersList);
             groupsWithMembers.add(groupMap);
         }
-        
+       
         return new ResponseEntity<>(groupsWithMembers, HttpStatus.OK);
     }
+
 
     /**
      * Get a group by ID
@@ -120,22 +119,23 @@ public class GroupsApiController {
         Optional<Groups> optionalGroup = groupsRepository.findById(id);
         if (optionalGroup.isPresent()) {
             Groups group = optionalGroup.get();
-            
+           
             Map<String, Object> groupMap = new HashMap<>();
             groupMap.put("id", group.getId());
-            
+           
             // Extract basic info from each person to avoid serialization issues
             List<Map<String, Object>> membersList = new ArrayList<>();
             for (Person person : group.getGroupMembers()) {
                 membersList.add(getPersonBasicInfo(person));
             }
-            
+           
             groupMap.put("members", membersList);
-            
+           
             return new ResponseEntity<>(groupMap, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
 
     /**
      * Create a new group with multiple people
@@ -147,8 +147,10 @@ public ResponseEntity<Object> createGroup(@RequestBody GroupDto groupDto) {
         // Create a new group with the provided name and period
         Groups group = new Groups(groupDto.getName(), groupDto.getPeriod(), new ArrayList<>());
 
+
         // Save the group first to generate an ID
         Groups savedGroup = groupsRepository.save(group);
+
 
         // Add members to the group using personUids
         if (groupDto.getPersonUids() != null) {
@@ -162,8 +164,10 @@ public ResponseEntity<Object> createGroup(@RequestBody GroupDto groupDto) {
             }
         }
 
+
         // Save the group again with all members
         Groups finalGroup = groupsRepository.save(savedGroup);
+
 
         // Prepare response
         Map<String, Object> response = new HashMap<>();
@@ -171,11 +175,13 @@ public ResponseEntity<Object> createGroup(@RequestBody GroupDto groupDto) {
         response.put("name", finalGroup.getName());
         response.put("period", finalGroup.getPeriod());
 
+
         List<Map<String, Object>> membersList = new ArrayList<>();
         for (Person person : finalGroup.getGroupMembers()) {
             membersList.add(getPersonBasicInfo(person));
         }
         response.put("members", membersList);
+
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     } catch (Exception e) {
@@ -186,9 +192,13 @@ public ResponseEntity<Object> createGroup(@RequestBody GroupDto groupDto) {
 
 
 
+
+
+
+
     /**
  * Bulk create multiple groups from a list of GroupDto objects.
- * 
+ *
  * @param groupDtos List of GroupDto objects containing group information
  * @return A ResponseEntity containing information about the created, duplicate, and error groups
  */
@@ -199,13 +209,16 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
     List<String> duplicateGroups = new ArrayList<>();
     List<String> errors = new ArrayList<>();
 
+
     for (GroupDto groupDto : groupDtos) {
         try {
             // Create a new group with the provided name and period
             Groups group = new Groups(groupDto.getName(), groupDto.getPeriod(), new ArrayList<>());
 
+
             // Save the group first to generate an ID
             Groups savedGroup = groupsRepository.save(group);
+
 
             // Add members by person UIDs
             for (String personUid : groupDto.getPersonUids()) {
@@ -217,13 +230,17 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
                 }
             }
 
+
             // Save the group again with all members added
             savedGroup = groupsRepository.save(savedGroup);
+
 
             // Force initialization of group members collection to avoid lazy loading issues
             savedGroup.getGroupMembers().size();
 
+
             createdGroups.add(groupDto.getName() + " (Period: " + groupDto.getPeriod() + ")");
+
 
         } catch (Exception e) {
             if (e.getMessage() != null && e.getMessage().toLowerCase().contains("duplicate")) {
@@ -235,14 +252,19 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
         }
     }
 
+
     // Prepare the response map
     Map<String, Object> response = new HashMap<>();
     response.put("created", createdGroups);
     response.put("duplicates", duplicateGroups);
     response.put("errors", errors);
 
+
     return new ResponseEntity<>(response, HttpStatus.OK);
 }
+
+
+
 
 
 
@@ -253,7 +275,7 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
     public ResponseEntity<List<Map<String, Object>>> bulkExtractGroups() {
         // Fetch all Groups entities from the database
         List<Groups> groups = groupsRepository.findAll();
-        
+       
         // Map Groups entities to Map objects
         List<Map<String, Object>> groupsList = new ArrayList<>();
         for (Groups group : groups) {
@@ -261,20 +283,21 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
             groupMap.put("id", group.getId());
             groupMap.put("name", group.getName());
             groupMap.put("period", group.getPeriod());
-            
+           
             // Extract basic info for each member
             List<Map<String, Object>> membersList = new ArrayList<>();
             for (Person person : group.getGroupMembers()) {
                 membersList.add(getPersonBasicInfo(person));
             }
             groupMap.put("members", membersList);
-            
+           
             groupsList.add(groupMap);
         }
-        
+       
         // Return the list of group maps
         return new ResponseEntity<>(groupsList, HttpStatus.OK);
     }
+
 
     /**
      * Add people to an existing group
@@ -285,7 +308,7 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
         Optional<Groups> optionalGroup = groupsRepository.findById(id);
         if (optionalGroup.isPresent()) {
             Groups group = optionalGroup.get();
-            
+           
             boolean changesDetected = false;
             for (Long personId : personIds) {
                 Optional<Person> optionalPerson = personRepository.findById(personId);
@@ -297,25 +320,26 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
                     }
                 }
             }
-            
+           
             // Only save if changes were made
             Groups updatedGroup = changesDetected ? groupsRepository.save(group) : group;
-            
+           
             // Return the group with its members
             Map<String, Object> response = new HashMap<>();
             response.put("id", updatedGroup.getId());
-            
+           
             List<Map<String, Object>> membersList = new ArrayList<>();
             for (Person person : updatedGroup.getGroupMembers()) {
                 membersList.add(getPersonBasicInfo(person));
             }
-            
+           
             response.put("members", membersList);
-            
+           
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
 
     /**
      * Remove people from a group
@@ -326,7 +350,7 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
         Optional<Groups> optionalGroup = groupsRepository.findById(id);
         if (optionalGroup.isPresent()) {
             Groups group = optionalGroup.get();
-            
+           
             boolean changesDetected = false;
             for (Long personId : personIds) {
                 Optional<Person> optionalPerson = personRepository.findById(personId);
@@ -338,12 +362,12 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
                     }
                 }
             }
-            
+           
             // Only save if changes were made
             if (changesDetected) {
                 // Save the group which will cascade the changes
                 Groups savedGroup = groupsRepository.save(group);
-                
+               
                 // Now save any persons that were removed from the group
                 for (Long personId : personIds) {
                     Optional<Person> optionalPerson = personRepository.findById(personId);
@@ -354,34 +378,35 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
                         }
                     }
                 }
-                
+               
                 Map<String, Object> response = new HashMap<>();
                 response.put("id", savedGroup.getId());
-                
+               
                 List<Map<String, Object>> membersList = new ArrayList<>();
                 for (Person person : savedGroup.getGroupMembers()) {
                     membersList.add(getPersonBasicInfo(person));
                 }
-                
+               
                 response.put("members", membersList);
-                
+               
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 Map<String, Object> response = new HashMap<>();
                 response.put("id", group.getId());
-                
+               
                 List<Map<String, Object>> membersList = new ArrayList<>();
                 for (Person person : group.getGroupMembers()) {
                     membersList.add(getPersonBasicInfo(person));
                 }
-                
+               
                 response.put("members", membersList);
-                
+               
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
 
     /**
      * Delete a group (but not its members)
@@ -392,27 +417,28 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
         Optional<Groups> optionalGroup = groupsRepository.findById(id);
         if (optionalGroup.isPresent()) {
             Groups group = optionalGroup.get();
-            
+           
             // Unlink all people from this group
             List<Person> members = new ArrayList<>(group.getGroupMembers());
             for (Person person : members) {
                 group.removePerson(person);
             }
-            
+           
             // Save group first to update all relationship changes
             groupsRepository.save(group);
-            
+           
             // Now save each person with their updated null group reference
             for (Person person : members) {
                 personRepository.save(person);
             }
-            
+           
             // Finally delete the group
             groupsRepository.deleteById(id);
             return new ResponseEntity<>("Group deleted successfully", HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
 
     /**
      * Update Group information
@@ -423,54 +449,55 @@ public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> group
         Optional<Groups> optionalGroup = groupsRepository.findById(id);
         if (optionalGroup.isPresent()) {
             Groups group = optionalGroup.get();
-            
+           
             // Update name and period
             group.setName(groupDto.getName());
             group.setPeriod(groupDto.getPeriod());
-            
+           
             // Save the updated group
             Groups updatedGroup = groupsRepository.save(group);
-            
+           
             // Prepare response
             Map<String, Object> response = new HashMap<>();
             response.put("id", updatedGroup.getId());
             response.put("name", updatedGroup.getName());
             response.put("period", updatedGroup.getPeriod());
-            
+           
             List<Map<String, Object>> membersList = new ArrayList<>();
             for (Person person : updatedGroup.getGroupMembers()) {
                 membersList.add(getPersonBasicInfo(person));
             }
             response.put("members", membersList);
-            
+           
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+
     /**
      * Find groups containing a specific person
      */
-    @GetMapping("/person/{personUid}")
+    @GetMapping("/person/{personId}")
     @Transactional(readOnly = true)
-    public ResponseEntity<List<Map<String, Object>>> getGroupsByPersonId(@PathVariable String personUid) {
-        List<Groups> groups = groupsRepository.findGroupsByPersonUid(personUid);
+    public ResponseEntity<List<Map<String, Object>>> getGroupsByPersonId(@PathVariable Long personId) {
+        List<Groups> groups = groupsRepository.findGroupsByPersonId(personId);
         List<Map<String, Object>> groupsWithMembers = new ArrayList<>();
-        
+       
         for (Groups group : groups) {
             Map<String, Object> groupMap = new HashMap<>();
             groupMap.put("id", group.getId());
-            
+           
             // Extract basic info from each person to avoid serialization issues
             List<Map<String, Object>> membersList = new ArrayList<>();
             for (Person person : group.getGroupMembers()) {
                 membersList.add(getPersonBasicInfo(person));
             }
-            
+           
             groupMap.put("members", membersList);
             groupsWithMembers.add(groupMap);
         }
-        
+       
         return new ResponseEntity<>(groupsWithMembers, HttpStatus.OK);
     }
 }
