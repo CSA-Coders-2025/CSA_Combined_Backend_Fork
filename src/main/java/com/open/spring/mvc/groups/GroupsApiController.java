@@ -38,11 +38,21 @@ public class GroupsApiController {
 
     // DTO for creating a new group
     @Getter
-    public static class GroupDto {
-        private List<String> personUids;
-        private String name;
-        private String period;
-    }
+        public static class GroupDto {
+            private List<String> personUids;
+            private String name;
+            private String period;
+
+            public List<String> getPersonUids() { return personUids; }
+            public void setPersonUids(List<String> personUids) { this.personUids = personUids; }
+
+            public String getName() { return name; }
+            public void setName(String name) { this.name = name; }
+
+            public String getPeriod() { return period; }
+            public void setPeriod(String period) { this.period = period; }
+        }
+
 
     /**
      * Extract basic info from a Person object to avoid circular references
@@ -114,44 +124,50 @@ public class GroupsApiController {
     /**
      * Create a new group with multiple people
      */
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
-    public ResponseEntity<Object> createGroup(@RequestBody GroupDto groupDto) {
-        try {
-            // Create a new group with the provided name and period
-            Groups group = new Groups(groupDto.getName(), groupDto.getPeriod(), new ArrayList<>());
+@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+@Transactional
+public ResponseEntity<Object> createGroup(@RequestBody GroupDto groupDto) {
+    try {
+        // Create a new group with the provided name and period
+        Groups group = new Groups(groupDto.getName(), groupDto.getPeriod(), new ArrayList<>());
 
-            // Save the group first to generate an ID
-            Groups savedGroup = groupsRepository.save(group);
-            
-            // Add members to the group
-            for (String personId : groupDto.getPersonUids()) {
-                Person person = personRepository.findByUid(personId);
+        // Save the group first to generate an ID
+        Groups savedGroup = groupsRepository.save(group);
+
+        // Add members to the group using personUids
+        if (groupDto.getPersonUids() != null) {
+            for (String personUid : groupDto.getPersonUids()) {
+                Person person = personRepository.findByUid(personUid);
                 if (person != null) {
                     savedGroup.addPerson(person);
+                } else {
+                    System.out.println("Warning: No person found with UID: " + personUid);
                 }
             }
-            
-            // Save the group again with all members
-            Groups finalGroup = groupsRepository.save(savedGroup);
-            
-            // Prepare response
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", finalGroup.getId());
-            response.put("name", finalGroup.getName());
-            response.put("period", finalGroup.getPeriod());
-            
-            List<Map<String, Object>> membersList = new ArrayList<>();
-            for (Person person : finalGroup.getGroupMembers()) {
-                membersList.add(getPersonBasicInfo(person));
-            }
-            response.put("members", membersList);
-            
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error creating group: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+
+        // Save the group again with all members
+        Groups finalGroup = groupsRepository.save(savedGroup);
+
+        // Prepare response
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", finalGroup.getId());
+        response.put("name", finalGroup.getName());
+        response.put("period", finalGroup.getPeriod());
+
+        List<Map<String, Object>> membersList = new ArrayList<>();
+        for (Person person : finalGroup.getGroupMembers()) {
+            membersList.add(getPersonBasicInfo(person));
+        }
+        response.put("members", membersList);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    } catch (Exception e) {
+        return new ResponseEntity<>("Error creating group: " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+}
+
+
 
 
     /**
@@ -161,41 +177,58 @@ public class GroupsApiController {
  * @return A ResponseEntity containing information about the created, duplicate, and error groups
  */
 @PostMapping("/bulk/create")
+@Transactional
 public ResponseEntity<Object> bulkCreateGroups(@RequestBody List<GroupDto> groupDtos) {
     List<String> createdGroups = new ArrayList<>();
     List<String> duplicateGroups = new ArrayList<>();
     List<String> errors = new ArrayList<>();
-    
+
     for (GroupDto groupDto : groupDtos) {
         try {
-            // Call the existing createGroup method
-            ResponseEntity<Object> response = createGroup(groupDto);
-            
-            // Check if the response is successful
-            if (response.getStatusCode() == HttpStatus.CREATED) {
-                createdGroups.add(groupDto.getName() + " (Period: " + groupDto.getPeriod() + ")");
-            } else {
-                errors.add("Failed to create group: " + groupDto.getName() + " (Period: " + groupDto.getPeriod() + ")");
+            // Create a new group with the provided name and period
+            Groups group = new Groups(groupDto.getName(), groupDto.getPeriod(), new ArrayList<>());
+
+            // Save the group first to generate an ID
+            Groups savedGroup = groupsRepository.save(group);
+
+            // Add members by person UIDs
+            for (String personUid : groupDto.getPersonUids()) {
+                Person person = personRepository.findByUid(personUid);
+                if (person != null) {
+                    savedGroup.addPerson(person);
+                } else {
+                    System.out.println("Warning: No person found with UID: " + personUid);
+                }
             }
+
+            // Save the group again with all members added
+            savedGroup = groupsRepository.save(savedGroup);
+
+            // Force initialization of group members collection to avoid lazy loading issues
+            savedGroup.getGroupMembers().size();
+
+            createdGroups.add(groupDto.getName() + " (Period: " + groupDto.getPeriod() + ")");
+
         } catch (Exception e) {
-            // Check for duplicates or other errors
-            if (e.getMessage() != null && e.getMessage().contains("duplicate")) {
+            if (e.getMessage() != null && e.getMessage().toLowerCase().contains("duplicate")) {
                 duplicateGroups.add(groupDto.getName() + " (Period: " + groupDto.getPeriod() + ")");
             } else {
-                errors.add("Exception occurred for group: " + groupDto.getName() 
-                    + " (Period: " + groupDto.getPeriod() + ") - " + e.getMessage());
+                errors.add("Exception occurred for group: " + groupDto.getName()
+                        + " (Period: " + groupDto.getPeriod() + ") - " + e.getMessage());
             }
         }
     }
-    
-    // Prepare the response
+
+    // Prepare the response map
     Map<String, Object> response = new HashMap<>();
     response.put("created", createdGroups);
     response.put("duplicates", duplicateGroups);
     response.put("errors", errors);
-    
+
     return new ResponseEntity<>(response, HttpStatus.OK);
 }
+
+
 
     /**
      * Bulk extract all groups with their members in a simplified format
