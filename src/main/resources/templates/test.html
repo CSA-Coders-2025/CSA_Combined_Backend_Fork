@@ -4,113 +4,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css">
     <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body class="bg-neutral-900">
-    
-    <!-- Search Input -->
-    <div class="mt-7 border rounded-xl shadow-2xs bg-neutral-900 border-neutral-700 max-w-md mx-auto">
-        <div class="p-4 sm:p-7">
-            <div class="text-center">
-                <h1 class="block text-2xl font-bold text-white">Signup</h1>
-                <p class="mt-2 text-sm text-neutral-400">
-                    Already have an account?
-                    <a class="decoration-2 hover:underline focus:outline-hidden focus:underline font-medium text-blue-500"
-                        th:href="@{/login}">
-                        Login here.
-                    </a>
-                </p>
-            </div>
-            <div class="mt-5">
-                <form class="grid gap-y-4" action="#" th:action="@{/mvc/person/create}" th:object="${person}" method="POST"
-                    onsubmit="validateForm(event)">
-                    <!-- github id input field -->
-                    <div>
-                        <label for="uid" class="block text-sm mb-2 text-white">GitHub ID</label>
-                        <div class="relative">
-                            <input type="text" th:field="*{uid}" id="uid" placeholder="GitHub ID"
-                                oninput="handleTyping()"
-                                class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600"
-                                style="margin-bottom: 0;">
-                        </div>
-                        <small th:if="${#fields.hasErrors('uid')}" th:errors="*{uid}" class="text-yellow-400 text-xs">GitHub
-                            ID Error</small>
-                    </div>
-                    <!-- email code input field (if verifying with email) -->
-                    <div id="feild0.5" style="display: none;">
-                        <label for="code" class="block text-sm mb-2 text-white">Verification Code</label>
-                        <input type="text" id="code" placeholder="enter email code" oninput="handleTyping2()"
-                            class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
-                    </div>
-                    <!-- display name input field -->
-                    <div id="feild1" style="display: none;">
-                        <label for="name" class="block text-sm mb-2 text-white">Username (Display Name)</label>
-                        <input type="text" th:field="*{name}" id="name" placeholder="display name"
-                            class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
-                        <small th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
-                            class="text-yellow-400 text-xs">Username Error</small>
-                    </div>
-                    <!-- email input field -->
-                    <div id="feild2" style="display: none;">
-                        <label for="email" class="block text-sm mb-2 text-white">Email Address</label>
-                        <input type="email" th:field="*{email}" id="email" placeholder="email address" required
-                            class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
-                        <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
-                            class="text-yellow-400 text-xs">Email Error</small>
-                    </div>
-                    <!-- password input field -->
-                    <div id="feild3" style="display: none;">
-                        <label for="password" class="block text-sm mb-2 text-white">Password</label>
-                        <input type="password" th:field="*{password}" id="password" placeholder="password"
-                            class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
-                        <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
-                            class="text-yellow-400 text-xs">Password Error</small>
-                    </div>
-                    <!-- confirm password input field -->
-                    <div id="feild4" style="display: none;">
-                        <label for="confirm_password" class="block text-sm mb-2 text-white">Confirm Password</label>
-                        <input type="password" id="confirm_password" placeholder="confirm password"
-                            class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
-                    </div>
-                    <!-- student id input field -->
-                    <div id="feild5" style="display: none;">
-                        <label for="sid" class="block text-sm mb-2 text-white">Student ID</label>
-                        <input type="number" th:field="*{sid}" id="sid" placeholder="student id"
-                            class="py-2.5 sm:py-3 px-4 block w-full rounded-lg sm:text-sm focus:border-blue-500 disabled:opacity-50 disabled:pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-400 placeholder-neutral-500 focus:ring-neutral-600">
-                        <small th:if="${#fields.hasErrors('sid')}" th:errors="*{sid}"
-                            class="text-yellow-400 text-xs">Student ID Error</small>
-                    </div>
-                    <!-- kasm server needed checkbox -->
-                    <div id="feild7" style="display: none;">
-                        <label for="kasmServerNeeded" class="block text-sm mb-2 text-white">Request a Kasm Server</label>
-                        <input type="checkbox" th:field="*{kasmServerNeeded}" id="kasmServerNeeded"
-                            class="mr-2 accent-blue-500">
-                        <small th:if="${#fields.hasErrors('kasmServerNeeded')}" th:errors="*{ksm}"
-                            class="text-yellow-400 text-xs">Kasm server request error</small>
-                    </div>
-                    <!-- verify account button -->
-                    <button id="verifyButton" onclick="attemptVerify()" type="button"
-                        class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                        Verify Account
-                    </button>
-                    <!-- create account button -->
-                    <button type="submit"
-                        class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-                        id="feild8" style="display: none;">
-                        Create Account
-                    </button>
-                    <!-- log in button aligned to the right -->
-                    <div class="text-right mt-2">
-                        <a th:href="@{/login}"
-                            class="decoration-2 hover:underline focus:outline-hidden focus:underline font-medium text-blue-500">Login</a>
-                    </div>
 
-                    
-                </form>
+    <div class="m-1 hs-dropdown [--trigger:hover] relative inline-flex">
+        <button id="hs-dropdown-hover-event" type="button"
+            class="hs-dropdown-toggle py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg borde shadow-2xs focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none 
+            bg-neutral-800 border-neutral-700 text-white hover:bg-neutral-700 focus:bg-neutral-700"
+            aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+            Actions
+            <svg class="hs-dropdown-open:rotate-180 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="m6 9 6 6 6-6" />
+            </svg>
+        </button>
+
+        <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 shadow-md rounded-lg mt-2 bg-neutral-800 border border-neutral-700 divide-neutral-700 after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full before:h-4 before:absolute before:-top-4 before:start-0 before:w-full"
+            role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-hover-event">
+            <div class="p-1 space-y-0.5">
+                <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm focus:outline-hidden text-neutral-400 hover:bg-neutral-700 hover:text-neutral-300 focus:bg-neutral-700"
+                    href="#">
+                    Newsletter
+                </a>
+                <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm focus:outline-hidden text-neutral-400 hover:bg-neutral-700 hover:text-neutral-300 focus:bg-neutral-700"
+                    href="#">
+                    Purchases
+                </a>
+                <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm focus:outline-hidden text-neutral-400 hover:bg-neutral-700 hover:text-neutral-300 focus:bg-neutral-700"
+                    href="#">
+                    Downloads
+                </a>
+                <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm focus:outline-hidden text-neutral-400 hover:bg-neutral-700 hover:text-neutral-300 focus:bg-neutral-700"
+                    href="#">
+                    Team Account
+                </a>
             </div>
         </div>
     </div>
-    <!-- End Search Input -->
+
+    <!-- add preline js for dropdowns to work -->
+    <script src="https://unpkg.com/preline@latest/dist/preline.js"></script>
 </body>
 
 </html>
