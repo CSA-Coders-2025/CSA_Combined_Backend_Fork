@@ -538,7 +538,7 @@ public void simulateStockValueChange(String username, List<UserStockInfo> stocks
 
         try {
             // Fetch price 5 years ago (initial purchase price)
-            String apiUrl = "https://nitdpython.stu.nighthawkcoding.com/api/stocks/price_five_years_ago/" + stockSymbol;
+            String apiUrl = "https://nitdpython.stu.nighthawkcodingsociety.com/api/stocks/price_five_years_ago/" + stockSymbol;
             ResponseEntity<String> oldPriceResponse = restTemplate.getForEntity(apiUrl, String.class);
 
             if (oldPriceResponse.getStatusCode() == HttpStatus.OK) {
