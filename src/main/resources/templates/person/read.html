@@ -11,17 +11,9 @@
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            transition: transform 0.3s ease;
             opacity: 1;
             transform-origin: bottom center;
             /* Set anchor point to bottom center */
-        }
-
-        /* Enlarges the profile picture when hovered */
-        .profile-picture-container:hover img {
-            transform: scale(2);
-            /* Enlarges the image */
-            opacity: 1;
         }
     </style>
 </th:block>
@@ -36,21 +28,21 @@
 
         <!-- Column visibility toggle buttons -->
         <div class="d-flex flex-wrap mb-3">
-            <button class="btn btn-secondary toggle-column active" data-column="0">ID#</button>
-            <button class="btn btn-secondary toggle-column active" data-column="1">UID</button>
-            <button class="btn btn-secondary toggle-column active" data-column="2">Name</button>
-            <button class="btn btn-secondary toggle-column inactive" data-column="3">Email</button>
-            <button class="btn btn-secondary toggle-column inactive" data-column="4">KSM</button>
-            <button class="btn btn-secondary toggle-column active" data-column="5">PFP</button>
-            <button class="btn btn-secondary toggle-column inactive" data-column="6">SID</button>
-            <button class="btn btn-secondary toggle-column active" data-column="7">Action</button>
-            <button class="btn btn-secondary toggle-column inactive" data-column="8">Import/Export</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-secondary toggle-column active" data-column="0">ID#</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-secondary toggle-column active" data-column="1">UID</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-secondary toggle-column active" data-column="2">Name</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-secondary toggle-column inactive" data-column="3">Email</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-secondary toggle-column inactive" data-column="4">KSM</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-secondary toggle-column active" data-column="5">PFP</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-secondary toggle-column inactive" data-column="6">SID</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-secondary toggle-column active" data-column="7">Action</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-secondary toggle-column inactive" data-column="8">Import/Export</button>
         </div>
         <br>
 
         <div sec:authorize="hasRole('ROLE_ADMIN')">
-            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#exportCollaspe" aria-expanded="false" aria-controls="exportCollaspe">export mass users</button>
-            <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#importCollaspe" aria-expanded="false" aria-controls="importCollaspe">import mass users</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#exportCollaspe" aria-expanded="false" aria-controls="exportCollaspe">Export Users</button>
+            <button class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#importCollaspe" aria-expanded="false" aria-controls="importCollaspe">Import Users</button>
             <br>
             <div class="collapse" id="exportCollaspe">
                 <div class="card card-body bg-success border-muted">
@@ -127,13 +119,13 @@
                         </td>
                         <td th:text="${person.sid}">Student ID</td>
                         <td>
-                            <a th:href="@{/mvc/person/update/{id}(id = ${person.id})}" class="btn btn-warning btn-sm"
+                            <a th:href="@{/mvc/person/update/{id}(id = ${person.id})}" class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-warning"
                                 name="update">Update</a>
                             <a sec:authorize="hasRole('ROLE_ADMIN')"
                                 th:href="@{/mvc/person/update/roles/{id}(id = ${person.id})}"
-                                class="btn btn-warning btn-sm" name="update">Update Roles</a>
+                                class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-warning" name="update">Update Roles</a>
                             <a th:href="@{/mvc/person/delete/{id}(id = ${person.id})}"
-                                class="btn btn-danger btn-sm">Delete</a>
+                                class="py-2 px-4 mr-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent text-white btn btn-danger">Delete</a>
                         </td>
                         <td>
                             <button>Import</button>
