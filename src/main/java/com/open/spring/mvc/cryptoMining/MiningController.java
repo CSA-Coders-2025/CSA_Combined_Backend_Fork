@@ -274,7 +274,7 @@ public class MiningController {
 
             // Deduct total GPU price from balance
             double newBalance = currentBalance - gpu.getPrice() * quantity;
-            bank.setBalance(newBalance, "cryptomining");
+            bank.setBalance(newBalance);
             personRepository.save(person);
             bankRepository.save(bank);
 
@@ -775,7 +775,7 @@ public class MiningController {
             Bank bank = bankRepository.findByUid(uid);
             double currentBalance = bank.getBalance();
             double newBalance = currentBalance - gpu.getPrice() * quantityToSell;
-            bank.setBalance(currentBalance + sellPrice, "cryptomining");
+            bank.setBalance(currentBalance + sellPrice);
             personRepository.save(person);
             bankRepository.save(bank);
 
@@ -838,7 +838,7 @@ public class MiningController {
             Bank bank = bankRepository.findByUid(uid);
             double currentBalance = bank.getBalance();
             double newBalance = currentBalance + totalSellPrice;
-            bank.setBalance(newBalance, "cryptomining");
+            bank.setBalance(newBalance);
             personRepository.save(person);
 
             // Save changes
