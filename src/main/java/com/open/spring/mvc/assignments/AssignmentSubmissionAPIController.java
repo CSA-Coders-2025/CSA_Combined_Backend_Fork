@@ -65,23 +65,10 @@ public class AssignmentSubmissionAPIController {
 
     @Autowired
     private SynergyGradeJpaRepository gradesRepo;
-
-    @Getter
-    @Setter
-    public static class PersonSubmissionDto {
-        public Long id;
-        public String name;
-        public String email;
-        public String uid;
-
-        public PersonSubmissionDto(Person person) {
-            this.id = person.getId();
-            this.name = person.getName();
-            this.email = person.getEmail();
-            this.uid = person.getUid();
-        }
-    }
     
+    /**
+     * A DTO class for returning only necessary assignment submission details.
+     */
     @Getter
     @Setter
     public static class AssignmentReturnDto {
@@ -128,6 +115,9 @@ public class AssignmentSubmissionAPIController {
         return ResponseEntity.ok(dtos);
     }
 
+    /**
+     * A DTO class with the format for the JSON when submitting assignments.
+     */
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
@@ -153,7 +143,7 @@ public class AssignmentSubmissionAPIController {
         @RequestBody SubmitAssignmentDto submissionInfo
     ) {
         Assignment assignment = assignmentRepo.findById(assignmentId).orElse(null);
-
+        
         // TODO: A better way to do this would be to have this be part of some sort of SubmitterService
         Submitter submitter;
         if (submissionInfo.isGroup) {
@@ -167,11 +157,11 @@ public class AssignmentSubmissionAPIController {
             error.put("error", "Submitter not found");
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
-
+        
         if (assignment != null) {
             AssignmentSubmission submission = new AssignmentSubmission(assignment, submitter, submissionInfo.content, submissionInfo.comment, submissionInfo.isLate);
             AssignmentSubmission savedSubmission = submissionRepo.save(submission);
-            return new ResponseEntity<>(savedSubmission, HttpStatus.CREATED);
+            return new ResponseEntity<>(new AssignmentSubmissionReturnDto(savedSubmission), HttpStatus.CREATED);
         }
         Map<String, String> error = new HashMap<>();
         error.put("error", "Assignment not found");
@@ -308,6 +298,12 @@ public class AssignmentSubmissionAPIController {
         return new ResponseEntity<>(submissionsReturn, HttpStatus.OK);
     }
 
+    /**
+     * Assign persons as graders to a specific submission.
+     * @param id the ID of the submission to which graders are being assigned
+     * @param personIds a list of person IDs to be assigned as graders
+     * @return a ResponseEntity indicating success or failure
+     */
     @PostMapping("/{id}/assigned-graders")
     public ResponseEntity<?> assignGradersToSubmission(@PathVariable Long id, @RequestBody List<Long> personIds) {
         Optional<AssignmentSubmission> submissionOptional = submissionRepo.findById(id);
@@ -324,6 +320,12 @@ public class AssignmentSubmissionAPIController {
         return ResponseEntity.ok("Persons assigned successfully");
     }
 
+    /**
+     * Get the IDs of persons assigned as graders for a specific submission.
+     * 
+     * @param id the ID of the submission whose assigned graders are to be fetched
+     * @return a ResponseEntity containing a list of assigned grader IDs or an error if the submission is not found
+     */
     @GetMapping("/{id}/assigned-graders")
     public ResponseEntity<?> getAssignedGraders(@PathVariable Long id) {
         Optional<AssignmentSubmission> submissionOptional = submissionRepo.findById(id);
