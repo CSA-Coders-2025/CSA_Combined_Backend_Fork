@@ -29,7 +29,7 @@ import lombok.Setter;
 @Entity // Marks this class as a JPA entity (mapped to a database table)
 @Getter // Lombok annotation to generate getters
 @Setter // Lombok annotation to generate setters
-public class userStocksTable {
+public class UserStocksTable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id; // Primary key for the userStocksTable entity
@@ -63,7 +63,7 @@ public class userStocksTable {
     private String cryptoHistory; // Stores all crypto purchase histories
 
     // Constructor for initializing a userStocksTable object
-    public userStocksTable(String stonks, String crypto, String email, Person person, boolean hasSimulated, boolean period1, String cryptoHistory) {
+    public UserStocksTable(String stonks, String crypto, String email, Person person, boolean hasSimulated, boolean period1, String cryptoHistory) {
         this.person_name = person.getName();
         this.stonks = stonks;
         this.crypto = crypto;
@@ -75,13 +75,13 @@ public class userStocksTable {
     }
 
     // Method to initialize an array of userStocksTable objects for a list of Person entities
-    public static userStocksTable[] init(Person[] persons) {
+    public static UserStocksTable[] init(Person[] persons) {
 
-        ArrayList<userStocksTable> stocks = new ArrayList<>();
+        ArrayList<UserStocksTable> stocks = new ArrayList<>();
         for (Person person : persons) {
-            stocks.add(new userStocksTable("AAPL,TSLA,AMZN", "BTC,ETH", person.getEmail(), person, false, true, ""));
+            stocks.add(new UserStocksTable("AAPL,TSLA,AMZN", "BTC,ETH", person.getEmail(), person, false, true, ""));
         }
-        return stocks.toArray(new userStocksTable[0]);
+        return stocks.toArray(new UserStocksTable[0]);
     }
 
     @PreUpdate

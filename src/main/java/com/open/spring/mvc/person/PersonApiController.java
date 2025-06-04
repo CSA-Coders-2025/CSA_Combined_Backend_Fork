@@ -31,7 +31,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.open.spring.mvc.userStocks.UserStocksRepository;
-import com.open.spring.mvc.userStocks.userStocksTable;
+import com.open.spring.mvc.userStocks.UserStocksTable;
 
 import jakarta.transaction.Transactional;
 import lombok.Getter;

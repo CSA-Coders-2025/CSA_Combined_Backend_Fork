@@ -32,7 +32,7 @@ import com.open.spring.mvc.groups.Groups;
 import com.open.spring.mvc.groups.Submitter;
 import com.open.spring.mvc.synergy.SynergyGrade;
 import com.open.spring.mvc.trains.TrainCompany;
-import com.open.spring.mvc.userStocks.userStocksTable;
+import com.open.spring.mvc.userStocks.UserStocksTable;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.FetchType;
@@ -186,7 +186,7 @@ public class Person extends Submitter implements Comparable<Person> {
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "person")
     @JsonIgnore
-    private userStocksTable user_stocks;
+    private UserStocksTable user_stocks;
 
 
     @ManyToMany(mappedBy = "groupMembers")
@@ -413,7 +413,7 @@ public class Person extends Submitter implements Comparable<Person> {
             
             
             // Create userStocksTable and set the one-to-one relationship
-            userStocksTable stock = new userStocksTable(
+            UserStocksTable stock = new UserStocksTable(
                 null,
                 (String) data.get("stocks"),
                 person.getEmail(),

@@ -44,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap; // use this instead of HashMap if
 // http://127.0.0.1:8585/stocks/table/addStock
 @Controller
 @RequestMapping("/stocks/table")
-public class userStocksTableApiController {
+public class UserStocksTableApiController {
 
     // Injecting the service that handles the core logic for stock management
     @Autowired
@@ -248,7 +248,7 @@ private BankJpaRepository bankJpaRepository;
      */
     @Override
     public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        userStocksTable user = userRepository.findByEmail(username);
+        UserStocksTable user = userRepository.findByEmail(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
@@ -329,7 +329,7 @@ private BankJpaRepository bankJpaRepository;
      * @return Total value of the portfolio.
      */
     public double calculatePortfolioValue(String username) {
-        userStocksTable user = userRepository.findByEmail(username);
+        UserStocksTable user = userRepository.findByEmail(username);
                 if (user == null) {
                     throw new RuntimeException("User not found");
                 }
@@ -359,7 +359,7 @@ private BankJpaRepository bankJpaRepository;
      * @param stockSymbol The symbol of the stock to add.
      */
     public void addStock(String username, int quantity, String stockSymbol) {
-        userStocksTable user = userRepository.findByEmail(username);
+        UserStocksTable user = userRepository.findByEmail(username);
                 if (user == null) {
                     throw new RuntimeException("User not found");
                 }
@@ -425,7 +425,7 @@ private BankJpaRepository bankJpaRepository;
      * @param stockSymbol The symbol of the stock to remove.
      */
     public void removeStock(String username, int quantity, String stockSymbol) {
-        userStocksTable user = userRepository.findByEmail(username);
+        UserStocksTable user = userRepository.findByEmail(username);
         if (user == null) {
             throw new RuntimeException("User not found");
         }
@@ -490,7 +490,7 @@ private BankJpaRepository bankJpaRepository;
      * @return A list of UserStockInfo.
      */
     public List<UserStockInfo> getUserStocks(String username) {
-        userStocksTable user = userRepository.findByEmail(username);
+        UserStocksTable user = userRepository.findByEmail(username);
         if (user == null) {
             throw new RuntimeException("User not found");
         }
@@ -516,7 +516,7 @@ private BankJpaRepository bankJpaRepository;
  */
 public void simulateStockValueChange(String username, List<UserStockInfo> stocks) {
     // Force fetch the latest user data to avoid caching issues
-    userStocksTable user = userRepository.findByEmail(username);
+    UserStocksTable user = userRepository.findByEmail(username);
     if (user == null) {
         throw new RuntimeException("User not found");
     }
@@ -538,7 +538,7 @@ public void simulateStockValueChange(String username, List<UserStockInfo> stocks
 
         try {
             // Fetch price 5 years ago (initial purchase price)
-            String apiUrl = "https://nitdpython.stu.opencodingsociety.com/api/stocks/price_five_years_ago/" + stockSymbol;
+            String apiUrl = "https://nitdpython.stu.nighthawkcodingsociety.com/api/stocks/price_five_years_ago/" + stockSymbol;
             ResponseEntity<String> oldPriceResponse = restTemplate.getForEntity(apiUrl, String.class);
 
             if (oldPriceResponse.getStatusCode() == HttpStatus.OK) {

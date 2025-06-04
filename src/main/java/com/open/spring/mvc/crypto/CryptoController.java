@@ -18,7 +18,7 @@ import com.open.spring.mvc.bank.BankJpaRepository;
 import com.open.spring.mvc.person.Person;
 import com.open.spring.mvc.person.PersonJpaRepository;
 import com.open.spring.mvc.userStocks.UserStocksRepository;
-import com.open.spring.mvc.userStocks.userStocksTable;
+import com.open.spring.mvc.userStocks.UserStocksTable;
 
 @RestController
 
@@ -43,7 +43,7 @@ public class CryptoController {
 
     @GetMapping("/balance")
     public ResponseEntity<?> getUserBalance(@RequestParam String email) {
-        userStocksTable userStocks = userStocksRepo.findByEmail(email);
+        UserStocksTable userStocks = userStocksRepo.findByEmail(email);
     
         if (userStocks == null) {
             return ResponseEntity.status(404).body("User balance not found for email: " + email);
@@ -54,7 +54,7 @@ public class CryptoController {
     
     @GetMapping("/balanceById")
     public ResponseEntity<?> getUserBalanceById(@RequestParam Long id) {
-        userStocksTable userStocks = userStocksRepo.findById(id).orElse(null);
+        UserStocksTable userStocks = userStocksRepo.findById(id).orElse(null);
 
         if (userStocks == null) {
             return ResponseEntity.status(404).body("User balance not found for ID: " + id);
@@ -139,9 +139,9 @@ public class CryptoController {
         double updatedBalance = bank.getBalance() - usdAmount;
         bank.setBalance(updatedBalance, "crypto");
     
-        userStocksTable userStocks = person.getUser_stocks();
+        UserStocksTable userStocks = person.getUser_stocks();
         if (userStocks == null) {
-            userStocks = new userStocksTable("", selectedCrypto.getSymbol() + ":" + cryptoAmount, person.getEmail(), person, false, true, "");
+            userStocks = new UserStocksTable("", selectedCrypto.getSymbol() + ":" + cryptoAmount, person.getEmail(), person, false, true, "");
         } else {
             String updatedCrypto = addOrUpdateCryptoHoldings(userStocks.getCrypto(), selectedCrypto.getSymbol(), cryptoAmount);
             userStocks.setCrypto(updatedCrypto);
@@ -187,7 +187,7 @@ public class CryptoController {
 
     @GetMapping("/holdings")
     public ResponseEntity<?> getUserHoldings(@RequestParam String email) {
-        userStocksTable userStocks = userStocksRepo.findByEmail(email);
+        UserStocksTable userStocks = userStocksRepo.findByEmail(email);
 
         if (userStocks == null || userStocks.getCrypto() == null || userStocks.getCrypto().isEmpty()) {
             return ResponseEntity.status(404).body("No crypto holdings found for email: " + email);
@@ -234,7 +234,7 @@ public class CryptoController {
         double cryptoPrice = selectedCrypto.getPrice();
     
         // Fetch and update crypto holdings
-        userStocksTable userStocks = person.getUser_stocks();
+        UserStocksTable userStocks = person.getUser_stocks();
         if (userStocks == null || userStocks.getCrypto() == null || userStocks.getCrypto().isEmpty()) {
             return ResponseEntity.badRequest().body("No crypto holdings found to sell.");
         }
@@ -265,7 +265,7 @@ public class CryptoController {
     }
     @GetMapping("/history")
     public ResponseEntity<?> getCryptoTransactionHistory(@RequestParam String email) {
-    userStocksTable userStocks = userStocksRepo.findByEmail(email);
+    UserStocksTable userStocks = userStocksRepo.findByEmail(email);
     
     if (userStocks == null || userStocks.getCryptoHistory() == null || userStocks.getCryptoHistory().isEmpty()) {
         return ResponseEntity.status(404).body("No transaction history found for email: " + email);
